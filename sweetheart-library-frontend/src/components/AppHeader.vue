@@ -71,7 +71,7 @@
                 </div>
               </li>
               <li><hr class="dropdown-divider"></li>
-
+              <li v-if="authStore.isUser"><router-link class="dropdown-item" to="/feedback">Send Feedback</router-link></li>
               <li v-if="authStore.isUser">
                 <router-link class="dropdown-item" to="/dashboard">Dashboard</router-link>
               </li>
@@ -83,6 +83,9 @@
               </li>
               <li v-if="authStore.isAdmin">
                 <router-link class="dropdown-item" to="/admin">Admin Dashboard</router-link>
+              </li>
+              <li v-if="authStore.isAdmin">
+                <router-link class="dropdown-item" to="/admin/feedback">View Feedback</router-link>
               </li>
 
               <li><hr class="dropdown-divider"></li>

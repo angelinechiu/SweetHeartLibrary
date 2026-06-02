@@ -79,7 +79,17 @@ const routes = [
     name: 'Events',
     component: () => import('../views/EventsView.vue')
   },
-
+  {
+    path: '/feedback',
+    name: 'Feedback',
+    component: () => import('../views/FeedbackView.vue')
+  },
+  {
+    path: '/admin/feedback',
+    name: 'AdminFeedback',
+    component: () => import('../views/AdminFeedbackView.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
   // Admin Route
   {
     path: '/admin',
