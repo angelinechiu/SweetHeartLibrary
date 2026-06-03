@@ -15,6 +15,12 @@
                 <div class="mb-4">
                   <input v-model="form.password" type="password" class="form-control form-control-lg" placeholder="Password" required>
                 </div>
+                <!-- Add this inside the form in RegisterView.vue -->
+                <div class="mb-3 text-end">
+                  <router-link to="/forgot-password" style="color: #E8B4B8; font-size: 0.9rem; text-decoration: none;">
+                    Forgot your password?
+                  </router-link>
+                </div>
 
                 <button type="submit" class="btn btn-pink btn-lg w-100" :disabled="loading">
                   Login

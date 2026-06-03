@@ -8,24 +8,32 @@
               <h2 class="text-center fw-bold mb-4" style="color: #2C2C2C;">Reset Your Password</h2>
 
               <div v-if="success" class="alert alert-success text-center">
-                <p>Password has been reset successfully!</p>
-                <router-link to="/login" class="btn btn-pink mt-2">Login Now</router-link>
+                <h5 class="mb-3">Password Reset Successful!</h5>
+                <p>You can now login with your new password.</p>
+                <router-link to="/login" class="btn btn-pink mt-2 px-4">
+                  Go to Login
+                </router-link>
               </div>
 
               <form v-else @submit.prevent="resetPassword">
                 <div class="mb-3">
-                  <label class="form-label">New Password</label>
+                  <label class="form-label fw-medium">New Password</label>
                   <input v-model="form.password" type="password" class="form-control" required minlength="6">
+                  <small class="text-muted">Minimum 6 characters</small>
                 </div>
                 <div class="mb-4">
-                  <label class="form-label">Confirm New Password</label>
+                  <label class="form-label fw-medium">Confirm New Password</label>
                   <input v-model="form.confirm_password" type="password" class="form-control" required>
                 </div>
 
                 <button type="submit" class="btn btn-pink btn-lg w-100" :disabled="loading">
-                  {{ loading ? 'Resetting...' : 'Reset Password' }}
+                  {{ loading ? 'Resetting Password...' : 'Reset Password' }}
                 </button>
               </form>
+
+              <p class="text-center mt-4">
+                <router-link to="/login" style="color: #E8B4B8;">Back to Login</router-link>
+              </p>
             </div>
           </div>
         </div>
@@ -53,12 +61,16 @@ const token = ref('')
 onMounted(() => {
   token.value = route.query.token
   if (!token.value) {
-    alert('Invalid reset link')
+    alert('Invalid or missing reset token')
     router.push('/forgot-password')
   }
 })
 
 const resetPassword = async () => {
+  if (form.value.password.length < 6) {
+    alert('Password must be at least 6 characters')
+    return
+  }
   if (form.value.password !== form.value.confirm_password) {
     alert('Passwords do not match!')
     return
@@ -73,12 +85,16 @@ const resetPassword = async () => {
 
     if (res.data.success) {
       success.value = true
+      // Auto redirect to login after 3 seconds
+      setTimeout(() => {
+        router.push('/login')
+      }, 3000)
     } else {
-      alert(res.data.message || 'Failed to reset password')
+      alert(res.data.message || 'Failed to reset password. The link may have expired.')
     }
   } catch (error) {
     console.error('Reset password error:', error)
-    alert('Something went wrong. The link may have expired.')
+    alert('Something went wrong. Please try again.')
   } finally {
     loading.value = false
   }
