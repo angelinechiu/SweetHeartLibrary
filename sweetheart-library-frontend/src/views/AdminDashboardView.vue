@@ -133,7 +133,13 @@
                   </thead>
                   <tbody>
                     <tr v-for="book in books" :key="book.id">
-                      <!-- ... table data ... -->
+                      <td>{{ book.title }}</td>
+                      <td>{{ book.author }}</td>
+                      <td>{{ book.isbn }}</td>
+                      <td>{{ book.category }}</td>
+                      <td>{{ book.publication_year }}</td>
+                      <td>{{ book.copies }}</td>
+                      <td>{{ book.availability_status }}</td>
                       <td class="text-end pe-4">
                         <!-- UPDATED: Colored Box Buttons -->
                         <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditBook(book)">
