@@ -275,6 +275,7 @@
                 <thead>
                   <tr>
                     <th>Event Title</th>
+                    <th>Description</th>
                     <th>Date</th>
                     <th>Time</th>
                     <th class="text-end pe-4">Actions</th>
@@ -282,13 +283,11 @@
                 </thead>
                 <tbody>
                   <tr v-for="event in events" :key="event.id">
-                    <td>
-                      <div class="fw-semibold">{{ event.title }}</div>
-                      <small class="text-muted">{{ event.description }}</small>
-                    </td>
-                    <td>{{ event.event_date }}</td>
-                    <td>{{ event.event_time }}</td>
-                    <td class="text-end pe-4">
+                    <td class="align-middle fw-semibold">{{ event.title }}</td>
+                    <td class="align-middle text-muted">{{ event.description || 'No description provided' }}</td>
+                    <td class="align-middle">{{ event.event_date }}</td>
+                    <td class="align-middle">{{ event.event_time }}</td>
+                    <td class="text-end pe-4 align-middle">
                       <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditEvent(event)">
                         <i class="bi bi-pencil-square me-1"></i> Edit
                       </button>
@@ -305,43 +304,117 @@
       </div>
     </div>
 
-    <!-- ==================== BOOKINGS MANAGEMENT ==================== -->
-    <div v-if="activeTab === 'bookings'" class="tab-pane">
-      <div class="card elegant-card">
-        <div class="card-header elegant-card-header d-flex justify-content-between align-items-center">
-          <h5 class="mb-0"><i class="bi bi-calendar-check-fill me-2"></i>Active Book Borrowings</h5>
-          <span class="badge bg-light text-dark px-3 py-2">{{ activeBorrowings.length }} active</span>
-        </div>
-        <div class="card-body p-0">
-          <table class="table table-hover mb-0">
+    <!-- ==================== BOOKINGS (New Section) ==================== -->
+<div v-if="activeTab === 'bookings'" class="tab-pane">
+  <h4 class="mb-4 fw-bold">Booking Management</h4>
+
+  <!-- Sub Tabs: Borrowed Books vs Room Bookings -->
+  <ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+      <button class="nav-link" :class="{ active: bookingSubTab === 'books' }"
+              @click="bookingSubTab = 'books'">
+        Borrowed Books
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" :class="{ active: bookingSubTab === 'rooms' }"
+              @click="bookingSubTab = 'rooms'">
+        Room Bookings
+      </button>
+    </li>
+  </ul>
+
+  <!-- ==================== BORROWED BOOKS ==================== -->
+  <div v-if="bookingSubTab === 'books'">
+    <div class="card elegant-card">
+      <div class="card-header elegant-card-header">
+        <h5 class="mb-0"><i class="bi bi-book me-2"></i>Borrowed Books</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
             <thead>
               <tr>
-                <th>Book</th>
                 <th>User</th>
-                <th>Borrowed Date</th>
+                <th>Book Title</th>
+                <th>Author</th>
+                <th>Borrow Date</th>
                 <th>Due Date</th>
                 <th>Status</th>
-                <th class="text-end pe-4">Actions</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="b in activeBorrowings" :key="b.id">
-                <td class="fw-semibold">{{ b.book_title }}</td>
-                <td>{{ b.user_name }}</td>
-                <td>{{ b.borrowed_date }}</td>
-                <td>{{ b.due_date }}</td>
-                <td><span class="badge bg-warning text-dark">{{ b.status }}</span></td>
-                <td class="text-end pe-4">
-                  <button class="btn btn-sm action-btn notify-btn me-2" @click="sendNotification(b)">
-                    <i class="bi bi-bell me-1"></i> Notify
-                  </button>
-                  <button class="btn btn-sm action-btn success-btn" @click="markAsReturned(b)">
-                    <i class="bi bi-check2-circle me-1"></i> Returned
+              <tr v-for="booking in activeBorrowings" :key="booking.id">
+                <td>{{ booking.user_name }}</td>
+                <td>{{ booking.book_title }}</td>
+                <td><strong>{{ booking.author }}</strong></td>
+                <td>{{ formatDate(booking.borrow_date) }}</td>
+                <td>{{ formatDate(booking.due_date) }}</td>
+                <td>
+                  <span :class="getBookingStatusClass(booking.status)">
+                    {{ booking.status }}
+                  </span>
+                </td>
+                <td>
+                  <button
+                    class="btn btn-sm btn-warning"
+                    :disabled="booking.status !== 'Overdue' && !booking.has_penalty"
+                    @click="sendReminder(booking)">
+                    Send Reminder
                   </button>
                 </td>
               </tr>
             </tbody>
           </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== ROOM BOOKINGS ==================== -->
+  <div v-if="bookingSubTab === 'rooms'">
+      <div class="card elegant-card">
+        <div class="card-header elegant-card-header">
+          <h5 class="mb-0"><i class="bi bi-door-open me-2"></i>Active Room Bookings</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Room</th>
+                  <th>Booking Time</th>
+                  <th>End Time</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="booking in roomBookings" :key="booking.id">
+                  <td>{{ booking.user_name }}</td>
+                  <td>{{ booking.room_name }}</td>
+                  <td>{{ formatDateTime(booking.start_time) }}</td>
+                  <td>{{ formatDateTime(booking.end_time) }}</td>
+                  <td>
+                    <span :class="getBookingStatusClass(booking.status)">
+                      {{ booking.status }}
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      v-if="canMarkRoomAvailable(booking)"
+                      class="btn btn-sm btn-success"
+                      @click="markRoomAvailable(booking)">
+                      Mark as Available
+                    </button>
+                    <span v-else class="text-muted small">Active</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -393,11 +466,13 @@
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import api from '../services/api.js'
+import axios from 'axios'
 
 const activeTab = ref('books')
 
@@ -412,7 +487,6 @@ const tabs = [
 const books = ref([])
 const rooms = ref([])
 const events = ref([])
-const activeBorrowings = ref([])
 const users = ref([])
 const selectedUser = ref(null)
 const showUserModal = ref(false)
@@ -533,23 +607,98 @@ const deleteEvent = async (id) => {
 }
 
 // ==================== BOOKINGS ====================
-const sendNotification = (borrowing) => {
-  const message = prompt(`Send message to ${borrowing.user_name}:`)
-  if (message) alert(`Notification sent to ${borrowing.user_email}:\n\n${message}`)
+const bookingSubTab = ref('books')
+const activeBorrowings = ref([])   // Borrowed Books
+const roomBookings = ref([])       // Room Bookings
+
+const API_BASE = 'http://localhost/sweetheart-library-backend/api/' // ← Change if needed
+
+// ==================== FETCH FUNCTIONS ====================
+const fetchBookings = async () => {
+  try {
+    const res = await axios.get(API_BASE + 'bookings.php?action=get')
+    console.log('fetchBookings response:', res)
+    if (res && res.data && res.data.success) {
+      activeBorrowings.value = res.data.borrowed_books || []
+      roomBookings.value = res.data.room_bookings || []
+    } else {
+      console.warn('Bookings API returned no success flag', res && res.data)
+    }
+  } catch (error) {
+    console.error('Failed to fetch bookings:', error)
+    alert('Failed to load booking data')
+  }
 }
 
-const markAsReturned = async (borrowing) => {
-  if (!confirm(`Mark "${borrowing.book_title}" as returned?`)) return
+// ==================== ACTION FUNCTIONS ====================
+const sendReminder = async (booking) => {
+  if (!booking?.id) return alert('Booking ID is missing')
+  if (!confirm(`Send reminder to ${booking.user_name} for "${booking.book_title}"?`)) return
 
-  await api.post('/books.php', {
-    id: borrowing.book_id,
-    availability_status: 'Available'
-  })
-  activeBorrowings.value = activeBorrowings.value.filter(b => b.id !== borrowing.id)
-  loadAllData()
-  alert('Book marked as returned and is now available.')
+  try {
+    const res = await axios.post(API_BASE + 'bookings.php?action=send_reminder', {
+      booking_id: booking.id
+    })
+    console.log('sendReminder response', res.data)
+    if (res.data?.success) {
+      alert(res.data.message || 'Reminder sent successfully!')
+      fetchBookings() // Refresh data
+    } else {
+      alert(res.data?.message || 'Failed to send reminder')
+    }
+  } catch (err) {
+    console.error('sendReminder error', err)
+    alert('Failed to send reminder: ' + (err?.message || 'Unknown error'))
+  }
 }
 
+/* markAsReturned removed (unused) */
+
+const markRoomAvailable = async (booking) => {
+  if (!booking?.id) return alert('Booking ID is missing')
+  if (!confirm(`Mark room "${booking.room_name}" as Available now?`)) return
+
+  try {
+    const res = await axios.post(API_BASE + 'bookings.php?action=mark_room_available', {
+      booking_id: booking.id
+    })
+    console.log('markRoomAvailable response', res.data)
+    if (res.data?.success) {
+      alert(res.data.message || 'Room marked as available!')
+      fetchBookings() // Refresh list (removes from active)
+    } else {
+      alert(res.data?.message || 'Failed to update room status')
+    }
+  } catch (err) {
+    console.error('markRoomAvailable error', err)
+    alert('Failed to update room status: ' + (err?.message || 'Unknown error'))
+  }
+}
+
+// ==================== HELPER FUNCTIONS ====================
+const formatDate = (date) => {
+  return date ? new Date(date).toLocaleDateString('en-MY') : '-'
+}
+
+const formatDateTime = (datetime) => {
+  return datetime ? new Date(datetime).toLocaleString('en-MY', { hour12: false }) : '-'
+}
+
+const isRoomBookingEnded = (booking) => {
+  return new Date(booking.end_time) < new Date()
+}
+
+const getBookingStatusClass = (statusOrBooking) => {
+  const status = typeof statusOrBooking === 'string' ? statusOrBooking : (statusOrBooking && statusOrBooking.status)
+  if (!status) return 'badge bg-secondary'
+  return status === 'Overdue' ? 'badge bg-danger' : 'badge bg-success'
+}
+
+const canMarkRoomAvailable = (booking) => {
+  return isRoomBookingEnded(booking) || booking.status === 'Completed'
+}
+
+// Reset helpers
 const resetBookForm = () => {
   newBook.value = {
     title: '', author: '', isbn: '', category: '', publication_year: new Date().getFullYear(),
@@ -563,14 +712,10 @@ const resetRoomForm = () => {
   editingRoom.value = false
 }
 
-const cancelEdit = () => {
-  resetBookForm()
-  resetRoomForm()
-  newEvent.value = { title: '', event_date: '', event_time: '', description: '' }
-  editingEvent.value = false
-}
-
-onMounted(loadAllData)
+// ==================== LIFECYCLE ====================
+onMounted(() => {
+  fetchBookings()
+})
 
 const loadUsers = async () => {
   try {
@@ -624,7 +769,6 @@ onMounted(() => {
   padding: 10px;
 }
 
-div
 .elegant-admin-tabs .nav-link.active {
   background-color: #E8B4B8;
   color: #2C2C2C;

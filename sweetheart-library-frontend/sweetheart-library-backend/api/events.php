@@ -9,12 +9,13 @@ if ($method === 'GET') {
 }
 
 if ($method === 'POST') {
+    $description = $data['description'] ?? '';
     if (!empty($data['id'])) {
-        $stmt = $pdo->prepare("UPDATE events SET title=?, event_date=?, event_time=? WHERE id=?");
-        $stmt->execute([$data['title'], $data['event_date'], $data['event_time'], $data['id']]);
+        $stmt = $pdo->prepare("UPDATE events SET title=?, event_date=?, event_time=?, description=? WHERE id=?");
+        $stmt->execute([$data['title'], $data['event_date'], $data['event_time'], $description, $data['id']]);
     } else {
-        $stmt = $pdo->prepare("INSERT INTO events (title, event_date, event_time) VALUES (?, ?, ?)");
-        $stmt->execute([$data['title'], $data['event_date'], $data['event_time']]);
+        $stmt = $pdo->prepare("INSERT INTO events (title, event_date, event_time, description) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$data['title'], $data['event_date'], $data['event_time'], $description]);
     }
     echo json_encode(['success' => true]);
 }

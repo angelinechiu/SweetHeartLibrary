@@ -158,3 +158,41 @@ INSERT INTO bookings (user_id, booking_date, start_time, end_time, purpose, stat
 (4, '2026-06-13', '10:30:00', '12:30:00', 'Online class preparation', 'confirmed'),
 (5, '2026-06-19', '19:00:00', '21:00:00', 'Group assignment meeting', 'confirmed');
 
+-- ==================== BORROWED BOOKS TABLE ====================
+CREATE TABLE IF NOT EXISTS `borrowed_books` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT NOT NULL,
+  `user_name` VARCHAR(150) NOT NULL,
+  `book_id` INT NOT NULL,
+  `book_title` VARCHAR(255) NOT NULL,
+  `author` VARCHAR(255) NOT NULL,
+  `borrow_date` DATE NOT NULL,
+  `due_date` DATE GENERATED ALWAYS AS (DATE_ADD(`borrow_date`, INTERVAL 14 DAY)) STORED,
+  `status` ENUM('On Time', 'Overdue', 'Returned') DEFAULT 'On Time',
+  `has_penalty` TINYINT(1) DEFAULT 0,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ==================== ROOM BOOKINGS TABLE ====================
+CREATE TABLE IF NOT EXISTS `room_bookings` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT NOT NULL,
+  `user_name` VARCHAR(150) NOT NULL,
+  `room_id` INT NOT NULL,
+  `room_name` VARCHAR(100) NOT NULL,
+  `start_time` DATETIME NOT NULL,
+  `end_time` DATETIME NOT NULL,
+  `status` ENUM('Active', 'Completed') DEFAULT 'Active',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Sample Data
+INSERT INTO borrowed_books (user_id, user_name, book_id, book_title, author, borrow_date, status) 
+VALUES 
+(1, 'Ali Ahmad', 5, 'The Great Gatsby', 'F. Scott Fitzgerald', '2026-05-20', 'Overdue'),
+(2, 'Siti Nur', 12, 'Clean Code', 'Robert C. Martin', '2026-05-28', 'On Time');
+
+INSERT INTO room_bookings (user_id, user_name, room_id, room_name, start_time, end_time) 
+VALUES 
+(3, 'John Doe', 1, 'Study Room A', '2026-06-04 10:00:00', '2026-06-04 12:00:00'),
+(4, 'Aisyah Lee', 2, 'Study Room B', '2026-06-03 08:00:00', '2026-06-03 10:00:00');
