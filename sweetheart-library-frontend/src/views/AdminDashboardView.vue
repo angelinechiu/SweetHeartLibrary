@@ -2,20 +2,43 @@
   <div class="admin-dashboard">
     <!-- Header -->
     <div class="admin-header mb-4">
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
-        <div>
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <!-- Left Side: Title -->
+        <div class="flex-grow-1">
           <h1 class="fw-bold mb-1" style="color: #2C2C2C; font-size: 2.4rem;">Admin Dashboard</h1>
           <p class="text-muted mb-0 fs-5">Manage Books • Rooms • Events • Borrowings</p>
         </div>
-        <span class="badge px-4 py-2 fs-6"
-              style="background-color: #E8B4B8; color: #2C2C2C; font-weight: 700; border-radius: 50px;">
-          ADMIN
-        </span>
+
+        <!-- Right Side: ADMIN Badge + Mobile Dropdown -->
+        <div class="d-flex align-items-center gap-3">
+          <span class="badge px-4 py-2 fs-6"
+                style="background-color: #E8B4B8; color: #2C2C2C; font-weight: 700; border-radius: 50px;">
+            ADMIN
+          </span>
+
+          <!-- Mobile Dropdown (only shows on small screens) -->
+          <div class="dropdown d-md-none">
+            <button class="btn btn-dark dropdown-toggle px-3 py-2 d-flex align-items-center gap-2"
+                    type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i :class="currentTabIcon"></i>
+              <span>{{ currentTabLabel }}</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow">
+              <li v-for="tab in tabs" :key="tab.key">
+                <button class="dropdown-item d-flex align-items-center gap-2"
+                        @click="activeTab = tab.key">
+                  <i :class="tab.icon"></i>
+                  <span>{{ tab.label }}</span>
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Tabs -->
-    <div class="mb-4">
+    <!-- Desktop Tabs (hidden on mobile) -->
+    <div class="mb-4 d-none d-md-block">
       <ul class="nav nav-pills elegant-admin-tabs">
         <li class="nav-item" v-for="tab in tabs" :key="tab.key">
           <button class="nav-link d-flex align-items-center gap-2"
@@ -110,27 +133,14 @@
                   </thead>
                   <tbody>
                     <tr v-for="book in books" :key="book.id">
-                      <td class="fw-semibold">{{ book.title }}</td>
-                      <td>{{ book.author }}</td>
-                      <td><small>{{ book.isbn }}</small></td>
-                      <td><span class="badge bg-secondary">{{ book.category }}</span></td>
-                      <td>{{ book.publication_year }}</td>
-                      <td><span class="badge bg-info text-dark">{{ book.copies }}</span></td>
-                      <td>
-                        <span class="badge" :class="{
-                          'bg-success': book.availability_status === 'Available',
-                          'bg-warning text-dark': book.availability_status === 'Borrowed',
-                          'bg-info': book.availability_status === 'Reserved'
-                        }">
-                          {{ book.availability_status }}
-                        </span>
-                      </td>
+                      <!-- ... table data ... -->
                       <td class="text-end pe-4">
-                        <button class="btn btn-sm btn-outline-warning me-2 px-3" @click="startEditBook(book)">
-                          <i class="bi bi-pencil-square"></i>
+                        <!-- UPDATED: Colored Box Buttons -->
+                        <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditBook(book)">
+                          <i class="bi bi-pencil-square me-1"></i> Edit
                         </button>
-                        <button class="btn btn-sm btn-outline-danger px-3" @click="deleteBook(book.id)">
-                          <i class="bi bi-trash3"></i>
+                        <button class="btn btn-sm action-btn delete-btn" @click="deleteBook(book.id)">
+                          <i class="bi bi-trash3 me-1"></i> Delete
                         </button>
                       </td>
                     </tr>
@@ -189,8 +199,12 @@
                     <td><span class="badge bg-secondary">{{ room.capacity }} seats</span></td>
                     <td>{{ room.equipment }}</td>
                     <td class="text-end pe-4">
-                      <button class="btn btn-sm btn-outline-warning me-2 px-3" @click="startEditRoom(room)"><i class="bi bi-pencil-square"></i></button>
-                      <button class="btn btn-sm btn-outline-danger px-3" @click="deleteRoom(room.id)"><i class="bi bi-trash3"></i></button>
+                      <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditRoom(room)">
+                        <i class="bi bi-pencil-square me-1"></i> Edit
+                      </button>
+                      <button class="btn btn-sm action-btn delete-btn" @click="deleteRoom(room.id)">
+                        <i class="bi bi-trash3 me-1"></i> Delete
+                      </button>
                     </td>
                   </tr>
                 </tbody>
@@ -259,11 +273,11 @@
                     <td>{{ event.event_date }}</td>
                     <td>{{ event.event_time }}</td>
                     <td class="text-end pe-4">
-                      <button class="btn btn-sm btn-outline-warning me-2 px-3" @click="startEditEvent(event)">
-                        <i class="bi bi-pencil-square"></i>
+                      <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditEvent(event)">
+                        <i class="bi bi-pencil-square me-1"></i> Edit
                       </button>
-                      <button class="btn btn-sm btn-outline-danger px-3" @click="deleteEvent(event.id)">
-                        <i class="bi bi-trash3"></i>
+                      <button class="btn btn-sm action-btn delete-btn" @click="deleteEvent(event.id)">
+                        <i class="bi bi-trash3 me-1"></i> Delete
                       </button>
                     </td>
                   </tr>
@@ -302,8 +316,12 @@
                 <td>{{ b.due_date }}</td>
                 <td><span class="badge bg-warning text-dark">{{ b.status }}</span></td>
                 <td class="text-end pe-4">
-                  <button class="btn btn-sm btn-outline-primary me-2 px-3" @click="sendNotification(b)">Notify User</button>
-                  <button class="btn btn-sm btn-success px-3" @click="markAsReturned(b)">Mark Returned</button>
+                  <button class="btn btn-sm action-btn notify-btn me-2" @click="sendNotification(b)">
+                    <i class="bi bi-bell me-1"></i> Notify
+                  </button>
+                  <button class="btn btn-sm action-btn success-btn" @click="markAsReturned(b)">
+                    <i class="bi bi-check2-circle me-1"></i> Returned
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -315,7 +333,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import api from '../services/api.js'
 
 const activeTab = ref('books')
@@ -359,6 +377,16 @@ const loadAllData = async () => {
 }
 
 // ==================== BOOKS CRUD ====================
+const currentTabLabel = computed(() => {
+  const tab = tabs.find(t => t.key === activeTab.value)
+  return tab ? tab.label : 'Menu'
+})
+
+const currentTabIcon = computed(() => {
+  const tab = tabs.find(t => t.key === activeTab.value)
+  return tab ? tab.icon : 'bi bi-list'
+})
+
 const addBook = async () => {
   if (!newBook.value.title) return alert('Title is required')
   await api.post('/books.php', newBook.value)
@@ -505,5 +533,58 @@ onMounted(loadAllData)
   color: #F8F4F0;
   padding: 16px 20px;
   font-weight: 600;
+}
+.action-btn {
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.edit-btn {
+  background-color: #FFF3CD;
+  color: #856404;
+}
+.edit-btn:hover {
+  background-color: #ffe69c;
+  color: #664d03;
+}
+
+.delete-btn {
+  background-color: #F8D7DA;
+  color: #842029;
+}
+.delete-btn:hover {
+  background-color: #f5c2c7;
+  color: #58151c;
+}
+
+.notify-btn {
+  background-color: #CFE2FF;
+  color: #084298;
+}
+.notify-btn:hover {
+  background-color: #b6d4fe;
+}
+
+.success-btn {
+  background-color: #D1E7DD;
+  color: #0f5132;
+}
+.success-btn:hover {
+  background-color: #badbcc;
+}
+
+/* Make sure dropdown looks good */
+.dropdown-menu {
+  border-radius: 12px;
+  padding: 8px 0;
+}
+
+.dropdown-item {
+  padding: 10px 16px;
+  font-weight: 500;
 }
 </style>

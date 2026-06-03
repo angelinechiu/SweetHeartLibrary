@@ -20,6 +20,7 @@ export const useAuthStore = defineStore('auth', () => {
   // Getters (Computed)
   const isLoggedIn = computed(() => !!token.value)
   const isAdmin = computed(() => role.value === 'admin')
+  const isUser = computed(() => role.value === 'user')
   const currentUser = computed(() => user.value)
 
   // Actions
@@ -66,6 +67,7 @@ export const useAuthStore = defineStore('auth', () => {
     // Getters
     isLoggedIn,
     isAdmin,
+    isUser,
     currentUser,
 
     // Actions
