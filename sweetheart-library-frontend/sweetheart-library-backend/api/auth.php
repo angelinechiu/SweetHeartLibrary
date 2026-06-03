@@ -1,4 +1,6 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 // ==================== CORS HEADERS ====================
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
@@ -70,12 +72,9 @@ if ($action === 'forgot_password' && $method === 'POST') {
         $pdo->prepare("INSERT INTO password_resets (email, token, expires_at) VALUES (?, ?, ?)")
             ->execute([$email, $token, $expires]);
 
-        // Send Email using PHPMailer (Manual)
-        require_once __DIR__ . '/../../../PHPMailer/src/PHPMailer.php';
-        require_once __DIR__ . '/../../../PHPMailer/src/SMTP.php';
-        require_once __DIR__ . '/../../../PHPMailer/src/Exception.php';
-
-        $phpmailer = new PHPMailer\PHPMailer\PHPMailer(true);
+        require_once __DIR__ . '/../PHPMailer/src/PHPMailer.php';
+        require_once __DIR__ . '/../PHPMailer/src/SMTP.php';
+        require_once __DIR__ . '/../PHPMailer/src/Exception.php';
 
         try {
             $phpmailer->isSMTP();
