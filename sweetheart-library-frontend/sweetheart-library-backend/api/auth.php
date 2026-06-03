@@ -1,6 +1,4 @@
 <?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
 // ==================== CORS HEADERS ====================
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
@@ -60,9 +58,12 @@ if ($action === 'forgot_password' && $method === 'POST') {
         exit;
     }
 
+    // Check if user exists
     $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch();
+
+    $resetLink = null;
 
     if ($user) {
         $token = bin2hex(random_bytes(32));
@@ -72,42 +73,13 @@ if ($action === 'forgot_password' && $method === 'POST') {
         $pdo->prepare("INSERT INTO password_resets (email, token, expires_at) VALUES (?, ?, ?)")
             ->execute([$email, $token, $expires]);
 
-        require_once __DIR__ . '/../PHPMailer/src/PHPMailer.php';
-        require_once __DIR__ . '/../PHPMailer/src/SMTP.php';
-        require_once __DIR__ . '/../PHPMailer/src/Exception.php';
-        try {
-            $phpmailer->isSMTP();
-            $phpmailer->Host       = 'sandbox.smtp.mailtrap.io';
-            $phpmailer->SMTPAuth   = true;
-            $phpmailer->Port       = 2525;
-            $phpmailer->Username   = '80eca2a39dc17b';
-            $phpmailer->Password   = 'a7652890e9491e';
-            $phpmailer->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-
-            $phpmailer->setFrom('no-reply@sweetheartlibrary.com', 'Sweetheart Library');
-            $phpmailer->addAddress($email);
-
-            $resetLink = "http://localhost:5173/reset-password?token=" . $token;
-
-            $phpmailer->isHTML(true);
-            $phpmailer->Subject = 'Reset Your Sweetheart Library Password';
-            $phpmailer->Body    = "
-                <h2>Password Reset Request</h2>
-                <p>Hello,</p>
-                <p>We received a request to reset your password.</p>
-                <p>Click the button below to reset your password:</p>
-                <p><a href='$resetLink' style='background:#E8B4B8;color:#2C2C2C;padding:12px 25px;text-decoration:none;border-radius:50px;'>Reset Password</a></p>
-                <p><strong>This link will expire in 1 hour.</strong></p>
-            ";
-
-            $phpmailer->send();
-
-        } catch (Exception $e) {
-            error_log("Mail Error: " . $phpmailer->ErrorInfo);
-        }
+        $resetLink = "http://localhost:5173/reset-password?token=" . $token;
     }
 
-    echo json_encode(['success' => true]);
+    echo json_encode([
+        'success' => true,
+        'reset_link' => $resetLink
+    ]);
 }
 
 // ==================== RESET PASSWORD ====================

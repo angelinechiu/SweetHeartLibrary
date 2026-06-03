@@ -8,16 +8,23 @@
               <h2 class="text-center fw-bold mb-2" style="color: #2C2C2C;">Forgot Password?</h2>
               <p class="text-center text-muted mb-4">Enter your email to receive a password reset link.</p>
 
-              <!-- Success Message with Reset Link -->
-              <div v-if="resetLink" class="alert alert-success">
-                <p><strong>Password reset link generated!</strong></p>
-                <p class="small">For testing, copy and open this link:</p>
-                <a :href="resetLink" target="_blank" class="btn btn-sm btn-outline-success w-100">
+              <!-- Success State -->
+              <div v-if="resetLink" class="alert alert-success text-center">
+                <h5>Password reset link generated!</h5>
+                <p class="mt-3">For testing on localhost, click the button below:</p>
+
+                <a
+                  :href="resetLink"
+                  target="_blank"
+                  class="btn btn-success px-4 py-2 mt-2"
+                >
                   Click here to Reset Password
                 </a>
-                <p class="mt-2 small text-muted">This link will expire in 1 hour.</p>
+
+                <p class="small text-muted mt-3 mb-0">This link will expire in 1 hour.</p>
               </div>
 
+              <!-- Form -->
               <form v-else @submit.prevent="handleForgotPassword">
                 <div class="mb-4">
                   <input
@@ -57,16 +64,18 @@ const resetLink = ref('')
 const handleForgotPassword = async () => {
   loading.value = true
   try {
-    const res = await api.post('/auth.php?action=forgot_password', { email: email.value })
+    const res = await api.post('/auth.php?action=forgot_password', {
+      email: email.value
+    })
 
     if (res.data.success && res.data.reset_link) {
-      // Show the reset link (for localhost testing)
-      resetLink.value = res.data.reset_link
+    // Use the real link returned by backend
+    resetLink.value = res.data.reset_link;
     } else {
-      alert(res.data.message || 'Something went wrong')
+        alert("Failed to generate reset link. Please try again.");
     }
   } catch (error) {
-    console.error('Forgot password error:', error)
+    console.error('Failed to send reset link', error)
     alert('Failed to process request. Please try again.')
   } finally {
     loading.value = false
