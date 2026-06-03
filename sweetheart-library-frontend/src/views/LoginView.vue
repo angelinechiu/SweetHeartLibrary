@@ -76,8 +76,15 @@ const handleLogin = async () => {
     const res = await api.post('/auth.php?action=login', form.value)
 
     if (res.data.success) {
+      // Login and save user + role
       authStore.login(res.data.user, res.data.token, res.data.user.role)
-      router.push('/dashboard')
+
+      // ✅ NEW: Role-based redirect
+      if (authStore.isAdmin) {
+        router.push('/admin')
+      } else {
+        router.push('/dashboard')
+      }
     } else {
       alert(res.data.message || 'Login failed')
     }

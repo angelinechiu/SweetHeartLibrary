@@ -49,7 +49,7 @@ if ($action === 'register' && $method === 'POST') {
     echo json_encode(['success' => $success]);
 }
 
-// ==================== FORGOT PASSWORD ====================
+// ==================== FORGOT PASSWORD (Without PHPMailer) ====================
 if ($action === 'forgot_password' && $method === 'POST') {
     $email = $data['email'] ?? '';
 
@@ -82,7 +82,7 @@ if ($action === 'forgot_password' && $method === 'POST') {
     ]);
 }
 
-// ==================== RESET PASSWORD ====================
+// ==================== RESET PASSWORD (Improved) ====================
 if ($action === 'reset_password' && $method === 'POST') {
     $token = $data['token'] ?? '';
     $newPassword = $data['password'] ?? '';
@@ -92,21 +92,30 @@ if ($action === 'reset_password' && $method === 'POST') {
         exit;
     }
 
-    $stmt = $pdo->prepare("SELECT email FROM password_resets WHERE token = ? AND expires_at > NOW()");
+    // More lenient check: token exists and not older than 24 hours
+    $stmt = $pdo->prepare("
+        SELECT email FROM password_resets 
+        WHERE token = ? 
+        AND created_at > DATE_SUB(NOW(), INTERVAL 24 HOUR)
+    ");
     $stmt->execute([$token]);
     $reset = $stmt->fetch();
 
     if ($reset) {
         $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
 
+        // Update user password
         $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE email = ?");
         $stmt->execute([$hashedPassword, $reset['email']]);
 
+        // Delete used token
         $pdo->prepare("DELETE FROM password_resets WHERE token = ?")->execute([$token]);
 
         echo json_encode(['success' => true, 'message' => 'Password reset successful']);
     } else {
-        echo json_encode(['success' => false, 'message' => 'Invalid or expired token']);
+        echo json_encode([
+            'success' => false, 
+            'message' => 'Invalid or expired token. Please generate a new reset link.'
+        ]);
     }
 }
-?>

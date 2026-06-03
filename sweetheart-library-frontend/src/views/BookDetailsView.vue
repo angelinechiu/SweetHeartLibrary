@@ -59,3 +59,20 @@ const reserveBook = () => {
 
 onMounted(loadBook)
 </script>
+
+<style scoped>
+.page-wrapper {
+  padding: 10px 0;
+}
+
+.page-header h1 {
+  font-size: 2.1rem;
+  letter-spacing: 0.3px;
+}
+
+@media (max-width: 576px) {
+  .page-header h1 {
+    font-size: 1.7rem;
+  }
+}
+</style>

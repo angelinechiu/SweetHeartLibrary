@@ -12,12 +12,46 @@ if ($method === 'GET') {
 if ($method === 'POST') {
     if (!empty($data['id'])) {
         // UPDATE
-        $stmt = $pdo->prepare("UPDATE books SET title=?, author=?, description=? WHERE id=?");
-        $stmt->execute([$data['title'], $data['author'], $data['description'], $data['id']]);
+        $stmt = $pdo->prepare("
+            UPDATE books SET 
+                title = ?, 
+                author = ?, 
+                isbn = ?, 
+                category = ?, 
+                publication_year = ?, 
+                copies = ?, 
+                description = ?, 
+                availability_status = ?
+            WHERE id = ?
+        ");
+        $stmt->execute([
+            $data['title'],
+            $data['author'],
+            $data['isbn'],
+            $data['category'],
+            $data['publication_year'],
+            $data['copies'],
+            $data['description'],
+            $data['availability_status'],
+            $data['id']
+        ]);
     } else {
         // CREATE
-        $stmt = $pdo->prepare("INSERT INTO books (title, author, description) VALUES (?, ?, ?)");
-        $stmt->execute([$data['title'], $data['author'], $data['description']]);
+        $stmt = $pdo->prepare("
+            INSERT INTO books 
+            (title, author, isbn, category, publication_year, copies, description, availability_status) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->execute([
+            $data['title'],
+            $data['author'],
+            $data['isbn'],
+            $data['category'],
+            $data['publication_year'],
+            $data['copies'],
+            $data['description'],
+            $data['availability_status'] ?? 'Available'
+        ]);
     }
     echo json_encode(['success' => true]);
 }
