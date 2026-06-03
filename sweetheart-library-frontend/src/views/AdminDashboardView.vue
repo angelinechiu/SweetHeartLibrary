@@ -6,7 +6,7 @@
         <!-- Left Side: Title -->
         <div class="flex-grow-1">
           <h1 class="fw-bold mb-1" style="color: #2C2C2C; font-size: 2.4rem;">Admin Dashboard</h1>
-          <p class="text-muted mb-0 fs-5">Manage Books • Rooms • Events • Borrowings</p>
+          <p class="text-muted mb-0 fs-5">Manage Books • Rooms • Events • Bookings • Users Details </p>
         </div>
 
         <!-- Right Side: ADMIN Badge + Mobile Dropdown -->
@@ -67,31 +67,31 @@
               <div class="row g-3">
                 <div class="col-12">
                   <label class="form-label fw-semibold small">Title</label>
-                  <input v-model="newBook.title" class="form-control form-control-lg" placeholder="Book Title">
+                  <input v-model="newBook.title" class="form-control fw-semibold small" placeholder="Book Title">
                 </div>
                 <div class="col-12">
                   <label class="form-label fw-semibold small">Author</label>
-                  <input v-model="newBook.author" class="form-control form-control-lg" placeholder="Author">
+                  <input v-model="newBook.author" class="form-control fw-semibold small" placeholder="Author">
                 </div>
                 <div class="col-md-6">
                   <label class="form-label fw-semibold small">ISBN</label>
-                  <input v-model="newBook.isbn" class="form-control" placeholder="978-3-16-148410-0">
+                  <input v-model="newBook.isbn" class="form-control fw-semibold small" placeholder="978-3-16-148410-0">
                 </div>
                 <div class="col-md-6">
                   <label class="form-label fw-semibold small">Category</label>
-                  <input v-model="newBook.category" class="form-control" placeholder="Fiction / Science">
+                  <input v-model="newBook.category" class="form-control fw-semibold small " placeholder="Fiction / Science">
                 </div>
                 <div class="col-md-6">
                   <label class="form-label fw-semibold small">Publication Year</label>
-                  <input v-model="newBook.publication_year" type="number" class="form-control" placeholder="2024">
+                  <input v-model="newBook.publication_year" type="number" class="form-control fw-semibold small" placeholder="2024">
                 </div>
                 <div class="col-md-6">
                   <label class="form-label fw-semibold small">Copies</label>
-                  <input v-model.number="newBook.copies" type="number" class="form-control" placeholder="3">
+                  <input v-model.number="newBook.copies" type="number" class="form-control fw-semibold small" placeholder="3">
                 </div>
                 <div class="col-12">
                   <label class="form-label fw-semibold small">Availability Status</label>
-                  <select v-model="newBook.availability_status" class="form-select">
+                  <select v-model="newBook.availability_status" class="form-select fw-semibold small">
                     <option value="Available">Available</option>
                     <option value="Borrowed">Borrowed</option>
                     <option value="Reserved">Reserved</option>
@@ -100,7 +100,7 @@
                 </div>
                 <div class="col-12">
                   <label class="form-label fw-semibold small">Description</label>
-                  <textarea v-model="newBook.description" class="form-control" rows="2" placeholder="Short description..."></textarea>
+                  <textarea v-model="newBook.description" class="form-control fw-semibold small" rows="2" placeholder="Short description..."></textarea>
                 </div>
 
                 <div class="col-12 d-flex gap-2 mt-2">
@@ -165,56 +165,66 @@
         <div class="col-lg-5">
           <div class="card elegant-card h-100">
             <div class="card-header elegant-card-header">
-              <h5 class="mb-0"><i class="bi bi-plus-circle-fill me-2"></i>Add New Room</h5>
+              <h5 class="mb-0">
+                <i class="bi bi-plus-circle-fill me-2"></i>
+                {{ editingRoom ? 'Edit Room' : 'Add New Room' }}
+              </h5>
             </div>
             <div class="card-body">
               <div class="row g-3">
-                <div class="col-12"><input v-model="newRoom.name" class="form-control form-control-lg" placeholder="Room Name"></div>
-                <div class="col-12"><input v-model.number="newRoom.capacity" type="number" class="form-control form-control-lg" placeholder="Capacity"></div>
-                <div class="col-12"><input v-model="newRoom.equipment" class="form-control" placeholder="Equipment"></div>
-                <div class="col-12"><button class="btn btn-pink w-100 py-2" @click="addRoom">Add Room</button></div>
+                <div class="col-12"><input v-model="newRoom.name" class="form-control fw-semibold small" placeholder="Room Name"></div>
+                <div class="col-12"><input v-model.number="newRoom.capacity" type="number" class="form-control fw-semibold small" placeholder="Capacity"></div>
+                <div class="col-12"><input v-model="newRoom.equipment" class="form-control fw-semibold small" placeholder="Equipment"></div>
+                <div class="col-12 d-flex gap-2 mt-2">
+                  <button v-if="!editingRoom" class="btn btn-pink w-100 py-2" @click="addRoom">
+                    <i class="bi bi-plus-lg me-2"></i> Add Room
+                  </button>
+                  <button v-else class="btn btn-success w-100 py-2" @click="saveRoomEdit">
+                    <i class="bi bi-save me-2"></i> Save Changes
+                  </button>
+                </div>
+                <div v-if="editingRoom" class="col-12">
+                  <button class="btn btn-secondary w-100 py-2" @click="cancelEdit">Cancel</button>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         <div class="col-lg-7">
-          <div class="card elegant-card mb-4" v-if="editingRoom">
-            <div class="card-header elegant-card-header"><h5 class="mb-0">Edit Room</h5></div>
-            <div class="card-body">
-              <div class="row g-2">
-                <div class="col-md-4"><input v-model="newRoom.name" class="form-control"></div>
-                <div class="col-md-3"><input v-model.number="newRoom.capacity" type="number" class="form-control"></div>
-                <div class="col-md-5"><input v-model="newRoom.equipment" class="form-control"></div>
-              </div>
-              <div class="d-flex gap-2 mt-3">
-                <button class="btn btn-success" @click="saveRoomEdit">Save</button>
-                <button class="btn btn-secondary" @click="cancelEdit">Cancel</button>
-              </div>
-            </div>
-          </div>
-
           <div class="card elegant-card">
-            <div class="card-header elegant-card-header"><h5 class="mb-0">Manage Rooms</h5></div>
+            <div class="card-header elegant-card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">Manage Rooms</h5>
+              <span class="badge bg-light text-dark px-3 py-2">{{ rooms.length }} rooms</span>
+            </div>
             <div class="card-body p-0">
-              <table class="table table-hover mb-0">
-                <thead><tr><th>Name</th><th>Capacity</th><th>Equipment</th><th class="text-end pe-4">Actions</th></tr></thead>
-                <tbody>
-                  <tr v-for="room in rooms" :key="room.id">
-                    <td class="fw-semibold">{{ room.name }}</td>
-                    <td><span class="badge bg-secondary">{{ room.capacity }} seats</span></td>
-                    <td>{{ room.equipment }}</td>
-                    <td class="text-end pe-4">
-                      <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditRoom(room)">
-                        <i class="bi bi-pencil-square me-1"></i> Edit
-                      </button>
-                      <button class="btn btn-sm action-btn delete-btn" @click="deleteRoom(room.id)">
-                        <i class="bi bi-trash3 me-1"></i> Delete
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Capacity</th>
+                      <th>Equipment</th>
+                      <th class="text-end pe-4">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="room in rooms" :key="room.id">
+                      <td class="fw-semibold">{{ room.name }}</td>
+                      <td><span class="badge bg-secondary">{{ room.capacity }} seats</span></td>
+                      <td>{{ room.equipment }}</td>
+                      <td class="text-end pe-4">
+                        <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditRoom(room)">
+                          <i class="bi bi-pencil-square me-1"></i> Edit
+                        </button>
+                        <button class="btn btn-sm action-btn delete-btn" @click="deleteRoom(room.id)">
+                          <i class="bi bi-trash3 me-1"></i> Delete
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
@@ -223,7 +233,7 @@
 
     <!-- ==================== EVENTS (Simple CRUD - No Attendance) ==================== -->
     <div v-if="activeTab === 'events'" class="tab-pane">
-      <div class="row g-4">
+      <div class="row g-3">
         <!-- Add Event Form -->
         <div class="col-lg-5">
           <div class="card elegant-card h-100">
@@ -233,16 +243,16 @@
             <div class="card-body">
               <div class="row g-3">
                 <div class="col-12">
-                  <input v-model="newEvent.title" class="form-control form-control-lg" placeholder="Event Title">
+                  <input v-model="newEvent.title" class="form-control fw-semibold small" placeholder="Event Title">
                 </div>
                 <div class="col-md-6">
-                  <input v-model="newEvent.event_date" type="date" class="form-control">
+                  <input v-model="newEvent.event_date" type="date" class="form-control fw-semibold small">
                 </div>
                 <div class="col-md-6">
-                  <input v-model="newEvent.event_time" type="time" class="form-control">
+                  <input v-model="newEvent.event_time" type="time" class="form-control fw-semibold small">
                 </div>
                 <div class="col-12">
-                  <textarea v-model="newEvent.description" class="form-control" rows="2" placeholder="Description"></textarea>
+                  <textarea v-model="newEvent.description" class="form-control fw-semibold small" rows="2" placeholder="Description"></textarea>
                 </div>
                 <div class="col-12 d-flex gap-2 mt-2">
                   <button v-if="!editingEvent" class="btn btn-pink w-100 py-2" @click="addEvent">Create Event</button>
@@ -336,6 +346,53 @@
       </div>
     </div>
   </div>
+  <!-- ==================== USERS ==================== -->
+  <div v-if="activeTab === 'users'" class="tab-pane mt-4">
+    <div class="card elegant-card">
+      <div class="card-header elegant-card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-people-fill me-2"></i>Manage Users</h5>
+        <span class="badge bg-light text-dark px-3 py-2">{{ users.length }} users</span>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="user in users" :key="user.id">
+                <td class="fw-semibold">{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.role || 'user' }}</td>
+                <td class="text-end">
+                  <button class="btn btn-sm action-btn edit-btn me-2" @click="viewUser(user)">View</button>
+                  <button class="btn btn-sm action-btn delete-btn" @click="deleteUser(user.id)">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- User details modal -->
+  <div v-if="showUserModal" class="admin-modal-backdrop">
+    <div class="admin-modal">
+      <h5>User details</h5>
+      <div><strong>Name:</strong> {{ selectedUser.name }}</div>
+      <div><strong>Email:</strong> {{ selectedUser.email }}</div>
+      <div><strong>Role:</strong> {{ selectedUser.role || 'user' }}</div>
+      <div class="mt-3 text-end">
+        <button class="btn btn-secondary me-2" @click="closeUserModal">Close</button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -348,13 +405,17 @@ const tabs = [
   { key: 'books', label: 'Books', icon: 'bi bi-book-fill' },
   { key: 'rooms', label: 'Rooms', icon: 'bi bi-door-open-fill' },
   { key: 'events', label: 'Events', icon: 'bi bi-calendar-event-fill' },
-  { key: 'bookings', label: 'Bookings', icon: 'bi bi-calendar-check-fill' }
+  { key: 'bookings', label: 'Bookings', icon: 'bi bi-calendar-check-fill' },
+  { key: 'users', label: 'Users', icon: 'bi bi-people-fill' }
 ]
 
 const books = ref([])
 const rooms = ref([])
 const events = ref([])
 const activeBorrowings = ref([])
+const users = ref([])
+const selectedUser = ref(null)
+const showUserModal = ref(false)
 
 const newBook = ref({
   title: '', author: '', isbn: '', category: '', publication_year: new Date().getFullYear(),
@@ -510,6 +571,42 @@ const cancelEdit = () => {
 }
 
 onMounted(loadAllData)
+
+const loadUsers = async () => {
+  try {
+    const res = await api.get('/users.php')
+    users.value = res.data || []
+  } catch (err) {
+    console.error('Failed loading users', err)
+  }
+}
+
+const viewUser = (u) => {
+  selectedUser.value = { ...u }
+  // explicitly omit sensitive fields
+  if (selectedUser.value.password) delete selectedUser.value.password
+  showUserModal.value = true
+}
+
+const closeUserModal = () => {
+  showUserModal.value = false
+  selectedUser.value = null
+}
+
+const deleteUser = async (id) => {
+  if (!confirm('Delete this user?')) return
+  try {
+    await api.delete(`/users.php?id=${id}`)
+    await loadUsers()
+  } catch (err) {
+    console.error('Failed to delete user', err)
+  }
+}
+
+onMounted(() => {
+  loadAllData()
+  loadUsers()
+})
 </script>
 
 <style scoped>
@@ -523,6 +620,11 @@ onMounted(loadAllData)
   background: white;
   transition: all 0.3s ease;
 }
+.table th, .table td {
+  padding: 10px;
+}
+
+div
 .elegant-admin-tabs .nav-link.active {
   background-color: #E8B4B8;
   color: #2C2C2C;
@@ -592,5 +694,23 @@ onMounted(loadAllData)
 .dropdown-item {
   padding: 10px 16px;
   font-weight: 500;
+}
+
+/* Simple modal for user details */
+.admin-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+.admin-modal {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  width: 320px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.2);
 }
 </style>
