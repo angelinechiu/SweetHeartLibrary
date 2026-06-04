@@ -257,8 +257,15 @@
                   <td>{{ booking.book_title }}</td>
                   <td>{{ formatDate(booking.due_date) }}</td>
                   <td><span :class="getBookingStatusClass(booking.status)">{{ booking.status }}</span></td>
-                  <td>
-                    <!-- Only Mark as Returned button (Renew will be on user side) -->
+                  <td class="d-flex gap-1 flex-wrap">
+                    <!-- Send Reminder (original) -->
+                    <button class="btn btn-sm btn-warning" 
+                            :disabled="booking.status !== 'Overdue'" 
+                            @click="sendReminder(booking)">
+                      Send Reminder
+                    </button>
+                    
+                    <!-- Mark as Returned -->
                     <button class="btn btn-sm btn-success" 
                             @click="markBookReturned(booking)">
                       Mark as Returned
@@ -546,7 +553,7 @@ const markRoomAvailable = async (booking) => {
 }
 
 // ==================== BORROWED BOOKS ACTIONS ====================
-// Mark book as returned (book will disappear from the list)
+// Mark book as returned
 const markBookReturned = async (booking) => {
   if (!booking?.id) return
   if (!confirm(`Mark "${booking.book_title}" as returned by ${booking.user_name}?`)) return
