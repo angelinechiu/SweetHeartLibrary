@@ -173,7 +173,7 @@ const recentlyAddedBooks = ref([
 const popularBooks = ref([
   { id: 5, title: "Dune", author: "Frank Herbert", cover_image: "https://picsum.photos/id/251/400/300" },
   { id: 6, title: "The Seven Husbands of Evelyn Hugo", author: "Taylor Jenkins Reid", cover_image: "https://picsum.photos/id/1005/400/300" },
-  { id: 7, title: "Project Hail Mary", author: "Andy Weir", cover_image: "https://picsum.photos/id/180/400/300" },
+  { id: 7, title: "Project Hail Mary", author: "Andy Weir", cover_image: "https://picsum.photos/id/29/400/300" },
   { id: 8, title: "The Alchemist", author: "Paulo Coelho", cover_image: "https://picsum.photos/id/29/400/300" }
 ])
 
@@ -231,7 +231,7 @@ const bookRoom = (room) => {
 
 <style scoped>
 .hover-card {
-  transition: all: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .hover-card:hover {
   transform: translateY(-10px);
