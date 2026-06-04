@@ -197,11 +197,11 @@ const viewRoomBooking = (room) => {
   router.push('/my-bookings')
 }
 
-const cancelRoomBooking = async (room) => {
-  if (!confirm(`Cancel booking for "${room.room_name}"?`)) return
+const cancelRoomBooking = async (booking) => {
+  if (!confirm(`Cancel booking for "${booking.room_name}"?`)) return
 
   try {
-    await api.post('/room-bookings.php?action=cancel', { booking_id: room.id })
+    await api.post('/room-bookings.php?action=cancel', { booking_id: booking.id })
     alert('Room booking cancelled successfully!')
     loadDashboardData()
   } catch (error) {
