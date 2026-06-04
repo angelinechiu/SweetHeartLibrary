@@ -472,7 +472,8 @@ const addAnnouncement = async () => {
     await api.post('/announcements.php', newAnnouncement.value)
     newAnnouncement.value = { title: '', type: 'Notice', message: '' }
     loadAnnouncements()
-  } catch (err) {
+  } catch (error) {
+    console.error(error)
     alert('Failed to create announcement')
   }
 }
@@ -488,7 +489,8 @@ const saveAnnouncementEdit = async () => {
     editingAnnouncement.value = false
     newAnnouncement.value = { title: '', type: 'Notice', message: '' }
     loadAnnouncements()
-  } catch (err) {
+  } catch (error) {
+    console.error(error)
     alert('Failed to update announcement')
   }
 }
@@ -498,7 +500,8 @@ const deleteAnnouncement = async (id) => {
     try {
       await api.delete(`/announcements.php?id=${id}`)
       loadAnnouncements()
-    } catch (err) {
+    } catch (error) {
+      console.error(error)
       alert('Failed to delete announcement')
     }
   }
@@ -519,7 +522,8 @@ const sendReminder = async (booking) => {
     })
     alert('Reminder sent successfully!')
     fetchBookings()
-  } catch (err) {
+  } catch (error) {
+    console.error(error)
     alert('Failed to send reminder')
   }
 }
@@ -531,7 +535,8 @@ const markRoomAvailable = async (booking) => {
     await axios.post(API_BASE + 'bookings.php?action=mark_room_available', { booking_id: booking.id })
     alert('Room marked as available!')
     fetchBookings()
-  } catch (err) {
+  } catch (error) {
+    console.error(error)
     alert('Failed to update room')
   }
 }
@@ -552,7 +557,7 @@ const startEditEvent = (event) => { newEvent.value = { ...event }; editingEvent.
 const saveEventEdit = async () => { await api.post('/events.php', newEvent.value); editingEvent.value = false; loadAllData() }
 const deleteEvent = async (id) => { if (confirm('Delete event?')) { await api.delete(`/events.php?id=${id}`); loadAllData() } }
 
-const loadUsers = async () => { try { const res = await api.get('/users.php'); users.value = res.data || [] } catch(err){} }
+const loadUsers = async () => { try { const res = await api.get('/users.php'); users.value = res.data || [] } catch(error) { console.error(error) } }
 const viewUser = (u) => { selectedUser.value = u; showUserModal.value = true }
 const closeUserModal = () => { showUserModal.value = false }
 const deleteUser = async (id) => { if (confirm('Delete user?')) { await api.delete(`/users.php?id=${id}`); loadUsers() } }
