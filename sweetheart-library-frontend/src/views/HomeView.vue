@@ -1,72 +1,54 @@
 <template>
-  <div class="homepage" style="background-color: #F8F4F0;">
+  <div class="homepage">
 
-    <!-- ==================== HERO BANNER ==================== -->
-    <div style="background-color: #2C2C2C; color: #F8F4F0;" class="py-5">
-      <div class="container text-center py-4">
-        <div class="mb-4">
-          <img src="../assets/images/logo.png" alt="Sweetheart Library Logo" style="width: 110px; height: 110px;" />
-        </div>
+    <!-- ==================== ELEGANT HERO ==================== -->
+    <div class="hero">
+      <div class="container text-center">
+        <img
+          src="../assets/images/logo.png"
+          alt="Sweetheart Library"
+          class="hero-logo mb-4"
+        />
 
-        <h1 class="display-3 fw-bold mb-3">
-          Welcome to <span style="color: #E8B4B8;">Sweetheart Library</span>
+        <h1 class="hero-title">
+          Welcome to <span class="brand-accent">Sweetheart Library</span>
         </h1>
-        <p class="lead fs-5 mb-4" style="color: #D9CFC2; max-width: 620px; margin: 0 auto;">
-          Your elegant sanctuary for knowledge, study, and quiet moments
+
+        <p class="hero-subtitle">
+          A refined space for readers, thinkers, and quiet moments.
         </p>
 
-        <!-- Search Bar -->
-        <div class="row justify-content-center mb-4">
-          <div class="col-md-8 col-lg-6">
-            <div class="input-group input-group-lg shadow-sm" style="border-radius: 50px; overflow: hidden;">
-              <input
-                v-model="searchQuery"
-                @keyup.enter="performSearch"
-                type="text"
-                class="form-control border-0 ps-4"
-                placeholder="Search books by title, author or ISBN..."
-                style="background-color: #F8F4F0; color: #2C2C2C;"
-              >
-              <button @click="performSearch" class="btn btn-pink px-4" style="border-radius: 0 50px 50px 0;">
-                <i class="bi bi-search"></i> Search
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Quick Access Buttons -->
-        <div class="d-flex flex-wrap justify-content-center gap-3">
-          <router-link to="/books" class="btn btn-lg px-4 py-2 fw-semibold" style="background-color: #E8B4B8; color: #2C2C2C; border-radius: 50px;">
-            Browse Catalog
+        <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
+          <router-link to="/books" class="btn btn-lg btn-pink px-5 py-3">
+            Browse the Collection
           </router-link>
-          <router-link to="/rooms" class="btn btn-lg px-4 py-2 fw-semibold btn-outline-light" style="border-radius: 50px; color: #F8F4F0; border-color: #E8B4B8;">
-            Book a Study Room
-          </router-link>
-          <router-link to="/dashboard" class="btn btn-lg px-4 py-2 fw-semibold btn-outline-light" style="border-radius: 50px; color: #F8F4F0; border-color: #E8B4B8;">
-            My Dashboard
+          <router-link to="/rooms" class="btn btn-lg btn-outline-pink px-5 py-3">
+            Reserve a Study Room
           </router-link>
         </div>
       </div>
     </div>
 
-    <!-- ==================== RECENTLY ADDED BOOKS ==================== -->
-    <div class="py-5">
+    <!-- ==================== RECENTLY ADDED ==================== -->
+    <div class="section">
       <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h2 class="fw-bold mb-0" style="color: #2C2C2C;">Recently Added Books</h2>
-          <router-link to="/books" class="text-decoration-none fw-semibold" style="color: #E8B4B8;">View All →</router-link>
+        <div class="section-header">
+          <h2>Recently Added</h2>
+          <router-link to="/books" class="section-link">View all →</router-link>
         </div>
 
         <div class="row g-4">
           <div class="col-6 col-md-4 col-lg-3" v-for="book in recentlyAddedBooks" :key="book.id">
-            <div class="card border-0 shadow-sm hover-card h-100" style="background-color: #D9CFC2; border-radius: 16px; overflow: hidden;">
-              <img :src="book.cover_image || 'https://picsum.photos/id/1015/400/300'" class="card-img-top" style="height: 220px; object-fit: cover;" alt="Book cover">
-              <div class="card-body d-flex flex-column p-3">
-                <h6 class="fw-semibold mb-1 text-truncate" style="color: #2C2C2C;">{{ book.title }}</h6>
-                <p class="text-muted small mb-2">{{ book.author }}</p>
-                <div class="mt-auto">
-                  <router-link :to="`/books/${book.id}`" class="btn btn-sm btn-pink w-100">View Details</router-link>
-                </div>
+            <div class="book-card">
+              <div class="book-image-wrapper">
+                <img :src="book.cover_image" class="book-image" alt="Book cover">
+              </div>
+              <div class="book-content">
+                <h6 class="book-title">{{ book.title }}</h6>
+                <p class="book-author">{{ book.author }}</p>
+                <router-link :to="`/books/${book.id}`" class="btn btn-sm btn-pink w-100 mt-2">
+                  View Details
+                </router-link>
               </div>
             </div>
           </div>
@@ -74,24 +56,26 @@
       </div>
     </div>
 
-    <!-- ==================== POPULAR BOOKS ==================== -->
-    <div class="py-5" style="background-color: #fff;">
+    <!-- ==================== POPULAR THIS WEEK ==================== -->
+    <div class="section section-alt">
       <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h2 class="fw-bold mb-0" style="color: #2C2C2C;">Popular This Week</h2>
-          <router-link to="/books" class="text-decoration-none fw-semibold" style="color: #E8B4B8;">Explore More →</router-link>
+        <div class="section-header">
+          <h2>Popular This Week</h2>
+          <router-link to="/books" class="section-link">Explore more →</router-link>
         </div>
 
         <div class="row g-4">
           <div class="col-6 col-md-4 col-lg-3" v-for="book in popularBooks" :key="book.id">
-            <div class="card border-0 shadow-sm hover-card h-100" style="background-color: #D9CFC2; border-radius: 16px; overflow: hidden;">
-              <img :src="book.cover_image || 'https://picsum.photos/id/106/400/300'" class="card-img-top" style="height: 220px; object-fit: cover;" alt="Book cover">
-              <div class="card-body d-flex flex-column p-3">
-                <h6 class="fw-semibold mb-1 text-truncate" style="color: #2C2C2C;">{{ book.title }}</h6>
-                <p class="text-muted small mb-2">{{ book.author }}</p>
-                <div class="mt-auto">
-                  <router-link :to="`/books/${book.id}`" class="btn btn-sm btn-pink w-100">View Details</router-link>
-                </div>
+            <div class="book-card">
+              <div class="book-image-wrapper">
+                <img :src="book.cover_image" class="book-image" alt="Book cover">
+              </div>
+              <div class="book-content">
+                <h6 class="book-title">{{ book.title }}</h6>
+                <p class="book-author">{{ book.author }}</p>
+                <router-link :to="`/books/${book.id}`" class="btn btn-sm btn-pink w-100 mt-2">
+                  View Details
+                </router-link>
               </div>
             </div>
           </div>
@@ -99,35 +83,32 @@
       </div>
     </div>
 
-    <!-- ==================== FEATURED ROOMS ==================== -->
-    <div class="py-5">
+    <!-- ==================== FEATURED STUDY ROOMS (Simplified) ==================== -->
+    <div class="section">
       <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h2 class="fw-bold mb-0" style="color: #2C2C2C;">Featured Study Rooms</h2>
-          <router-link to="/rooms" class="text-decoration-none fw-semibold" style="color: #E8B4B8;">See All Rooms →</router-link>
+        <div class="section-header">
+          <h2>Featured Study Rooms</h2>
+          <router-link to="/rooms" class="section-link">See all rooms →</router-link>
         </div>
 
         <div class="row g-4">
           <div class="col-md-6 col-lg-4" v-for="room in featuredRooms" :key="room.id">
-            <div class="card border-0 shadow-sm hover-card h-100" style="background-color: #D9CFC2; border-radius: 16px; overflow: hidden;">
-              <img :src="room.image || 'https://picsum.photos/id/1018/600/300'" class="card-img-top" style="height: 180px; object-fit: cover;" alt="Room image">
-              <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <h5 class="fw-semibold mb-0" style="color: #2C2C2C;">{{ room.name }}</h5>
-                  <span class="badge bg-success">Featured</span>
-                </div>
-                <p class="text-muted small mb-2"><i class="bi bi-geo-alt"></i> {{ room.location }} • Capacity: {{ room.capacity }}</p>
+            <div class="room-card">
+              <div class="room-image-wrapper">
+                <img :src="room.image" class="room-image" alt="Study room">
+              </div>
+              <div class="room-content">
+                <h5 class="room-name">{{ room.name }}</h5>
+                <p class="room-meta">
+                  {{ room.location }} • {{ room.capacity }} seats
+                </p>
 
-                <div class="mb-3">
-                  <span v-for="facility in room.facilities" :key="facility" class="badge me-1 mb-1" style="background-color: #E8B4B8; color: #2C2C2C; font-size: 0.75rem;">
-                    {{ facility }}
-                  </span>
-                </div>
-
-                <div class="d-flex gap-2 mt-3">
-                  <router-link :to="`/rooms/${room.id}`" class="btn btn-sm btn-outline-dark flex-fill">View Details</router-link>
-                  <button @click="bookRoom(room)" class="btn btn-sm btn-pink flex-fill">Book Room</button>
-                </div>
+                <router-link
+                  to="/rooms"
+                  class="btn btn-pink w-100 mt-3"
+                >
+                  View
+                </router-link>
               </div>
             </div>
           </div>
@@ -135,20 +116,15 @@
       </div>
     </div>
 
-    <!-- ==================== BOOK CATEGORIES ==================== -->
-    <div class="py-5" style="background-color: #fff;">
-      <div class="container">
-        <h2 class="fw-bold text-center mb-5" style="color: #2C2C2C;">Explore by Category</h2>
-        <div class="row g-3 justify-content-center">
-          <div class="col-6 col-md-4 col-lg-2" v-for="category in categories" :key="category.name">
-            <router-link :to="`/books?category=${category.name}`" class="text-decoration-none">
-              <div class="card border-0 shadow-sm text-center p-4 hover-card h-100" style="background-color: #D9CFC2; border-radius: 16px;">
-                <div class="mb-3" style="font-size: 2.2rem;">{{ category.icon }}</div>
-                <h6 class="fw-semibold mb-0" style="color: #2C2C2C;">{{ category.name }}</h6>
-              </div>
-            </router-link>
-          </div>
-        </div>
+    <!-- ==================== ELEGANT CLOSING CTA ==================== -->
+    <div class="cta-section">
+      <div class="container text-center">
+        <h2 class="cta-title">Your next chapter awaits.</h2>
+        <p class="cta-subtitle">Join Sweetheart Library and enjoy a space designed for focus and inspiration.</p>
+
+        <router-link to="/register" class="btn btn-lg btn-pink px-5 py-3 mt-3">
+          Become a Member
+        </router-link>
       </div>
     </div>
 
@@ -157,12 +133,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 
-const router = useRouter()
-const searchQuery = ref('')
-
-// Sample data - Replace with real API calls
 const recentlyAddedBooks = ref([
   { id: 1, title: "The Silent Patient", author: "Alex Michaelides", cover_image: "https://picsum.photos/id/1015/400/300" },
   { id: 2, title: "Educated", author: "Tara Westover", cover_image: "https://picsum.photos/id/106/400/300" },
@@ -183,70 +154,235 @@ const featuredRooms = ref([
     name: "The Rose Study",
     location: "2nd Floor, East Wing",
     capacity: 6,
-    image: "https://picsum.photos/id/1018/600/300",
-    facilities: ["WiFi", "Projector", "Whiteboard", "AC"]
+    image: "https://picsum.photos/id/1018/600/300"
   },
   {
     id: 2,
     name: "The Garden Room",
     location: "Ground Floor, West Wing",
     capacity: 8,
-    image: "https://picsum.photos/id/160/600/300",
-    facilities: ["WiFi", "TV", "Power Sockets", "AC"]
+    image: "https://picsum.photos/id/160/600/300"
   },
   {
     id: 3,
     name: "The Library Nook",
     location: "3rd Floor, Quiet Zone",
     capacity: 4,
-    image: "https://picsum.photos/id/201/600/300",
-    facilities: ["WiFi", "Whiteboard", "Natural Light"]
+    image: "https://picsum.photos/id/201/600/300"
   }
 ])
-
-const categories = ref([
-  { name: "Drama", icon: "🎭" },
-  { name: "Horror", icon: "👻" },
-  { name: "Fiction", icon: "📖" },
-  { name: "Mystery", icon: "🔍" },
-  { name: "Romance", icon: "💕" },
-  { name: "Science", icon: "🔬" },
-  { name: "Technology", icon: "💻" },
-  { name: "History", icon: "🏛️" },
-  { name: "Education", icon: "📚" }
-])
-
-const performSearch = () => {
-  if (searchQuery.value.trim()) {
-    router.push({ path: '/books', query: { search: searchQuery.value.trim() } })
-  } else {
-    router.push('/books')
-  }
-}
-
-const bookRoom = (room) => {
-  router.push({ path: '/booking-form', query: { roomId: room.id, roomName: room.name } })
-}
 </script>
 
 <style scoped>
-.hover-card {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+/* ==================== HERO ==================== */
+.hero {
+  background-color: #2C2C2C;
+  color: #F8F4F0;
+  padding: 100px 0 80px;
 }
-.hover-card:hover {
+
+.hero-logo {
+  width: 120px;
+  height: 120px;
+}
+
+.hero-title {
+  font-size: 3.2rem;
+  font-weight: 700;
+  color: #F8F4F0;
+  margin-bottom: 16px;
+  letter-spacing: -1.5px;
+}
+
+.brand-accent {
+  color: #E8B4B8;
+}
+
+.hero-subtitle {
+  font-size: 1.15rem;
+  color: #D9CFC2;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+/* ==================== SECTIONS ==================== */
+.section {
+  padding: 70px 0;
+}
+
+.section-alt {
+  background-color: #fff;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 32px;
+}
+
+.section-header h2 {
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: #2C2C2C;
+  margin: 0;
+}
+
+.section-link {
+  color: #E8B4B8;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: color 0.2s ease;
+}
+
+.section-link:hover {
+  color: #D89CA1;
+}
+
+/* ==================== BOOK CARDS ==================== */
+.book-card {
+  background-color: #D9CFC2;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 100%;
+}
+
+.book-card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1) !important;
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.12);
 }
+
+.book-image-wrapper {
+  overflow: hidden;
+}
+
+.book-image {
+  width: 100%;
+  height: 210px;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.book-card:hover .book-image {
+  transform: scale(1.07);
+}
+
+.book-content {
+  padding: 20px;
+}
+
+.book-title {
+  font-weight: 700;
+  color: #2C2C2C;
+  margin-bottom: 4px;
+  font-size: 1rem;
+}
+
+.book-author {
+  color: #5C5C5C;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+}
+
+/* ==================== ROOM CARDS (Simplified & Beautiful) ==================== */
+.room-card {
+  background-color: #D9CFC2;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 100%;
+}
+
+.room-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.12);
+}
+
+.room-image-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.room-image {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.room-card:hover .room-image {
+  transform: scale(1.06);
+}
+
+.room-content {
+  padding: 24px;
+}
+
+.room-name {
+  font-weight: 700;
+  color: #2C2C2C;
+  margin-bottom: 8px;
+}
+
+.room-meta {
+  color: #5C5C5C;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+
+/* ==================== BUTTONS ==================== */
 .btn-pink {
   background-color: #E8B4B8;
   color: #2C2C2C;
   font-weight: 600;
   border: none;
+  border-radius: 50px;
   transition: all 0.3s ease;
 }
+
 .btn-pink:hover {
   background-color: #D89CA1;
   color: #2C2C2C;
   transform: translateY(-2px);
+}
+
+.btn-outline-pink {
+  background-color: transparent;
+  color: #F8F4F0;
+  border: 2px solid #E8B4B8;
+  font-weight: 600;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-pink:hover {
+  background-color: #E8B4B8;
+  color: #2C2C2C;
+  border-color: #E8B4B8;
+}
+
+/* ==================== CTA SECTION ==================== */
+.cta-section {
+  background-color: #2C2C2C;
+  color: #F8F4F0;
+  padding: 80px 0;
+}
+
+.cta-title {
+  font-size: 2.1rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.cta-subtitle {
+  color: #D9CFC2;
+  max-width: 480px;
+  margin: 0 auto 24px;
 }
 </style>
