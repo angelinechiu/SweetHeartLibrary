@@ -26,7 +26,6 @@
                 <label class="form-label">Type</label>
                 <select v-model="form.type" class="form-select">
                   <option value="Notice">Notice</option>
-                  <option value="Overdue Reminder">Overdue Reminder</option>
                   <option value="Event">Event</option>
                   <option value="Maintenance">Maintenance</option>
                 </select>
