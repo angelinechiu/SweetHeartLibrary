@@ -1,36 +1,68 @@
 <template>
   <div style="background-color: #F8F4F0;" class="py-5">
     <div class="container">
-      <h2 class="fw-bold mb-4" style="color: #2C2C2C;">Study Room Booking History</h2>
+      <!-- Header -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="fw-bold mb-1" style="color: #2C2C2C;">Study Room Booking History</h2>
+          <p class="text-muted mb-0">All your past and upcoming room bookings</p>
+        </div>
+        <router-link to="/rooms" class="btn btn-pink">
+          <i class="bi bi-plus-lg me-1"></i> Book New Room
+        </router-link>
+      </div>
 
       <LoadingSpinner :loading="loading" />
 
-      <div v-if="!loading" class="table-responsive">
-        <table class="table table-striped">
-          <thead style="background-color: #2C2C2C; color: #F8F4F0;">
-            <tr>
-              <th>Date</th>
-              <th>Time</th>
-              <th>Room / Purpose</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="booking in roomHistory" :key="booking.id">
-              <td>{{ booking.booking_date }}</td>
-              <td>{{ booking.start_time }} — {{ booking.end_time }}</td>
-              <td>{{ booking.purpose }}</td>
-              <td>
-                <span class="badge" :class="getStatusClass(booking.status)">
-                  {{ booking.status }}
+      <div v-if="!loading" class="row g-3">
+        <div
+          v-for="booking in roomHistory"
+          :key="booking.id"
+          class="col-md-6 col-lg-4"
+        >
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <!-- Top Badges -->
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="badge bg-info text-white px-3 py-1">Study Room</span>
+                <span class="badge px-3 py-1" :class="getStatusClass(booking.status)">
+                  {{ booking.status || 'Pending' }}
                 </span>
-              </td>
-            </tr>
-            <tr v-if="roomHistory.length === 0">
-              <td colspan="4" class="text-center text-muted">No study room booking history found.</td>
-            </tr>
-          </tbody>
-        </table>
+              </div>
+
+              <!-- Room Name -->
+              <h5 class="fw-semibold mb-1" style="color: #2C2C2C;">
+                {{ booking.room_name || booking.purpose || 'Study Room' }}
+              </h5>
+
+              <!-- Date & Time -->
+              <p class="text-muted small mb-3">
+                {{ formatDate(booking.booking_date || booking.start_time) }}
+                • {{ formatTime(booking) }}
+              </p>
+
+              <!-- Action Buttons -->
+              <div class="d-flex gap-2 mt-auto">
+                <button class="btn btn-sm btn-outline-secondary flex-fill">View</button>
+
+                <button
+                  class="btn btn-sm btn-outline-danger flex-fill"
+                  :disabled="!canCancel(booking)"
+                  @click="cancelRoomBooking(booking)">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div v-if="roomHistory.length === 0" class="col-12">
+          <div class="text-center py-5 bg-white rounded-3 shadow-sm">
+            <i class="bi bi-calendar-x fs-1 text-muted d-block mb-2"></i>
+            <p class="text-muted mb-0">No room booking history found.</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -47,27 +79,70 @@ const allBookings = ref([])
 const loading = ref(true)
 
 const roomHistory = computed(() => {
-  return allBookings.value.filter(b =>
-    b.purpose && b.purpose.toLowerCase().includes('room') &&
-    (new Date(b.booking_date) < new Date() || b.status === 'completed' || b.status === 'cancelled')
-  )
+  if (!allBookings.value || !Array.isArray(allBookings.value)) return []
+  return allBookings.value.filter(b => {
+    const purpose = (b.purpose || b.room_name || '').toLowerCase()
+    return purpose.includes('room') || purpose.includes('study')
+  })
 })
 
+const formatDate = (dateStr) => {
+  if (!dateStr) return 'N/A'
+  return new Date(dateStr).toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'short', year: 'numeric'
+  })
+}
+
+const formatTime = (booking) => {
+  if (booking.start_time && booking.end_time) {
+    return `${booking.start_time} — ${booking.end_time}`
+  }
+  return booking.booking_time || '—'
+}
+
 const getStatusClass = (status) => {
-  if (status === 'confirmed' || status === 'completed') return 'bg-success'
-  if (status === 'cancelled') return 'bg-danger'
-  return 'bg-secondary'
+  if (!status) return 'bg-secondary text-white'
+  const s = status.toLowerCase()
+  if (['confirmed', 'active'].includes(s)) return 'bg-success text-white'
+  if (s === 'completed') return 'bg-secondary text-white'
+  if (s === 'cancelled') return 'bg-danger text-white'
+  if (s === 'pending') return 'bg-warning text-dark'
+  return 'bg-secondary text-white'
+}
+
+const canCancel = (booking) => {
+  const status = (booking.status || '').toLowerCase()
+  return !['completed', 'cancelled'].includes(status)
+}
+
+const cancelRoomBooking = async (booking) => {
+  const roomName = booking.room_name || booking.purpose || 'this room'
+  if (!confirm(`Cancel booking for "${roomName}"?`)) return
+
+  try {
+    await api.post('/room-bookings.php?action=cancel', { booking_id: booking.id })
+    alert('Room booking cancelled successfully!')
+    await loadBookings()
+  } catch (error) {
+    console.error(error)
+    alert('Failed to cancel room booking. Please try again.')
+  }
+}
+
+const loadBookings = async () => {
+  if (!authStore.user?.id) return
+  try {
+    const res = await api.get(`/bookings.php?action=get&user_id=${authStore.user.id}`)
+    allBookings.value = res.data?.room_bookings || res.data || []
+  } catch (error) {
+    console.error(error)
+    allBookings.value = []
+  }
 }
 
 onMounted(async () => {
   loading.value = true
-  try {
-    const res = await api.get(`/bookings.php?user_id=${authStore.user.id}`)
-    allBookings.value = res.data
-  } catch (error) {
-    console.error(error)
-  } finally {
-    loading.value = false
-  }
+  await loadBookings()
+  loading.value = false
 })
 </script>

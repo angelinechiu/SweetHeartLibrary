@@ -24,7 +24,7 @@
             <h4 class="fw-semibold mb-0" style="color: #2C2C2C;">
               <i class="bi bi-door-open me-2"></i> Recently Booked Rooms
             </h4>
-            <router-link to="/my-bookings" class="text-decoration-none small fw-semibold" style="color: #E8B4B8;">See all room bookings →</router-link>
+            <router-link to="/room-history" class="text-decoration-none small fw-semibold" style="color: #E8B4B8;">See all room bookings →</router-link>
           </div>
 
           <div v-if="recentRoomBookings.length === 0" class="text-center py-4 bg-white rounded-3 shadow-sm">
@@ -193,7 +193,7 @@ const calculateOverdueDays = (dueDate) => {
 }
 
 // Actions
-const viewRoomBooking = (room) => {
+const viewRoomBooking = () => {
   router.push('/my-bookings')
 }
 
