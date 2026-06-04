@@ -560,15 +560,65 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.elegant-admin-tabs .nav-link { color: #2C2C2C; font-weight: 600; padding: 10px 24px; border-radius: 50px; margin-right: 8px; border: 2px solid #E8B4B8; background: white; transition: all 0.3s ease; }
-.elegant-admin-tabs .nav-link.active { background-color: #E8B4B8; color: #2C2C2C; border-color: #E8B4B8; box-shadow: 0 4px 15px rgba(232, 180, 184, 0.4); }
+/* ==================== TAB STYLING ==================== */
+.elegant-admin-tabs .nav-link {
+  color: #2C2C2C;
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 50px;
+  margin-right: 8px;
+  border: 2px solid #E8B4B8;
+  background: white;
+  transition: all 0.3s ease;
+}
 
-.elegant-card { border: none; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
-.elegant-card-header { background: linear-gradient(#2C2C2C, #1F1F1F); color: #F8F4F0; padding: 16px 20px; font-weight: 600; }
+.elegant-admin-tabs .nav-link.active {
+  background-color: #E8B4B8 !important;
+  color: #2C2C2C !important;
+  border-color: #E8B4B8 !important;
+  box-shadow: 0 4px 15px rgba(232, 180, 184, 0.4);
+  font-weight: 700;
+}
 
-.action-btn { border-radius: 8px; padding: 6px 14px; font-weight: 600; font-size: 0.875rem; transition: all 0.2s ease; border: none; }
-.edit-btn { background-color: #FFF3CD; color: #856404; }
-.edit-btn:hover { background-color: #ffe69c; color: #664d03; }
-.delete-btn { background-color: #F8D7DA; color: #842029; }
-.delete-btn:hover { background-color: #f5c2c7; color: #58151c; }
+/* ==================== CARDS ==================== */
+.elegant-card {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
+
+.elegant-card-header {
+  background: linear-gradient(#2C2C2C, #1F1F1F);
+  color: #F8F4F0;
+  padding: 16px 20px;
+  font-weight: 600;
+}
+
+/* ==================== ACTION BUTTONS ==================== */
+.action-btn {
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.edit-btn {
+  background-color: #FFF3CD;
+  color: #856404;
+}
+.edit-btn:hover {
+  background-color: #ffe69c;
+  color: #664d03;
+}
+
+.delete-btn {
+  background-color: #F8D7DA;
+  color: #842029;
+}
+.delete-btn:hover {
+  background-color: #f5c2c7;
+  color: #58151c;
+}
 </style>
