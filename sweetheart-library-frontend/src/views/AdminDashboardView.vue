@@ -98,8 +98,12 @@
                     <td>{{ book.copies }}</td>
                     <td>{{ book.availability_status }}</td>
                     <td class="text-end">
-                      <button class="btn btn-sm btn-outline-primary me-1" @click="startEditBook(book)">Edit</button>
-                      <button class="btn btn-sm btn-outline-danger" @click="deleteBook(book.id)">Delete</button>
+                      <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditBook(book)">
+                        <i class="bi bi-pencil-square me-1"></i> Edit
+                      </button>
+                      <button class="btn btn-sm action-btn delete-btn" @click="deleteBook(book.id)">
+                        <i class="bi bi-trash3 me-1"></i> Delete
+                      </button>
                     </td>
                   </tr>
                 </tbody>
@@ -155,8 +159,12 @@
                     <td><span class="badge bg-secondary">{{ room.capacity }} seats</span></td>
                     <td>{{ room.equipment }}</td>
                     <td class="text-end">
-                      <button class="btn btn-sm btn-outline-primary me-1" @click="startEditRoom(room)">Edit</button>
-                      <button class="btn btn-sm btn-outline-danger" @click="deleteRoom(room.id)">Delete</button>
+                      <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditRoom(room)">
+                        <i class="bi bi-pencil-square me-1"></i> Edit
+                      </button>
+                      <button class="btn btn-sm action-btn delete-btn" @click="deleteRoom(room.id)">
+                        <i class="bi bi-trash3 me-1"></i> Delete
+                      </button>
                     </td>
                   </tr>
                 </tbody>
@@ -214,8 +222,12 @@
                     <td>{{ event.event_date }}</td>
                     <td>{{ event.event_time }}</td>
                     <td class="text-end">
-                      <button class="btn btn-sm btn-outline-primary me-1" @click="startEditEvent(event)">Edit</button>
-                      <button class="btn btn-sm btn-outline-danger" @click="deleteEvent(event.id)">Delete</button>
+                      <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditEvent(event)">
+                        <i class="bi bi-pencil-square me-1"></i> Edit
+                      </button>
+                      <button class="btn btn-sm action-btn delete-btn" @click="deleteEvent(event.id)">
+                        <i class="bi bi-trash3 me-1"></i> Delete
+                      </button>
                     </td>
                   </tr>
                 </tbody>
@@ -268,7 +280,11 @@
             <table class="table table-hover mb-0">
               <thead>
                 <tr>
-                  <th>User</th><th>Room</th><th>Time</th><th>Status</th><th>Actions</th>
+                  <th>User</th>
+                  <th>Room</th>
+                  <th>Time</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -306,8 +322,8 @@
                 <td>{{ user.email }}</td>
                 <td>{{ user.role || 'user' }}</td>
                 <td class="text-end">
-                  <button class="btn btn-sm btn-outline-primary me-1" @click="viewUser(user)">View</button>
-                  <button class="btn btn-sm btn-outline-danger" @click="deleteUser(user.id)">Delete</button>
+                  <button class="btn btn-sm action-btn edit-btn me-2" @click="viewUser(user)">View</button>
+                  <button class="btn btn-sm action-btn delete-btn" @click="deleteUser(user.id)">Delete</button>
                 </td>
               </tr>
             </tbody>
@@ -362,8 +378,8 @@
                     <td><span class="badge bg-pink text-dark">{{ ann.type }}</span></td>
                     <td>{{ ann.created_at }}</td>
                     <td class="text-end">
-                      <button class="btn btn-sm btn-outline-primary me-1" @click="startEditAnnouncement(ann)">Edit</button>
-                      <button class="btn btn-sm btn-outline-danger" @click="deleteAnnouncement(ann.id)">Delete</button>
+                      <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditAnnouncement(ann)">Edit</button>
+                      <button class="btn btn-sm action-btn delete-btn" @click="deleteAnnouncement(ann.id)">Delete</button>
                     </td>
                   </tr>
                 </tbody>
@@ -500,7 +516,7 @@ const sendReminder = async (booking) => {
   }
 }
 
-const markRoomAvailable = async (booking) => { /* ... */ }
+const markRoomAvailable = async (booking) => { /* implementation if needed */ }
 
 const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-MY') : '-'
 const formatDateTime = (d) => d ? new Date(d).toLocaleString('en-MY') : '-'
@@ -509,7 +525,7 @@ const getBookingStatusClass = (s) => s === 'Overdue' ? 'badge bg-danger' : 'badg
 
 const canMarkRoomAvailable = (b) => new Date(b.end_time) < new Date()
 
-// Other methods (simplified)
+// Simplified CRUD methods
 const addBook = async () => { await api.post('/books.php', newBook.value); loadAllData() }
 const startEditBook = (book) => { newBook.value = { ...book }; editingBook.value = true }
 const saveBookEdit = async () => { await api.post('/books.php', newBook.value); editingBook.value = false; loadAllData() }
@@ -539,8 +555,37 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.elegant-admin-tabs .nav-link { color: #2C2C2C; font-weight: 600; padding: 10px 24px; border-radius: 50px; margin-right: 8px; border: 2px solid #E8B4B8; background: white; }
-.elegant-admin-tabs .nav-link.active { background-color: #E8B4B8; color: #2C2C2C; border-color: #E8B4B8; }
+.elegant-admin-tabs .nav-link { color: #2C2C2C; font-weight: 600; padding: 10px 24px; border-radius: 50px; margin-right: 8px; border: 2px solid #E8B4B8; background: white; transition: all 0.3s ease; }
+.elegant-admin-tabs .nav-link.active { background-color: #E8B4B8; color: #2C2C2C; border-color: #E8B4B8; box-shadow: 0 4px 15px rgba(232, 180, 184, 0.4); }
+
 .elegant-card { border: none; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
 .elegant-card-header { background: linear-gradient(#2C2C2C, #1F1F1F); color: #F8F4F0; padding: 16px 20px; font-weight: 600; }
+
+/* Restored original button colors */
+.action-btn {
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.edit-btn {
+  background-color: #FFF3CD;
+  color: #856404;
+}
+.edit-btn:hover {
+  background-color: #ffe69c;
+  color: #664d03;
+}
+
+.delete-btn {
+  background-color: #F8D7DA;
+  color: #842029;
+}
+.delete-btn:hover {
+  background-color: #f5c2c7;
+  color: #58151c;
+}
 </style>
