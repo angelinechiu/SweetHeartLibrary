@@ -80,7 +80,7 @@
           <div class="card elegant-card">
             <div class="card-header elegant-card-header d-flex justify-content-between">
               <h5><i class="bi bi-book-fill me-2"></i>Manage Books</h5>
-              <span class="badge bg-light">{{ books.length }} books</span>
+              <span class="badge bg-white text-dark">{{ books.length }} books</span>
             </div>
             <div class="card-body p-0">
               <table class="table table-hover mb-0">
@@ -138,7 +138,7 @@
           <div class="card elegant-card">
             <div class="card-header elegant-card-header d-flex justify-content-between">
               <h5><i class="bi bi-door-open-fill me-2"></i>Manage Rooms</h5>
-              <span class="badge bg-light">{{ rooms.length }} rooms</span>
+              <span class="badge bg-white text-dark">{{ rooms.length }} rooms</span>
             </div>
             <div class="card-body p-0">
               <table class="table table-hover mb-0">
@@ -304,7 +304,7 @@
       <div class="card elegant-card">
         <div class="card-header elegant-card-header d-flex justify-content-between">
           <h5><i class="bi bi-people-fill me-2"></i>Manage Users</h5>
-          <span class="badge bg-light">{{ users.length }} users</span>
+          <span class="badge bg-white text-dark">{{ users.length }} users</span>
         </div>
         <div class="card-body p-0">
           <table class="table table-hover mb-0">
@@ -360,7 +360,7 @@
           <div class="card elegant-card">
             <div class="card-header elegant-card-header d-flex justify-content-between">
               <h5><i class="bi bi-megaphone-fill me-2"></i>Manage Announcements</h5>
-              <span class="badge bg-light">{{ announcements.length }} announcements</span>
+              <span class="badge bg-white text-dark">{{ announcements.length }} announcements</span>
             </div>
             <div class="card-body p-0">
               <table class="table table-hover mb-0">
