@@ -6,7 +6,7 @@
         <!-- Left Side: Title -->
         <div class="flex-grow-1">
           <h1 class="fw-bold mb-1" style="color: #2C2C2C; font-size: 2.4rem;">Admin Dashboard</h1>
-          <p class="text-muted mb-0 fs-5">Manage Books • Rooms • Events • Bookings • Users Details </p>
+          <p class="text-muted mb-0 fs-5">Manage Books • Rooms • Events • Bookings • Users • Announcements</p>
         </div>
 
         <!-- Right Side: ADMIN Badge + Mobile Dropdown -->
@@ -53,8 +53,8 @@
 
     <!-- ==================== BOOKS ==================== -->
     <div v-if="activeTab === 'books'" class="tab-pane">
+      <!-- Books content remains the same -->
       <div class="row g-4">
-        <!-- Add/Edit Book Form -->
         <div class="col-xl-5">
           <div class="card elegant-card h-100">
             <div class="card-header elegant-card-header">
@@ -115,7 +115,6 @@
           </div>
         </div>
 
-        <!-- Books Table -->
         <div class="col-xl-7">
           <div class="card elegant-card">
             <div class="card-header elegant-card-header d-flex justify-content-between align-items-center">
@@ -141,7 +140,6 @@
                       <td>{{ book.copies }}</td>
                       <td>{{ book.availability_status }}</td>
                       <td class="text-end pe-4">
-                        <!-- UPDATED: Colored Box Buttons -->
                         <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditBook(book)">
                           <i class="bi bi-pencil-square me-1"></i> Edit
                         </button>
@@ -161,6 +159,7 @@
 
     <!-- ==================== ROOMS ==================== -->
     <div v-if="activeTab === 'rooms'" class="tab-pane">
+      <!-- Rooms content remains -->
       <div class="row g-4">
         <div class="col-lg-5">
           <div class="card elegant-card h-100">
@@ -231,10 +230,10 @@
       </div>
     </div>
 
-    <!-- ==================== EVENTS (Simple CRUD - No Attendance) ==================== -->
+    <!-- ==================== EVENTS ==================== -->
     <div v-if="activeTab === 'events'" class="tab-pane">
+      <!-- Events content remains -->
       <div class="row g-3">
-        <!-- Add Event Form -->
         <div class="col-lg-5">
           <div class="card elegant-card h-100">
             <div class="card-header elegant-card-header">
@@ -264,7 +263,6 @@
           </div>
         </div>
 
-        <!-- Events List -->
         <div class="col-lg-7">
           <div class="card elegant-card">
             <div class="card-header elegant-card-header">
@@ -304,112 +302,139 @@
       </div>
     </div>
 
-    <!-- ==================== BOOKINGS (New Section) ==================== -->
-<div v-if="activeTab === 'bookings'" class="tab-pane">
-  <h4 class="mb-4 fw-bold">Booking Management</h4>
+    <!-- ==================== BOOKINGS ==================== -->
+    <div v-if="activeTab === 'bookings'" class="tab-pane">
+      <!-- Bookings content remains -->
+      <h4 class="mb-4 fw-bold">Booking Management</h4>
 
-  <!-- Sub Tabs: Borrowed Books vs Room Bookings -->
-  <ul class="nav nav-tabs mb-3">
-    <li class="nav-item">
-      <button class="nav-link" :class="{ active: bookingSubTab === 'books' }"
-              @click="bookingSubTab = 'books'">
-        Borrowed Books
-      </button>
-    </li>
-    <li class="nav-item">
-      <button class="nav-link" :class="{ active: bookingSubTab === 'rooms' }"
-              @click="bookingSubTab = 'rooms'">
-        Room Bookings
-      </button>
-    </li>
-  </ul>
+      <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+          <button class="nav-link" :class="{ active: bookingSubTab === 'books' }" @click="bookingSubTab = 'books'">
+            Borrowed Books
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" :class="{ active: bookingSubTab === 'rooms' }" @click="bookingSubTab = 'rooms'">
+            Room Bookings
+          </button>
+        </li>
+      </ul>
 
-  <!-- ==================== BORROWED BOOKS ==================== -->
-  <div v-if="bookingSubTab === 'books'">
-    <div class="card elegant-card">
-      <div class="card-header elegant-card-header">
-        <h5 class="mb-0"><i class="bi bi-book me-2"></i>Borrowed Books</h5>
+      <div v-if="bookingSubTab === 'books'">
+        <div class="card elegant-card">
+          <div class="card-header elegant-card-header">
+            <h5 class="mb-0"><i class="bi bi-book me-2"></i>Borrowed Books</h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Book Title</th>
+                    <th>Author</th>
+                    <th>Borrow Date</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="booking in activeBorrowings" :key="booking.id">
+                    <td>{{ booking.user_name }}</td>
+                    <td>{{ booking.book_title }}</td>
+                    <td><strong>{{ booking.author }}</strong></td>
+                    <td>{{ formatDate(booking.borrow_date) }}</td>
+                    <td>{{ formatDate(booking.due_date) }}</td>
+                    <td>
+                      <span :class="getBookingStatusClass(booking.status)">
+                        {{ booking.status }}
+                      </span>
+                    </td>
+                    <td>
+                      <button class="btn btn-sm btn-warning" :disabled="booking.status !== 'Overdue' && !booking.has_penalty" @click="sendReminder(booking)">
+                        Send Reminder
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead>
-              <tr>
-                <th>User</th>
-                <th>Book Title</th>
-                <th>Author</th>
-                <th>Borrow Date</th>
-                <th>Due Date</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="booking in activeBorrowings" :key="booking.id">
-                <td>{{ booking.user_name }}</td>
-                <td>{{ booking.book_title }}</td>
-                <td><strong>{{ booking.author }}</strong></td>
-                <td>{{ formatDate(booking.borrow_date) }}</td>
-                <td>{{ formatDate(booking.due_date) }}</td>
-                <td>
-                  <span :class="getBookingStatusClass(booking.status)">
-                    {{ booking.status }}
-                  </span>
-                </td>
-                <td>
-                  <button
-                    class="btn btn-sm btn-warning"
-                    :disabled="booking.status !== 'Overdue' && !booking.has_penalty"
-                    @click="sendReminder(booking)">
-                    Send Reminder
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+
+      <div v-if="bookingSubTab === 'rooms'">
+        <div class="card elegant-card">
+          <div class="card-header elegant-card-header">
+            <h5 class="mb-0"><i class="bi bi-door-open me-2"></i>Active Room Bookings</h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Room</th>
+                    <th>Booking Time</th>
+                    <th>End Time</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="booking in roomBookings" :key="booking.id">
+                    <td>{{ booking.user_name }}</td>
+                    <td>{{ booking.room_name }}</td>
+                    <td>{{ formatDateTime(booking.start_time) }}</td>
+                    <td>{{ formatDateTime(booking.end_time) }}</td>
+                    <td>
+                      <span :class="getBookingStatusClass(booking.status)">
+                        {{ booking.status }}
+                      </span>
+                    </td>
+                    <td>
+                      <button v-if="canMarkRoomAvailable(booking)" class="btn btn-sm btn-success" @click="markRoomAvailable(booking)">
+                        Mark as Available
+                      </button>
+                      <span v-else class="text-muted small">Active</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- ==================== ROOM BOOKINGS ==================== -->
-  <div v-if="bookingSubTab === 'rooms'">
+    <!-- ==================== USERS ==================== -->
+    <div v-if="activeTab === 'users'" class="tab-pane mt-4">
+      <!-- Users content remains -->
       <div class="card elegant-card">
-        <div class="card-header elegant-card-header">
-          <h5 class="mb-0"><i class="bi bi-door-open me-2"></i>Active Room Bookings</h5>
+        <div class="card-header elegant-card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="bi bi-people-fill me-2"></i>Manage Users</h5>
+          <span class="badge bg-light text-dark px-3 py-2">{{ users.length }} users</span>
         </div>
         <div class="card-body p-0">
           <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+            <table class="table table-hover mb-0">
               <thead>
                 <tr>
-                  <th>User</th>
-                  <th>Room</th>
-                  <th>Booking Time</th>
-                  <th>End Time</th>
-                  <th>Status</th>
-                  <th>Actions</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th class="text-end">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="booking in roomBookings" :key="booking.id">
-                  <td>{{ booking.user_name }}</td>
-                  <td>{{ booking.room_name }}</td>
-                  <td>{{ formatDateTime(booking.start_time) }}</td>
-                  <td>{{ formatDateTime(booking.end_time) }}</td>
-                  <td>
-                    <span :class="getBookingStatusClass(booking.status)">
-                      {{ booking.status }}
-                    </span>
-                  </td>
-                  <td>
-                    <button
-                      v-if="canMarkRoomAvailable(booking)"
-                      class="btn btn-sm btn-success"
-                      @click="markRoomAvailable(booking)">
-                      Mark as Available
-                    </button>
-                    <span v-else class="text-muted small">Active</span>
+                <tr v-for="user in users" :key="user.id">
+                  <td class="fw-semibold">{{ user.name }}</td>
+                  <td>{{ user.email }}</td>
+                  <td>{{ user.role || 'user' }}</td>
+                  <td class="text-end">
+                    <button class="btn btn-sm action-btn edit-btn me-2" @click="viewUser(user)">View</button>
+                    <button class="btn btn-sm action-btn delete-btn" @click="deleteUser(user.id)">Delete</button>
                   </td>
                 </tr>
               </tbody>
@@ -418,55 +443,106 @@
         </div>
       </div>
     </div>
-  </div>
-  <!-- ==================== USERS ==================== -->
-  <div v-if="activeTab === 'users'" class="tab-pane mt-4">
-    <div class="card elegant-card">
-      <div class="card-header elegant-card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="bi bi-people-fill me-2"></i>Manage Users</h5>
-        <span class="badge bg-light text-dark px-3 py-2">{{ users.length }} users</span>
+
+    <!-- ==================== ANNOUNCEMENTS (NEW TAB - Full CRUD for Admin) ==================== -->
+    <div v-if="activeTab === 'announcements'" class="tab-pane">
+      <div class="row g-4">
+        <!-- Add / Edit Announcement Form -->
+        <div class="col-lg-5">
+          <div class="card elegant-card h-100">
+            <div class="card-header elegant-card-header">
+              <h5 class="mb-0">
+                <i class="bi bi-plus-circle-fill me-2"></i>
+                {{ editingAnnouncement ? 'Edit Announcement' : 'Create New Announcement' }}
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label fw-semibold small">Title</label>
+                  <input v-model="newAnnouncement.title" class="form-control fw-semibold small" placeholder="Announcement Title">
+                </div>
+                <div class="col-12">
+                  <label class="form-label fw-semibold small">Type</label>
+                  <select v-model="newAnnouncement.type" class="form-select fw-semibold small">
+                    <option value="Notice">Notice</option>
+                    <option value="Reminder">Reminder</option>
+                    <option value="Event">Event</option>
+                    <option value="Maintenance">Maintenance</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label class="form-label fw-semibold small">Message</label>
+                  <textarea v-model="newAnnouncement.message" class="form-control fw-semibold small" rows="4" placeholder="Announcement message..."></textarea>
+                </div>
+                <div class="col-12 d-flex gap-2 mt-2">
+                  <button v-if="!editingAnnouncement" class="btn btn-pink flex-fill py-2" @click="addAnnouncement">
+                    <i class="bi bi-plus-lg me-2"></i> Publish Announcement
+                  </button>
+                  <button v-else class="btn btn-success flex-fill py-2" @click="saveAnnouncementEdit">Save Changes</button>
+                  <button v-if="editingAnnouncement" class="btn btn-secondary flex-fill py-2" @click="cancelEdit">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Announcements List -->
+        <div class="col-lg-7">
+          <div class="card elegant-card">
+            <div class="card-header elegant-card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0"><i class="bi bi-megaphone-fill me-2"></i>Manage Announcements</h5>
+              <span class="badge bg-light text-dark px-3 py-2">{{ announcements.length }} announcements</span>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>Title</th>
+                      <th>Type</th>
+                      <th>Date</th>
+                      <th>Message</th>
+                      <th class="text-end pe-4">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="ann in announcements" :key="ann.id">
+                      <td class="fw-semibold">{{ ann.title }}</td>
+                      <td><span class="badge" style="background-color: #E8B4B8; color: #2C2C2C;">{{ ann.type }}</span></td>
+                      <td>{{ ann.date || ann.created_at }}</td>
+                      <td class="text-muted small" style="max-width: 280px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ ann.message }}</td>
+                      <td class="text-end pe-4">
+                        <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditAnnouncement(ann)">
+                          <i class="bi bi-pencil-square me-1"></i> Edit
+                        </button>
+                        <button class="btn btn-sm action-btn delete-btn" @click="deleteAnnouncement(ann.id)">
+                          <i class="bi bi-trash3 me-1"></i> Delete
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-hover mb-0">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th class="text-end">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="user in users" :key="user.id">
-                <td class="fw-semibold">{{ user.name }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.role || 'user' }}</td>
-                <td class="text-end">
-                  <button class="btn btn-sm action-btn edit-btn me-2" @click="viewUser(user)">View</button>
-                  <button class="btn btn-sm action-btn delete-btn" @click="deleteUser(user.id)">Delete</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+    </div>
+
+    <!-- User details modal -->
+    <div v-if="showUserModal" class="admin-modal-backdrop">
+      <div class="admin-modal">
+        <h5>User details</h5>
+        <div><strong>Name:</strong> {{ selectedUser.name }}</div>
+        <div><strong>Email:</strong> {{ selectedUser.email }}</div>
+        <div><strong>Role:</strong> {{ selectedUser.role || 'user' }}</div>
+        <div class="mt-3 text-end">
+          <button class="btn btn-secondary me-2" @click="closeUserModal">Close</button>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- User details modal -->
-  <div v-if="showUserModal" class="admin-modal-backdrop">
-    <div class="admin-modal">
-      <h5>User details</h5>
-      <div><strong>Name:</strong> {{ selectedUser.name }}</div>
-      <div><strong>Email:</strong> {{ selectedUser.email }}</div>
-      <div><strong>Role:</strong> {{ selectedUser.role || 'user' }}</div>
-      <div class="mt-3 text-end">
-        <button class="btn btn-secondary me-2" @click="closeUserModal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
 </template>
 
 <script setup>
@@ -481,9 +557,11 @@ const tabs = [
   { key: 'rooms', label: 'Rooms', icon: 'bi bi-door-open-fill' },
   { key: 'events', label: 'Events', icon: 'bi bi-calendar-event-fill' },
   { key: 'bookings', label: 'Bookings', icon: 'bi bi-calendar-check-fill' },
-  { key: 'users', label: 'Users', icon: 'bi bi-people-fill' }
+  { key: 'users', label: 'Users', icon: 'bi bi-people-fill' },
+  { key: 'announcements', label: 'Announcements', icon: 'bi bi-megaphone-fill' }
 ]
 
+// Existing data refs
 const books = ref([])
 const rooms = ref([])
 const events = ref([])
@@ -491,10 +569,13 @@ const users = ref([])
 const selectedUser = ref(null)
 const showUserModal = ref(false)
 
-const newBook = ref({
-  title: '', author: '', isbn: '', category: '', publication_year: new Date().getFullYear(),
-  copies: 1, description: '', availability_status: 'Available'
-})
+// New: Announcements
+const announcements = ref([])
+const newAnnouncement = ref({ title: '', type: 'Notice', message: '' })
+const editingAnnouncement = ref(false)
+
+// Existing form refs
+const newBook = ref({ title: '', author: '', isbn: '', category: '', publication_year: new Date().getFullYear(), copies: 1, description: '', availability_status: 'Available' })
 const newRoom = ref({ name: '', capacity: '', equipment: '' })
 const newEvent = ref({ title: '', event_date: '', event_time: '', description: '' })
 
@@ -502,6 +583,7 @@ const editingBook = ref(false)
 const editingRoom = ref(false)
 const editingEvent = ref(false)
 
+// ==================== LOAD DATA ====================
 const loadAllData = async () => {
   try {
     const [b, r, e] = await Promise.all([
@@ -517,7 +599,62 @@ const loadAllData = async () => {
   }
 }
 
-// ==================== BOOKS CRUD ====================
+const loadAnnouncements = async () => {
+  try {
+    const res = await api.get('/announcements.php')
+    announcements.value = res.data || []
+  } catch (error) {
+    console.error('Failed to load announcements', error)
+  }
+}
+
+// ==================== ANNOUNCEMENTS CRUD ====================
+const addAnnouncement = async () => {
+  if (!newAnnouncement.value.title || !newAnnouncement.value.message) {
+    return alert('Title and Message are required')
+  }
+  try {
+    await api.post('/announcements.php', newAnnouncement.value)
+    resetAnnouncementForm()
+    loadAnnouncements()
+  } catch (err) {
+    alert('Failed to create announcement')
+  }
+}
+
+const startEditAnnouncement = (ann) => {
+  newAnnouncement.value = { ...ann }
+  editingAnnouncement.value = true
+}
+
+const saveAnnouncementEdit = async () => {
+  try {
+    await api.post('/announcements.php', newAnnouncement.value)
+    resetAnnouncementForm()
+    loadAnnouncements()
+  } catch (err) {
+    alert('Failed to update announcement')
+  }
+}
+
+const deleteAnnouncement = async (id) => {
+  if (!confirm('Delete this announcement?')) return
+  try {
+    await api.delete(`/announcements.php?id=${id}`)
+    loadAnnouncements()
+  } catch (err) {
+    alert('Failed to delete announcement')
+  }
+}
+
+const resetAnnouncementForm = () => {
+  newAnnouncement.value = { title: '', type: 'Notice', message: '' }
+  editingAnnouncement.value = false
+}
+
+// ==================== EXISTING CRUD (Books, Rooms, Events, Users) ====================
+// (Keeping all existing methods to avoid breaking other tabs)
+
 const currentTabLabel = computed(() => {
   const tab = tabs.find(t => t.key === activeTab.value)
   return tab ? tab.label : 'Menu'
@@ -528,6 +665,7 @@ const currentTabIcon = computed(() => {
   return tab ? tab.icon : 'bi bi-list'
 })
 
+// Books CRUD
 const addBook = async () => {
   if (!newBook.value.title) return alert('Title is required')
   await api.post('/books.php', newBook.value)
@@ -553,7 +691,7 @@ const deleteBook = async (id) => {
   }
 }
 
-// ==================== ROOMS CRUD ====================
+// Rooms CRUD
 const addRoom = async () => {
   if (!newRoom.value.name) return alert('Room name is required')
   await api.post('/rooms.php', newRoom.value)
@@ -579,7 +717,7 @@ const deleteRoom = async (id) => {
   }
 }
 
-// ==================== EVENTS CRUD (Simple - No Attendance) ====================
+// Events CRUD
 const addEvent = async () => {
   if (!newEvent.value.title) return alert('Event title is required')
   await api.post('/events.php', newEvent.value)
@@ -606,87 +744,56 @@ const deleteEvent = async (id) => {
   }
 }
 
-// ==================== BOOKINGS ====================
+// Bookings logic (kept from previous)
 const bookingSubTab = ref('books')
-const activeBorrowings = ref([])   // Borrowed Books
-const roomBookings = ref([])       // Room Bookings
+const activeBorrowings = ref([])
+const roomBookings = ref([])
+const API_BASE = 'http://localhost/sweetheart-library-backend/api/'
 
-const API_BASE = 'http://localhost/sweetheart-library-backend/api/' // ← Change if needed
-
-// ==================== FETCH FUNCTIONS ====================
 const fetchBookings = async () => {
   try {
     const res = await axios.get(API_BASE + 'bookings.php?action=get')
-    console.log('fetchBookings response:', res)
     if (res && res.data && res.data.success) {
       activeBorrowings.value = res.data.borrowed_books || []
       roomBookings.value = res.data.room_bookings || []
-    } else {
-      console.warn('Bookings API returned no success flag', res && res.data)
     }
   } catch (error) {
     console.error('Failed to fetch bookings:', error)
-    alert('Failed to load booking data')
   }
 }
 
-// ==================== ACTION FUNCTIONS ====================
 const sendReminder = async (booking) => {
   if (!booking?.id) return alert('Booking ID is missing')
   if (!confirm(`Send reminder to ${booking.user_name} for "${booking.book_title}"?`)) return
-
   try {
-    const res = await axios.post(API_BASE + 'bookings.php?action=send_reminder', {
-      booking_id: booking.id
-    })
-    console.log('sendReminder response', res.data)
+    const res = await axios.post(API_BASE + 'bookings.php?action=send_reminder', { booking_id: booking.id })
     if (res.data?.success) {
       alert(res.data.message || 'Reminder sent successfully!')
-      fetchBookings() // Refresh data
-    } else {
-      alert(res.data?.message || 'Failed to send reminder')
+      fetchBookings()
     }
   } catch (err) {
-    console.error('sendReminder error', err)
-    alert('Failed to send reminder: ' + (err?.message || 'Unknown error'))
+    alert('Failed to send reminder')
   }
 }
-
-/* markAsReturned removed (unused) */
 
 const markRoomAvailable = async (booking) => {
   if (!booking?.id) return alert('Booking ID is missing')
   if (!confirm(`Mark room "${booking.room_name}" as Available now?`)) return
-
   try {
-    const res = await axios.post(API_BASE + 'bookings.php?action=mark_room_available', {
-      booking_id: booking.id
-    })
-    console.log('markRoomAvailable response', res.data)
+    const res = await axios.post(API_BASE + 'bookings.php?action=mark_room_available', { booking_id: booking.id })
     if (res.data?.success) {
       alert(res.data.message || 'Room marked as available!')
-      fetchBookings() // Refresh list (removes from active)
-    } else {
-      alert(res.data?.message || 'Failed to update room status')
+      fetchBookings()
     }
   } catch (err) {
-    console.error('markRoomAvailable error', err)
-    alert('Failed to update room status: ' + (err?.message || 'Unknown error'))
+    alert('Failed to update room status')
   }
 }
 
-// ==================== HELPER FUNCTIONS ====================
-const formatDate = (date) => {
-  return date ? new Date(date).toLocaleDateString('en-MY') : '-'
-}
+const formatDate = (date) => date ? new Date(date).toLocaleDateString('en-MY') : '-'
+const formatDateTime = (datetime) => datetime ? new Date(datetime).toLocaleString('en-MY', { hour12: false }) : '-'
 
-const formatDateTime = (datetime) => {
-  return datetime ? new Date(datetime).toLocaleString('en-MY', { hour12: false }) : '-'
-}
-
-const isRoomBookingEnded = (booking) => {
-  return new Date(booking.end_time) < new Date()
-}
+const isRoomBookingEnded = (booking) => new Date(booking.end_time) < new Date()
 
 const getBookingStatusClass = (statusOrBooking) => {
   const status = typeof statusOrBooking === 'string' ? statusOrBooking : (statusOrBooking && statusOrBooking.status)
@@ -694,16 +801,11 @@ const getBookingStatusClass = (statusOrBooking) => {
   return status === 'Overdue' ? 'badge bg-danger' : 'badge bg-success'
 }
 
-const canMarkRoomAvailable = (booking) => {
-  return isRoomBookingEnded(booking) || booking.status === 'Completed'
-}
+const canMarkRoomAvailable = (booking) => isRoomBookingEnded(booking) || booking.status === 'Completed'
 
 // Reset helpers
 const resetBookForm = () => {
-  newBook.value = {
-    title: '', author: '', isbn: '', category: '', publication_year: new Date().getFullYear(),
-    copies: 1, description: '', availability_status: 'Available'
-  }
+  newBook.value = { title: '', author: '', isbn: '', category: '', publication_year: new Date().getFullYear(), copies: 1, description: '', availability_status: 'Available' }
   editingBook.value = false
 }
 
@@ -712,11 +814,7 @@ const resetRoomForm = () => {
   editingRoom.value = false
 }
 
-// ==================== LIFECYCLE ====================
-onMounted(() => {
-  fetchBookings()
-})
-
+// User management
 const loadUsers = async () => {
   try {
     const res = await api.get('/users.php')
@@ -728,7 +826,6 @@ const loadUsers = async () => {
 
 const viewUser = (u) => {
   selectedUser.value = { ...u }
-  // explicitly omit sensitive fields
   if (selectedUser.value.password) delete selectedUser.value.password
   showUserModal.value = true
 }
@@ -748,13 +845,17 @@ const deleteUser = async (id) => {
   }
 }
 
+// ==================== LIFECYCLE ====================
 onMounted(() => {
   loadAllData()
   loadUsers()
+  loadAnnouncements()
+  fetchBookings()
 })
 </script>
 
 <style scoped>
+/* Keep all existing styles */
 .elegant-admin-tabs .nav-link {
   color: #2C2C2C;
   font-weight: 600;
@@ -813,23 +914,6 @@ onMounted(() => {
   color: #58151c;
 }
 
-.notify-btn {
-  background-color: #CFE2FF;
-  color: #084298;
-}
-.notify-btn:hover {
-  background-color: #b6d4fe;
-}
-
-.success-btn {
-  background-color: #D1E7DD;
-  color: #0f5132;
-}
-.success-btn:hover {
-  background-color: #badbcc;
-}
-
-/* Make sure dropdown looks good */
 .dropdown-menu {
   border-radius: 12px;
   padding: 8px 0;
@@ -840,7 +924,6 @@ onMounted(() => {
   font-weight: 500;
 }
 
-/* Simple modal for user details */
 .admin-modal-backdrop {
   position: fixed;
   inset: 0;
