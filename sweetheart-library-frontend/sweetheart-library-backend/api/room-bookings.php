@@ -17,7 +17,7 @@ $data = json_decode(file_get_contents('php://input'), true);
 
 if ($method === 'GET') {
     if ($action === 'my_recent') {
-        // Get recent room bookings for logged in user (last 5)
+        // Get recent room bookings for logged in user (last 3 only)
         $user_id = $_GET['user_id'] ?? 1; // TODO: get from session/token
 
         $stmt = $pdo->prepare("
@@ -25,7 +25,7 @@ if ($method === 'GET') {
             FROM room_bookings 
             WHERE user_id = ? 
             ORDER BY start_time DESC 
-            LIMIT 5
+            LIMIT 3
         ");
         $stmt->execute([$user_id]);
         $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
