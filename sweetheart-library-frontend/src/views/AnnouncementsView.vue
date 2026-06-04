@@ -10,12 +10,6 @@
         <router-link v-if="isAdmin" to="/admin" class="btn btn-pink">Manage Announcements</router-link>
       </div>
 
-      <!-- Debug Info (Temporary) -->
-      <div v-if="debugInfo" class="alert alert-info mb-4">
-        <strong>Debug Info:</strong><br>
-        {{ debugInfo }}
-      </div>
-
       <!-- Loading -->
       <LoadingSpinner :loading="loading" message="Loading announcements..." />
 
@@ -73,27 +67,16 @@ import LoadingSpinner from '../components/LoadingSpinner.vue'
 const authStore = useAuthStore()
 const loading = ref(true)
 const announcements = ref([])
-const debugInfo = ref('')   // For debugging
 
 const isAdmin = computed(() => authStore.user?.role === 'admin')
 
 const loadAnnouncements = async () => {
   loading.value = true
-  debugInfo.value = 'Starting to load announcements...'
-  
   try {
-    console.log('[Announcements] Calling API...')
     const res = await api.get('/announcements.php?action=get_published')
-    
-    console.log('[Announcements] API Response:', res)
-    console.log('[Announcements] Data received:', res.data)
-    
     announcements.value = res.data || []
-    debugInfo.value = `Success! Loaded ${announcements.value.length} announcements`
-    
   } catch (error) {
-    console.error('[Announcements] Error loading announcements:', error)
-    debugInfo.value = 'Error: ' + (error.response?.data?.error || error.message || 'Unknown error')
+    console.error('Failed to load announcements:', error)
     announcements.value = []
   } finally {
     loading.value = false
