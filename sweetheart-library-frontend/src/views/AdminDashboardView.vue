@@ -3,24 +3,30 @@
     <!-- Header -->
     <div class="admin-header mb-4">
       <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <!-- Left Side: Title -->
         <div class="flex-grow-1">
           <h1 class="fw-bold mb-1" style="color: #2C2C2C; font-size: 2.4rem;">Admin Dashboard</h1>
-          <p class="text-muted mb-0 fs-5">Manage Books • Rooms • Events • Bookings • Users • Announcements</p>
+          <p class="text-muted mb-0 fs-5">Manage Books • Rooms • Events • Bookings • Users Details </p>
         </div>
 
+        <!-- Right Side: ADMIN Badge + Mobile Dropdown -->
         <div class="d-flex align-items-center gap-3">
-          <span class="badge px-4 py-2 fs-6" style="background-color: #E8B4B8; color: #2C2C2C; font-weight: 700; border-radius: 50px;">
+          <span class="badge px-4 py-2 fs-6"
+                style="background-color: #E8B4B8; color: #2C2C2C; font-weight: 700; border-radius: 50px;">
             ADMIN
           </span>
 
+          <!-- Mobile Dropdown (only shows on small screens) -->
           <div class="dropdown d-md-none">
-            <button class="btn btn-dark dropdown-toggle px-3 py-2 d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+            <button class="btn btn-dark dropdown-toggle px-3 py-2 d-flex align-items-center gap-2"
+                    type="button" data-bs-toggle="dropdown" aria-expanded="false">
               <i :class="currentTabIcon"></i>
               <span>{{ currentTabLabel }}</span>
             </button>
             <ul class="dropdown-menu dropdown-menu-end shadow">
               <li v-for="tab in tabs" :key="tab.key">
-                <button class="dropdown-item d-flex align-items-center gap-2" @click="activeTab = tab.key">
+                <button class="dropdown-item d-flex align-items-center gap-2"
+                        @click="activeTab = tab.key">
                   <i :class="tab.icon"></i>
                   <span>{{ tab.label }}</span>
                 </button>
@@ -31,11 +37,13 @@
       </div>
     </div>
 
-    <!-- Desktop Tabs -->
+    <!-- Desktop Tabs (hidden on mobile) -->
     <div class="mb-4 d-none d-md-block">
       <ul class="nav nav-pills elegant-admin-tabs">
         <li class="nav-item" v-for="tab in tabs" :key="tab.key">
-          <button class="nav-link d-flex align-items-center gap-2" :class="{ active: activeTab === tab.key }" @click="activeTab = tab.key">
+          <button class="nav-link d-flex align-items-center gap-2"
+                  :class="{ active: activeTab === tab.key }"
+                  @click="activeTab = tab.key">
             <i :class="tab.icon"></i>
             <span>{{ tab.label }}</span>
           </button>
@@ -50,86 +58,133 @@
         <div class="col-xl-5">
           <div class="card elegant-card h-100">
             <div class="card-header elegant-card-header">
-              <h5 class="mb-0"><i class="bi bi-plus-circle-fill me-2"></i>{{ editingBook ? 'Edit Book' : 'Add New Book' }}</h5>
+              <h5 class="mb-0">
+                <i class="bi bi-plus-circle-fill me-2"></i>
+                {{ editingBook ? 'Edit Book' : 'Add New Book' }}
+              </h5>
             </div>
             <div class="card-body">
               <div class="row g-3">
-                <div class="col-12"><input v-model="newBook.title" class="form-control" placeholder="Book Title"></div>
-                <div class="col-12"><input v-model="newBook.author" class="form-control" placeholder="Author"></div>
-                <div class="col-md-6"><input v-model="newBook.isbn" class="form-control" placeholder="ISBN"></div>
-                <div class="col-md-6"><input v-model="newBook.category" class="form-control" placeholder="Category"></div>
-                <div class="col-md-6"><input v-model.number="newBook.publication_year" type="number" class="form-control" placeholder="Year"></div>
-                <div class="col-md-6"><input v-model.number="newBook.copies" type="number" class="form-control" placeholder="Copies"></div>
                 <div class="col-12">
-                  <select v-model="newBook.availability_status" class="form-select">
+                  <label class="form-label fw-semibold small">Title</label>
+                  <input v-model="newBook.title" class="form-control fw-semibold small" placeholder="Book Title">
+                </div>
+                <div class="col-12">
+                  <label class="form-label fw-semibold small">Author</label>
+                  <input v-model="newBook.author" class="form-control fw-semibold small" placeholder="Author">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold small">ISBN</label>
+                  <input v-model="newBook.isbn" class="form-control fw-semibold small" placeholder="978-3-16-148410-0">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold small">Category</label>
+                  <input v-model="newBook.category" class="form-control fw-semibold small " placeholder="Fiction / Science">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold small">Publication Year</label>
+                  <input v-model="newBook.publication_year" type="number" class="form-control fw-semibold small" placeholder="2024">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold small">Copies</label>
+                  <input v-model.number="newBook.copies" type="number" class="form-control fw-semibold small" placeholder="3">
+                </div>
+                <div class="col-12">
+                  <label class="form-label fw-semibold small">Availability Status</label>
+                  <select v-model="newBook.availability_status" class="form-select fw-semibold small">
                     <option value="Available">Available</option>
                     <option value="Borrowed">Borrowed</option>
                     <option value="Reserved">Reserved</option>
+                    <option value="Maintenance">Under Maintenance</option>
                   </select>
                 </div>
-                <div class="col-12 d-flex gap-2 mt-3">
-                  <button v-if="!editingBook" class="btn btn-pink flex-fill" @click="addBook">Add Book</button>
-                  <button v-else class="btn btn-success flex-fill" @click="saveBookEdit">Save Changes</button>
-                  <button v-if="editingBook" class="btn btn-secondary flex-fill" @click="cancelEdit">Cancel</button>
+                <div class="col-12">
+                  <label class="form-label fw-semibold small">Description</label>
+                  <textarea v-model="newBook.description" class="form-control fw-semibold small" rows="2" placeholder="Short description..."></textarea>
+                </div>
+
+                <div class="col-12 d-flex gap-2 mt-2">
+                  <button v-if="!editingBook" class="btn btn-pink flex-fill py-2" @click="addBook">
+                    <i class="bi bi-plus-lg me-2"></i> Add Book
+                  </button>
+                  <button v-else class="btn btn-success flex-fill py-2" @click="saveBookEdit">Save Changes</button>
+                  <button v-if="editingBook" class="btn btn-secondary flex-fill py-2" @click="cancelEdit">Cancel</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Books List -->
+        <!-- Books Table -->
         <div class="col-xl-7">
           <div class="card elegant-card">
-            <div class="card-header elegant-card-header d-flex justify-content-between">
-              <h5><i class="bi bi-book-fill me-2"></i>Manage Books</h5>
-              <span class="badge bg-light">{{ books.length }} books</span>
+            <div class="card-header elegant-card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0"><i class="bi bi-book-fill me-2"></i>Manage Books</h5>
+              <span class="badge bg-light text-dark px-3 py-2">{{ books.length }} books</span>
             </div>
             <div class="card-body p-0">
-              <table class="table table-hover mb-0">
-                <thead>
-                  <tr>
-                    <th>Title</th><th>Author</th><th>ISBN</th><th>Category</th><th>Year</th><th>Copies</th><th>Status</th><th class="text-end">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="book in books" :key="book.id">
-                    <td>{{ book.title }}</td>
-                    <td>{{ book.author }}</td>
-                    <td>{{ book.isbn }}</td>
-                    <td>{{ book.category }}</td>
-                    <td>{{ book.publication_year }}</td>
-                    <td>{{ book.copies }}</td>
-                    <td>{{ book.availability_status }}</td>
-                    <td class="text-end">
-                      <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditBook(book)">Edit</button>
-                      <button class="btn btn-sm action-btn delete-btn" @click="deleteBook(book.id)">Delete</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>Title</th><th>Author</th><th>ISBN</th><th>Category</th>
+                      <th>Year</th><th>Copies</th><th>Status</th><th class="text-end pe-4">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="book in books" :key="book.id">
+                      <td>{{ book.title }}</td>
+                      <td>{{ book.author }}</td>
+                      <td>{{ book.isbn }}</td>
+                      <td>{{ book.category }}</td>
+                      <td>{{ book.publication_year }}</td>
+                      <td>{{ book.copies }}</td>
+                      <td>{{ book.availability_status }}</td>
+                      <td class="text-end pe-4">
+                        <!-- UPDATED: Colored Box Buttons -->
+                        <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditBook(book)">
+                          <i class="bi bi-pencil-square me-1"></i> Edit
+                        </button>
+                        <button class="btn btn-sm action-btn delete-btn" @click="deleteBook(book.id)">
+                          <i class="bi bi-trash3 me-1"></i> Delete
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ROOMS TAB -->
+    <!-- ==================== ROOMS ==================== -->
     <div v-if="activeTab === 'rooms'" class="tab-pane">
       <div class="row g-4">
         <div class="col-lg-5">
           <div class="card elegant-card h-100">
             <div class="card-header elegant-card-header">
-              <h5><i class="bi bi-plus-circle-fill me-2"></i>{{ editingRoom ? 'Edit Room' : 'Add New Room' }}</h5>
+              <h5 class="mb-0">
+                <i class="bi bi-plus-circle-fill me-2"></i>
+                {{ editingRoom ? 'Edit Room' : 'Add New Room' }}
+              </h5>
             </div>
             <div class="card-body">
               <div class="row g-3">
-                <div class="col-12"><input v-model="newRoom.name" class="form-control" placeholder="Room Name"></div>
-                <div class="col-12"><input v-model.number="newRoom.capacity" type="number" class="form-control" placeholder="Capacity"></div>
-                <div class="col-12"><input v-model="newRoom.equipment" class="form-control" placeholder="Equipment"></div>
-                <div class="col-12 d-flex gap-2 mt-3">
-                  <button v-if="!editingRoom" class="btn btn-pink w-100" @click="addRoom">Add Room</button>
-                  <button v-else class="btn btn-success w-100" @click="saveRoomEdit">Save</button>
-                  <button v-if="editingRoom" class="btn btn-secondary w-100" @click="cancelEdit">Cancel</button>
+                <div class="col-12"><input v-model="newRoom.name" class="form-control fw-semibold small" placeholder="Room Name"></div>
+                <div class="col-12"><input v-model.number="newRoom.capacity" type="number" class="form-control fw-semibold small" placeholder="Capacity"></div>
+                <div class="col-12"><input v-model="newRoom.equipment" class="form-control fw-semibold small" placeholder="Equipment"></div>
+                <div class="col-12 d-flex gap-2 mt-2">
+                  <button v-if="!editingRoom" class="btn btn-pink w-100 py-2" @click="addRoom">
+                    <i class="bi bi-plus-lg me-2"></i> Add Room
+                  </button>
+                  <button v-else class="btn btn-success w-100 py-2" @click="saveRoomEdit">
+                    <i class="bi bi-save me-2"></i> Save Changes
+                  </button>
+                </div>
+                <div v-if="editingRoom" class="col-12">
+                  <button class="btn btn-secondary w-100 py-2" @click="cancelEdit">Cancel</button>
                 </div>
               </div>
             </div>
@@ -138,66 +193,82 @@
 
         <div class="col-lg-7">
           <div class="card elegant-card">
-            <div class="card-header elegant-card-header d-flex justify-content-between">
-              <h5><i class="bi bi-door-open-fill me-2"></i>Manage Rooms</h5>
-              <span class="badge bg-light">{{ rooms.length }} rooms</span>
+            <div class="card-header elegant-card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">Manage Rooms</h5>
+              <span class="badge bg-light text-dark px-3 py-2">{{ rooms.length }} rooms</span>
             </div>
             <div class="card-body p-0">
-              <table class="table table-hover mb-0">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Capacity</th>
-                    <th>Equipment</th>
-                    <th class="text-end">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="room in rooms" :key="room.id">
-                    <td class="fw-semibold">{{ room.name }}</td>
-                    <td><span class="badge bg-secondary">{{ room.capacity }} seats</span></td>
-                    <td>{{ room.equipment }}</td>
-                    <td class="text-end">
-                      <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditRoom(room)">Edit</button>
-                      <button class="btn btn-sm action-btn delete-btn" @click="deleteRoom(room.id)">Delete</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Capacity</th>
+                      <th>Equipment</th>
+                      <th class="text-end pe-4">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="room in rooms" :key="room.id">
+                      <td class="fw-semibold">{{ room.name }}</td>
+                      <td><span class="badge bg-secondary">{{ room.capacity }} seats</span></td>
+                      <td>{{ room.equipment }}</td>
+                      <td class="text-end pe-4">
+                        <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditRoom(room)">
+                          <i class="bi bi-pencil-square me-1"></i> Edit
+                        </button>
+                        <button class="btn btn-sm action-btn delete-btn" @click="deleteRoom(room.id)">
+                          <i class="bi bi-trash3 me-1"></i> Delete
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- EVENTS TAB -->
+    <!-- ==================== EVENTS (Simple CRUD - No Attendance) ==================== -->
     <div v-if="activeTab === 'events'" class="tab-pane">
       <div class="row g-3">
+        <!-- Add Event Form -->
         <div class="col-lg-5">
           <div class="card elegant-card h-100">
             <div class="card-header elegant-card-header">
-              <h5><i class="bi bi-plus-circle-fill me-2"></i>{{ editingEvent ? 'Edit Event' : 'Add New Event' }}</h5>
+              <h5 class="mb-0"><i class="bi bi-plus-circle-fill me-2"></i>Add New Event</h5>
             </div>
             <div class="card-body">
               <div class="row g-3">
-                <div class="col-12"><input v-model="newEvent.title" class="form-control" placeholder="Event Title"></div>
-                <div class="col-md-6"><input v-model="newEvent.event_date" type="date" class="form-control"></div>
-                <div class="col-md-6"><input v-model="newEvent.event_time" type="time" class="form-control"></div>
-                <div class="col-12"><textarea v-model="newEvent.description" class="form-control" rows="2" placeholder="Description"></textarea></div>
-                <div class="col-12 d-flex gap-2 mt-3">
-                  <button v-if="!editingEvent" class="btn btn-pink w-100" @click="addEvent">Create Event</button>
-                  <button v-else class="btn btn-success w-100" @click="saveEventEdit">Save</button>
-                  <button v-if="editingEvent" class="btn btn-secondary w-100" @click="cancelEdit">Cancel</button>
+                <div class="col-12">
+                  <input v-model="newEvent.title" class="form-control fw-semibold small" placeholder="Event Title">
+                </div>
+                <div class="col-md-6">
+                  <input v-model="newEvent.event_date" type="date" class="form-control fw-semibold small">
+                </div>
+                <div class="col-md-6">
+                  <input v-model="newEvent.event_time" type="time" class="form-control fw-semibold small">
+                </div>
+                <div class="col-12">
+                  <textarea v-model="newEvent.description" class="form-control fw-semibold small" rows="2" placeholder="Description"></textarea>
+                </div>
+                <div class="col-12 d-flex gap-2 mt-2">
+                  <button v-if="!editingEvent" class="btn btn-pink w-100 py-2" @click="addEvent">Create Event</button>
+                  <button v-else class="btn btn-success flex-fill py-2" @click="saveEventEdit">Save Changes</button>
+                  <button v-if="editingEvent" class="btn btn-secondary flex-fill py-2" @click="cancelEdit">Cancel</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
+        <!-- Events List -->
         <div class="col-lg-7">
           <div class="card elegant-card">
             <div class="card-header elegant-card-header">
-              <h5><i class="bi bi-calendar-event-fill me-2"></i>Manage Events</h5>
+              <h5 class="mb-0"><i class="bi bi-calendar-event-fill me-2"></i>Manage Events</h5>
             </div>
             <div class="card-body p-0">
               <table class="table table-hover mb-0">
@@ -207,18 +278,22 @@
                     <th>Description</th>
                     <th>Date</th>
                     <th>Time</th>
-                    <th class="text-end">Actions</th>
+                    <th class="text-end pe-4">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="event in events" :key="event.id">
-                    <td class="fw-semibold">{{ event.title }}</td>
-                    <td class="text-muted">{{ event.description || '-' }}</td>
-                    <td>{{ event.event_date }}</td>
-                    <td>{{ event.event_time }}</td>
-                    <td class="text-end">
-                      <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditEvent(event)">Edit</button>
-                      <button class="btn btn-sm action-btn delete-btn" @click="deleteEvent(event.id)">Delete</button>
+                    <td class="align-middle fw-semibold">{{ event.title }}</td>
+                    <td class="align-middle text-muted">{{ event.description || 'No description provided' }}</td>
+                    <td class="align-middle">{{ event.event_date }}</td>
+                    <td class="align-middle">{{ event.event_time }}</td>
+                    <td class="text-end pe-4 align-middle">
+                      <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditEvent(event)">
+                        <i class="bi bi-pencil-square me-1"></i> Edit
+                      </button>
+                      <button class="btn btn-sm action-btn delete-btn" @click="deleteEvent(event.id)">
+                        <i class="bi bi-trash3 me-1"></i> Delete
+                      </button>
                     </td>
                   </tr>
                 </tbody>
@@ -229,57 +304,89 @@
       </div>
     </div>
 
-    <!-- BOOKINGS TAB -->
-    <div v-if="activeTab === 'bookings'" class="tab-pane">
-      <h4 class="mb-4 fw-bold">Booking Management</h4>
+    <!-- ==================== BOOKINGS (New Section) ==================== -->
+<div v-if="activeTab === 'bookings'" class="tab-pane">
+  <h4 class="mb-4 fw-bold">Booking Management</h4>
 
-      <ul class="nav nav-tabs mb-3">
-        <li class="nav-item"><button class="nav-link" :class="{active: bookingSubTab === 'books'}" @click="bookingSubTab = 'books'">Borrowed Books</button></li>
-        <li class="nav-item"><button class="nav-link" :class="{active: bookingSubTab === 'rooms'}" @click="bookingSubTab = 'rooms'">Room Bookings</button></li>
-      </ul>
+  <!-- Sub Tabs: Borrowed Books vs Room Bookings -->
+  <ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+      <button class="nav-link" :class="{ active: bookingSubTab === 'books' }"
+              @click="bookingSubTab = 'books'">
+        Borrowed Books
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" :class="{ active: bookingSubTab === 'rooms' }"
+              @click="bookingSubTab = 'rooms'">
+        Room Bookings
+      </button>
+    </li>
+  </ul>
 
-      <!-- Borrowed Books -->
-      <div v-if="bookingSubTab === 'books'">
-        <div class="card elegant-card">
-          <div class="card-header elegant-card-header"><h5><i class="bi bi-book me-2"></i>Borrowed Books</h5></div>
-          <div class="card-body p-0">
-            <table class="table table-hover mb-0">
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Book</th>
-                  <th>Due Date</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="booking in activeBorrowings" :key="booking.id">
-                  <td>{{ booking.user_name }}</td>
-                  <td>{{ booking.book_title }}</td>
-                  <td>{{ formatDate(booking.due_date) }}</td>
-                  <td><span :class="getBookingStatusClass(booking.status)">{{ booking.status }}</span></td>
-                  <td>
-                    <button class="btn btn-sm btn-warning" :disabled="booking.status !== 'Overdue'" @click="sendReminder(booking)">Send Reminder</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+  <!-- ==================== BORROWED BOOKS ==================== -->
+  <div v-if="bookingSubTab === 'books'">
+    <div class="card elegant-card">
+      <div class="card-header elegant-card-header">
+        <h5 class="mb-0"><i class="bi bi-book me-2"></i>Borrowed Books</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Book Title</th>
+                <th>Author</th>
+                <th>Borrow Date</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="booking in activeBorrowings" :key="booking.id">
+                <td>{{ booking.user_name }}</td>
+                <td>{{ booking.book_title }}</td>
+                <td><strong>{{ booking.author }}</strong></td>
+                <td>{{ formatDate(booking.borrow_date) }}</td>
+                <td>{{ formatDate(booking.due_date) }}</td>
+                <td>
+                  <span :class="getBookingStatusClass(booking.status)">
+                    {{ booking.status }}
+                  </span>
+                </td>
+                <td>
+                  <button
+                    class="btn btn-sm btn-warning"
+                    :disabled="booking.status !== 'Overdue' && !booking.has_penalty"
+                    @click="sendReminder(booking)">
+                    Send Reminder
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
+    </div>
+  </div>
 
-      <!-- Room Bookings -->
-      <div v-if="bookingSubTab === 'rooms'">
-        <div class="card elegant-card">
-          <div class="card-header elegant-card-header"><h5><i class="bi bi-door-open me-2"></i>Active Room Bookings</h5></div>
-          <div class="card-body p-0">
-            <table class="table table-hover mb-0">
+  <!-- ==================== ROOM BOOKINGS ==================== -->
+  <div v-if="bookingSubTab === 'rooms'">
+      <div class="card elegant-card">
+        <div class="card-header elegant-card-header">
+          <h5 class="mb-0"><i class="bi bi-door-open me-2"></i>Active Room Bookings</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
               <thead>
                 <tr>
                   <th>User</th>
                   <th>Room</th>
-                  <th>Time</th>
+                  <th>Booking Time</th>
+                  <th>End Time</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
@@ -289,9 +396,20 @@
                   <td>{{ booking.user_name }}</td>
                   <td>{{ booking.room_name }}</td>
                   <td>{{ formatDateTime(booking.start_time) }}</td>
-                  <td><span :class="getBookingStatusClass(booking.status)">{{ booking.status }}</span></td>
+                  <td>{{ formatDateTime(booking.end_time) }}</td>
                   <td>
-                    <button v-if="canMarkRoomAvailable(booking)" class="btn btn-sm btn-success" @click="markRoomAvailable(booking)">Mark Available</button>
+                    <span :class="getBookingStatusClass(booking.status)">
+                      {{ booking.status }}
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      v-if="canMarkRoomAvailable(booking)"
+                      class="btn btn-sm btn-success"
+                      @click="markRoomAvailable(booking)">
+                      Mark as Available
+                    </button>
+                    <span v-else class="text-muted small">Active</span>
                   </td>
                 </tr>
               </tbody>
@@ -300,18 +418,24 @@
         </div>
       </div>
     </div>
-
-    <!-- USERS TAB -->
-    <div v-if="activeTab === 'users'" class="tab-pane mt-4">
-      <div class="card elegant-card">
-        <div class="card-header elegant-card-header d-flex justify-content-between">
-          <h5><i class="bi bi-people-fill me-2"></i>Manage Users</h5>
-          <span class="badge bg-light">{{ users.length }} users</span>
-        </div>
-        <div class="card-body p-0">
+  </div>
+  <!-- ==================== USERS ==================== -->
+  <div v-if="activeTab === 'users'" class="tab-pane mt-4">
+    <div class="card elegant-card">
+      <div class="card-header elegant-card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-people-fill me-2"></i>Manage Users</h5>
+        <span class="badge bg-light text-dark px-3 py-2">{{ users.length }} users</span>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
           <table class="table table-hover mb-0">
             <thead>
-              <tr><th>Name</th><th>Email</th><th>Role</th><th class="text-end">Actions</th></tr>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th class="text-end">Actions</th>
+              </tr>
             </thead>
             <tbody>
               <tr v-for="user in users" :key="user.id">
@@ -328,75 +452,21 @@
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- ANNOUNCEMENTS TAB -->
-    <div v-if="activeTab === 'announcements'" class="tab-pane">
-      <div class="row g-4">
-        <div class="col-lg-5">
-          <div class="card elegant-card h-100">
-            <div class="card-header elegant-card-header">
-              <h5><i class="bi bi-plus-circle-fill me-2"></i>{{ editingAnnouncement ? 'Edit' : 'Create' }} Announcement</h5>
-            </div>
-            <div class="card-body">
-              <div class="row g-3">
-                <div class="col-12"><input v-model="newAnnouncement.title" class="form-control" placeholder="Title"></div>
-                <div class="col-12">
-                  <select v-model="newAnnouncement.type" class="form-select">
-                    <option value="Notice">Notice</option>
-                    <option value="Reminder">Reminder</option>
-                    <option value="Event">Event</option>
-                  </select>
-                </div>
-                <div class="col-12"><textarea v-model="newAnnouncement.message" class="form-control" rows="3" placeholder="Message"></textarea></div>
-                <div class="col-12 d-flex gap-2 mt-2">
-                  <button v-if="!editingAnnouncement" class="btn btn-pink flex-fill" @click="addAnnouncement">Publish</button>
-                  <button v-else class="btn btn-success flex-fill" @click="saveAnnouncementEdit">Save</button>
-                  <button v-if="editingAnnouncement" class="btn btn-secondary flex-fill" @click="cancelEdit">Cancel</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-7">
-          <div class="card elegant-card">
-            <div class="card-header elegant-card-header d-flex justify-content-between">
-              <h5><i class="bi bi-megaphone-fill me-2"></i>Manage Announcements</h5>
-              <span class="badge bg-light">{{ announcements.length }} announcements</span>
-            </div>
-            <div class="card-body p-0">
-              <table class="table table-hover mb-0">
-                <thead>
-                  <tr><th>Title</th><th>Type</th><th>Date</th><th class="text-end">Actions</th></tr>
-                </thead>
-                <tbody>
-                  <tr v-for="ann in announcements" :key="ann.id">
-                    <td class="fw-semibold">{{ ann.title }}</td>
-                    <td><span class="badge bg-pink text-dark">{{ ann.type }}</span></td>
-                    <td>{{ ann.created_at }}</td>
-                    <td class="text-end">
-                      <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditAnnouncement(ann)">Edit</button>
-                      <button class="btn btn-sm action-btn delete-btn" @click="deleteAnnouncement(ann.id)">Delete</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- User Modal -->
-    <div v-if="showUserModal" class="admin-modal-backdrop">
-      <div class="admin-modal">
-        <h5>User Details</h5>
-        <p><strong>Name:</strong> {{ selectedUser?.name }}</p>
-        <p><strong>Email:</strong> {{ selectedUser?.email }}</p>
-        <button class="btn btn-secondary mt-3" @click="closeUserModal">Close</button>
+  <!-- User details modal -->
+  <div v-if="showUserModal" class="admin-modal-backdrop">
+    <div class="admin-modal">
+      <h5>User details</h5>
+      <div><strong>Name:</strong> {{ selectedUser.name }}</div>
+      <div><strong>Email:</strong> {{ selectedUser.email }}</div>
+      <div><strong>Role:</strong> {{ selectedUser.role || 'user' }}</div>
+      <div class="mt-3 text-end">
+        <button class="btn btn-secondary me-2" @click="closeUserModal">Close</button>
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <script setup>
@@ -405,13 +475,13 @@ import api from '../services/api.js'
 import axios from 'axios'
 
 const activeTab = ref('books')
+
 const tabs = [
   { key: 'books', label: 'Books', icon: 'bi bi-book-fill' },
   { key: 'rooms', label: 'Rooms', icon: 'bi bi-door-open-fill' },
   { key: 'events', label: 'Events', icon: 'bi bi-calendar-event-fill' },
   { key: 'bookings', label: 'Bookings', icon: 'bi bi-calendar-check-fill' },
-  { key: 'users', label: 'Users', icon: 'bi bi-people-fill' },
-  { key: 'announcements', label: 'Announcements', icon: 'bi bi-megaphone-fill' }
+  { key: 'users', label: 'Users', icon: 'bi bi-people-fill' }
 ]
 
 const books = ref([])
@@ -421,11 +491,10 @@ const users = ref([])
 const selectedUser = ref(null)
 const showUserModal = ref(false)
 
-const announcements = ref([])
-const newAnnouncement = ref({ title: '', type: 'Notice', message: '' })
-const editingAnnouncement = ref(false)
-
-const newBook = ref({ title: '', author: '', isbn: '', category: '', publication_year: new Date().getFullYear(), copies: 1, availability_status: 'Available' })
+const newBook = ref({
+  title: '', author: '', isbn: '', category: '', publication_year: new Date().getFullYear(),
+  copies: 1, description: '', availability_status: 'Available'
+})
 const newRoom = ref({ name: '', capacity: '', equipment: '' })
 const newEvent = ref({ title: '', event_date: '', event_time: '', description: '' })
 
@@ -433,143 +502,359 @@ const editingBook = ref(false)
 const editingRoom = ref(false)
 const editingEvent = ref(false)
 
-const bookingSubTab = ref('books')
-const activeBorrowings = ref([])
-const roomBookings = ref([])
-
-const API_BASE = 'http://localhost/sweetheart-library-backend/api/'
-
-// ==================== LOAD DATA ====================
 const loadAllData = async () => {
   try {
-    const [b, r, e] = await Promise.all([api.get('/books.php'), api.get('/rooms.php'), api.get('/events.php')])
+    const [b, r, e] = await Promise.all([
+      api.get('/books.php'),
+      api.get('/rooms.php'),
+      api.get('/events.php')
+    ])
     books.value = b.data || []
     rooms.value = r.data || []
     events.value = e.data || []
-  } catch (e) { console.error(e) }
+  } catch (error) {
+    console.error(error)
+  }
 }
 
-const loadAnnouncements = async () => {
-  try {
-    const res = await api.get('/announcements.php?action=get_all')
-    announcements.value = res.data || []
-  } catch (e) { console.error(e) }
+// ==================== BOOKS CRUD ====================
+const currentTabLabel = computed(() => {
+  const tab = tabs.find(t => t.key === activeTab.value)
+  return tab ? tab.label : 'Menu'
+})
+
+const currentTabIcon = computed(() => {
+  const tab = tabs.find(t => t.key === activeTab.value)
+  return tab ? tab.icon : 'bi bi-list'
+})
+
+const addBook = async () => {
+  if (!newBook.value.title) return alert('Title is required')
+  await api.post('/books.php', newBook.value)
+  resetBookForm()
+  loadAllData()
 }
 
+const startEditBook = (book) => {
+  newBook.value = { ...book }
+  editingBook.value = true
+}
+
+const saveBookEdit = async () => {
+  await api.post('/books.php', newBook.value)
+  resetBookForm()
+  loadAllData()
+}
+
+const deleteBook = async (id) => {
+  if (confirm('Delete this book?')) {
+    await api.delete(`/books.php?id=${id}`)
+    loadAllData()
+  }
+}
+
+// ==================== ROOMS CRUD ====================
+const addRoom = async () => {
+  if (!newRoom.value.name) return alert('Room name is required')
+  await api.post('/rooms.php', newRoom.value)
+  resetRoomForm()
+  loadAllData()
+}
+
+const startEditRoom = (room) => {
+  newRoom.value = { ...room }
+  editingRoom.value = true
+}
+
+const saveRoomEdit = async () => {
+  await api.post('/rooms.php', newRoom.value)
+  resetRoomForm()
+  loadAllData()
+}
+
+const deleteRoom = async (id) => {
+  if (confirm('Delete this room?')) {
+    await api.delete(`/rooms.php?id=${id}`)
+    loadAllData()
+  }
+}
+
+// ==================== EVENTS CRUD (Simple - No Attendance) ====================
+const addEvent = async () => {
+  if (!newEvent.value.title) return alert('Event title is required')
+  await api.post('/events.php', newEvent.value)
+  newEvent.value = { title: '', event_date: '', event_time: '', description: '' }
+  loadAllData()
+}
+
+const startEditEvent = (event) => {
+  newEvent.value = { ...event }
+  editingEvent.value = true
+}
+
+const saveEventEdit = async () => {
+  await api.post('/events.php', newEvent.value)
+  newEvent.value = { title: '', event_date: '', event_time: '', description: '' }
+  editingEvent.value = false
+  loadAllData()
+}
+
+const deleteEvent = async (id) => {
+  if (confirm('Delete this event?')) {
+    await api.delete(`/events.php?id=${id}`)
+    loadAllData()
+  }
+}
+
+// ==================== BOOKINGS ====================
+const bookingSubTab = ref('books')
+const activeBorrowings = ref([])   // Borrowed Books
+const roomBookings = ref([])       // Room Bookings
+
+const API_BASE = 'http://localhost/sweetheart-library-backend/api/' // ← Change if needed
+
+// ==================== FETCH FUNCTIONS ====================
 const fetchBookings = async () => {
   try {
     const res = await axios.get(API_BASE + 'bookings.php?action=get')
-    if (res.data?.success) {
+    console.log('fetchBookings response:', res)
+    if (res && res.data && res.data.success) {
       activeBorrowings.value = res.data.borrowed_books || []
       roomBookings.value = res.data.room_bookings || []
+    } else {
+      console.warn('Bookings API returned no success flag', res && res.data)
     }
-  } catch (e) { console.error(e) }
-}
-
-// ==================== ANNOUNCEMENTS ====================
-const addAnnouncement = async () => {
-  if (!newAnnouncement.value.title || !newAnnouncement.value.message) return alert('Title and message required')
-  await api.post('/announcements.php', newAnnouncement.value)
-  newAnnouncement.value = { title: '', type: 'Notice', message: '' }
-  loadAnnouncements()
-}
-
-const startEditAnnouncement = (ann) => {
-  newAnnouncement.value = { ...ann }
-  editingAnnouncement.value = true
-}
-
-const saveAnnouncementEdit = async () => {
-  await api.post('/announcements.php', newAnnouncement.value)
-  editingAnnouncement.value = false
-  newAnnouncement.value = { title: '', type: 'Notice', message: '' }
-  loadAnnouncements()
-}
-
-const deleteAnnouncement = async (id) => {
-  if (confirm('Delete this announcement?')) {
-    await api.delete(`/announcements.php?id=${id}`)
-    loadAnnouncements()
+  } catch (error) {
+    console.error('Failed to fetch bookings:', error)
+    alert('Failed to load booking data')
   }
 }
 
-// ==================== SEND REMINDER ====================
+// ==================== ACTION FUNCTIONS ====================
 const sendReminder = async (booking) => {
-  if (!booking?.id) return
-  if (!confirm(`Send reminder for ${booking.book_title}?`)) return
+  if (!booking?.id) return alert('Booking ID is missing')
+  if (!confirm(`Send reminder to ${booking.user_name} for "${booking.book_title}"?`)) return
 
   try {
-    await api.post('/announcements.php', {
-      title: 'Overdue Book Reminder',
-      message: `You have an overdue book: "${booking.book_title}". Please return it soon.`,
-      type: 'Overdue Reminder',
-      due_date: booking.due_date,
-      is_published: 1
+    const res = await axios.post(API_BASE + 'bookings.php?action=send_reminder', {
+      booking_id: booking.id
     })
-    alert('Reminder sent successfully!')
-    fetchBookings()
-  } catch (e) {
-    alert('Failed to send reminder')
+    console.log('sendReminder response', res.data)
+    if (res.data?.success) {
+      alert(res.data.message || 'Reminder sent successfully!')
+      fetchBookings() // Refresh data
+    } else {
+      alert(res.data?.message || 'Failed to send reminder')
+    }
+  } catch (err) {
+    console.error('sendReminder error', err)
+    alert('Failed to send reminder: ' + (err?.message || 'Unknown error'))
   }
 }
+
+/* markAsReturned removed (unused) */
 
 const markRoomAvailable = async (booking) => {
-  if (!booking?.id) return
-  if (!confirm(`Mark room as available?`)) return
+  if (!booking?.id) return alert('Booking ID is missing')
+  if (!confirm(`Mark room "${booking.room_name}" as Available now?`)) return
+
   try {
-    await axios.post(API_BASE + 'bookings.php?action=mark_room_available', { booking_id: booking.id })
-    alert('Room marked as available!')
-    fetchBookings()
-  } catch (e) {
-    alert('Failed to update room')
+    const res = await axios.post(API_BASE + 'bookings.php?action=mark_room_available', {
+      booking_id: booking.id
+    })
+    console.log('markRoomAvailable response', res.data)
+    if (res.data?.success) {
+      alert(res.data.message || 'Room marked as available!')
+      fetchBookings() // Refresh list (removes from active)
+    } else {
+      alert(res.data?.message || 'Failed to update room status')
+    }
+  } catch (err) {
+    console.error('markRoomAvailable error', err)
+    alert('Failed to update room status: ' + (err?.message || 'Unknown error'))
   }
 }
 
-// ==================== CRUD ====================
-const addBook = async () => { await api.post('/books.php', newBook.value); loadAllData() }
-const startEditBook = (book) => { newBook.value = { ...book }; editingBook.value = true }
-const saveBookEdit = async () => { await api.post('/books.php', newBook.value); editingBook.value = false; loadAllData() }
-const deleteBook = async (id) => { if (confirm('Delete book?')) { await api.delete(`/books.php?id=${id}`); loadAllData() } }
+// ==================== HELPER FUNCTIONS ====================
+const formatDate = (date) => {
+  return date ? new Date(date).toLocaleDateString('en-MY') : '-'
+}
 
-const addRoom = async () => { await api.post('/rooms.php', newRoom.value); loadAllData() }
-const startEditRoom = (room) => { newRoom.value = { ...room }; editingRoom.value = true }
-const saveRoomEdit = async () => { await api.post('/rooms.php', newRoom.value); editingRoom.value = false; loadAllData() }
-const deleteRoom = async (id) => { if (confirm('Delete room?')) { await api.delete(`/rooms.php?id=${id}`); loadAllData() } }
+const formatDateTime = (datetime) => {
+  return datetime ? new Date(datetime).toLocaleString('en-MY', { hour12: false }) : '-'
+}
 
-const addEvent = async () => { await api.post('/events.php', newEvent.value); loadAllData() }
-const startEditEvent = (event) => { newEvent.value = { ...event }; editingEvent.value = true }
-const saveEventEdit = async () => { await api.post('/events.php', newEvent.value); editingEvent.value = false; loadAllData() }
-const deleteEvent = async (id) => { if (confirm('Delete event?')) { await api.delete(`/events.php?id=${id}`); loadAllData() } }
+const isRoomBookingEnded = (booking) => {
+  return new Date(booking.end_time) < new Date()
+}
 
-const loadUsers = async () => { try { const res = await api.get('/users.php'); users.value = res.data || [] } catch(e){} }
-const viewUser = (u) => { selectedUser.value = u; showUserModal.value = true }
-const closeUserModal = () => { showUserModal.value = false }
-const deleteUser = async (id) => { if (confirm('Delete user?')) { await api.delete(`/users.php?id=${id}`); loadUsers() } }
+const getBookingStatusClass = (statusOrBooking) => {
+  const status = typeof statusOrBooking === 'string' ? statusOrBooking : (statusOrBooking && statusOrBooking.status)
+  if (!status) return 'badge bg-secondary'
+  return status === 'Overdue' ? 'badge bg-danger' : 'badge bg-success'
+}
 
-// Helpers
-const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-MY') : '-'
-const formatDateTime = (d) => d ? new Date(d).toLocaleString('en-MY') : '-'
-const getBookingStatusClass = (s) => s === 'Overdue' ? 'badge bg-danger' : 'badge bg-success'
-const canMarkRoomAvailable = (b) => new Date(b.end_time) < new Date()
+const canMarkRoomAvailable = (booking) => {
+  return isRoomBookingEnded(booking) || booking.status === 'Completed'
+}
+
+// Reset helpers
+const resetBookForm = () => {
+  newBook.value = {
+    title: '', author: '', isbn: '', category: '', publication_year: new Date().getFullYear(),
+    copies: 1, description: '', availability_status: 'Available'
+  }
+  editingBook.value = false
+}
+
+const resetRoomForm = () => {
+  newRoom.value = { name: '', capacity: '', equipment: '' }
+  editingRoom.value = false
+}
+
+// ==================== LIFECYCLE ====================
+onMounted(() => {
+  fetchBookings()
+})
+
+const loadUsers = async () => {
+  try {
+    const res = await api.get('/users.php')
+    users.value = res.data || []
+  } catch (err) {
+    console.error('Failed loading users', err)
+  }
+}
+
+const viewUser = (u) => {
+  selectedUser.value = { ...u }
+  // explicitly omit sensitive fields
+  if (selectedUser.value.password) delete selectedUser.value.password
+  showUserModal.value = true
+}
+
+const closeUserModal = () => {
+  showUserModal.value = false
+  selectedUser.value = null
+}
+
+const deleteUser = async (id) => {
+  if (!confirm('Delete this user?')) return
+  try {
+    await api.delete(`/users.php?id=${id}`)
+    await loadUsers()
+  } catch (err) {
+    console.error('Failed to delete user', err)
+  }
+}
 
 onMounted(() => {
   loadAllData()
   loadUsers()
-  loadAnnouncements()
-  fetchBookings()
 })
 </script>
 
 <style scoped>
-.elegant-admin-tabs .nav-link { color: #2C2C2C; font-weight: 600; padding: 10px 24px; border-radius: 50px; margin-right: 8px; border: 2px solid #E8B4B8; background: white; transition: all 0.3s ease; }
-.elegant-admin-tabs .nav-link.active { background-color: #E8B4B8; color: #2C2C2C; border-color: #E8B4B8; box-shadow: 0 4px 15px rgba(232, 180, 184, 0.4); }
+.elegant-admin-tabs .nav-link {
+  color: #2C2C2C;
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 50px;
+  margin-right: 8px;
+  border: 2px solid #E8B4B8;
+  background: white;
+  transition: all 0.3s ease;
+}
+.table th, .table td {
+  padding: 10px;
+}
 
-.elegant-card { border: none; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
-.elegant-card-header { background: linear-gradient(#2C2C2C, #1F1F1F); color: #F8F4F0; padding: 16px 20px; font-weight: 600; }
+.elegant-admin-tabs .nav-link.active {
+  background-color: #E8B4B8;
+  color: #2C2C2C;
+  border-color: #E8B4B8;
+  box-shadow: 0 4px 15px rgba(232, 180, 184, 0.4);
+}
+.elegant-card {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
+.elegant-card-header {
+  background: linear-gradient(#2C2C2C, #1F1F1F);
+  color: #F8F4F0;
+  padding: 16px 20px;
+  font-weight: 600;
+}
+.action-btn {
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  border: none;
+}
 
-.action-btn { border-radius: 8px; padding: 6px 14px; font-weight: 600; font-size: 0.875rem; transition: all 0.2s ease; border: none; }
-.edit-btn { background-color: #FFF3CD; color: #856404; }
-.edit-btn:hover { background-color: #ffe69c; color: #664d03; }
-.delete-btn { background-color: #F8D7DA; color: #842029; }
-.delete-btn:hover { background-color: #f5c2c7; color: #58151c; }
+.edit-btn {
+  background-color: #FFF3CD;
+  color: #856404;
+}
+.edit-btn:hover {
+  background-color: #ffe69c;
+  color: #664d03;
+}
+
+.delete-btn {
+  background-color: #F8D7DA;
+  color: #842029;
+}
+.delete-btn:hover {
+  background-color: #f5c2c7;
+  color: #58151c;
+}
+
+.notify-btn {
+  background-color: #CFE2FF;
+  color: #084298;
+}
+.notify-btn:hover {
+  background-color: #b6d4fe;
+}
+
+.success-btn {
+  background-color: #D1E7DD;
+  color: #0f5132;
+}
+.success-btn:hover {
+  background-color: #badbcc;
+}
+
+/* Make sure dropdown looks good */
+.dropdown-menu {
+  border-radius: 12px;
+  padding: 8px 0;
+}
+
+.dropdown-item {
+  padding: 10px 16px;
+  font-weight: 500;
+}
+
+/* Simple modal for user details */
+.admin-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+.admin-modal {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  width: 320px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+}
 </style>
