@@ -152,31 +152,6 @@
       </div>
     </div>
 
-    <!-- ==================== LATEST ANNOUNCEMENTS ==================== -->
-    <div class="py-5">
-      <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h2 class="fw-bold mb-0" style="color: #2C2C2C;">Latest Announcements</h2>
-          <router-link to="/announcements" class="text-decoration-none fw-semibold" style="color: #E8B4B8;">View All →</router-link>
-        </div>
-
-        <div class="row g-4">
-          <div class="col-md-6" v-for="announcement in latestAnnouncements" :key="announcement.id">
-            <div class="card border-0 shadow-sm h-100" style="background-color: #D9CFC2; border-radius: 16px;">
-              <div class="card-body p-4">
-                <div class="d-flex align-items-center mb-3">
-                  <span class="badge px-3 py-1 me-2" style="background-color: #E8B4B8; color: #2C2C2C;">{{ announcement.type }}</span>
-                  <small class="text-muted">{{ announcement.date }}</small>
-                </div>
-                <h5 class="fw-semibold mb-2" style="color: #2C2C2C;">{{ announcement.title }}</h5>
-                <p class="text-muted mb-0">{{ announcement.message }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
   </div>
 </template>
 
@@ -241,23 +216,6 @@ const categories = ref([
   { name: "Education", icon: "📚" }
 ])
 
-const latestAnnouncements = ref([
-  {
-    id: 1,
-    type: "Notice",
-    title: "Library Hours Extended",
-    message: "Sweetheart Library will now be open until 10 PM on weekdays starting next week.",
-    date: "June 3, 2026"
-  },
-  {
-    id: 2,
-    type: "Reminder",
-    title: "Overdue Book Returns",
-    message: "Please return all borrowed books by June 10 to avoid late fees. Renewals available via dashboard.",
-    date: "June 2, 2026"
-  }
-])
-
 const performSearch = () => {
   if (searchQuery.value.trim()) {
     router.push({ path: '/books', query: { search: searchQuery.value.trim() } })
@@ -273,7 +231,7 @@ const bookRoom = (room) => {
 
 <style scoped>
 .hover-card {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .hover-card:hover {
   transform: translateY(-10px);
