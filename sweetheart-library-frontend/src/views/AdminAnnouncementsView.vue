@@ -15,7 +15,7 @@
       <div v-if="showCreateForm" class="card border-0 shadow-sm mb-4" style="background-color: #fff; border-radius: 16px;">
         <div class="card-body p-4">
           <h5 class="fw-semibold mb-3">{{ editingId ? 'Edit Announcement' : 'Create New Announcement' }}</h5>
-          
+
           <form @submit.prevent="saveAnnouncement">
             <div class="row g-3">
               <div class="col-md-8">
@@ -169,6 +169,7 @@ const togglePublish = async (ann) => {
     })
     await loadAnnouncements()
   } catch (error) {
+    console.error('Failed to update publish status:', error)
     alert('Failed to update status')
   }
 }
@@ -179,6 +180,7 @@ const deleteAnnouncement = async (ann) => {
     await api.delete(`/announcements.php?id=${ann.id}`)
     await loadAnnouncements()
   } catch (error) {
+    console.error('Failed to delete announcement:', error)
     alert('Failed to delete announcement')
   }
 }
