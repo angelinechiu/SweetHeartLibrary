@@ -516,7 +516,7 @@ const sendReminder = async (booking) => {
   }
 }
 
-const markRoomAvailable = async (booking) => { /* implementation if needed */ }
+const markRoomAvailable = async (booking) => { /* ... */ }
 
 const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-MY') : '-'
 const formatDateTime = (d) => d ? new Date(d).toLocaleString('en-MY') : '-'
@@ -525,7 +525,7 @@ const getBookingStatusClass = (s) => s === 'Overdue' ? 'badge bg-danger' : 'badg
 
 const canMarkRoomAvailable = (b) => new Date(b.end_time) < new Date()
 
-// Simplified CRUD methods
+// CRUD methods
 const addBook = async () => { await api.post('/books.php', newBook.value); loadAllData() }
 const startEditBook = (book) => { newBook.value = { ...book }; editingBook.value = true }
 const saveBookEdit = async () => { await api.post('/books.php', newBook.value); editingBook.value = false; loadAllData() }
@@ -555,13 +555,39 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.elegant-admin-tabs .nav-link { color: #2C2C2C; font-weight: 600; padding: 10px 24px; border-radius: 50px; margin-right: 8px; border: 2px solid #E8B4B8; background: white; transition: all 0.3s ease; }
-.elegant-admin-tabs .nav-link.active { background-color: #E8B4B8; color: #2C2C2C; border-color: #E8B4B8; box-shadow: 0 4px 15px rgba(232, 180, 184, 0.4); }
+/* ==================== ELEGANT ADMIN STYLING ==================== */
+.elegant-admin-tabs .nav-link {
+  color: #2C2C2C;
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 50px;
+  margin-right: 8px;
+  border: 2px solid #E8B4B8;
+  background: white;
+  transition: all 0.3s ease;
+}
 
-.elegant-card { border: none; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
-.elegant-card-header { background: linear-gradient(#2C2C2C, #1F1F1F); color: #F8F4F0; padding: 16px 20px; font-weight: 600; }
+.elegant-admin-tabs .nav-link.active {
+  background-color: #E8B4B8;
+  color: #2C2C2C;
+  border-color: #E8B4B8;
+  box-shadow: 0 4px 15px rgba(232, 180, 184, 0.4);
+}
 
-/* Restored original button colors */
+.elegant-card {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
+
+.elegant-card-header {
+  background: linear-gradient(#2C2C2C, #1F1F1F);
+  color: #F8F4F0;
+  padding: 16px 20px;
+  font-weight: 600;
+}
+
+/* Action Buttons */
 .action-btn {
   border-radius: 8px;
   padding: 6px 14px;
@@ -587,5 +613,41 @@ onMounted(() => {
 .delete-btn:hover {
   background-color: #f5c2c7;
   color: #58151c;
+}
+
+/* Table */
+.table th, .table td {
+  padding: 12px 15px;
+  vertical-align: middle;
+}
+
+/* Dropdown */
+.dropdown-menu {
+  border-radius: 12px;
+  padding: 8px 0;
+}
+
+.dropdown-item {
+  padding: 10px 16px;
+  font-weight: 500;
+}
+
+/* Modal */
+.admin-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.admin-modal {
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  width: 340px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.2);
 }
 </style>
