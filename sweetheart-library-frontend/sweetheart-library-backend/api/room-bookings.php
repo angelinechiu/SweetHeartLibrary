@@ -31,8 +31,7 @@ if ($method === 'GET') {
                     room_name, 
                     start_time, 
                     end_time, 
-                    status, 
-                    COALESCE(location, 'Main Library') AS location
+                    status
                 FROM room_bookings 
                 WHERE user_id = ? 
                 ORDER BY start_time DESC 
@@ -41,7 +40,7 @@ if ($method === 'GET') {
             $stmt->execute([$user_id]);
             $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Safe formatting for frontend
+            // Format for frontend (no location)
             foreach ($bookings as &$b) {
                 if (!empty($b['start_time']) && !empty($b['end_time'])) {
                     $b['date'] = date('M j, Y', strtotime($b['start_time']));
@@ -49,10 +48,6 @@ if ($method === 'GET') {
                 } else {
                     $b['date'] = 'N/A';
                     $b['time'] = 'N/A';
-                }
-                // Ensure location always exists
-                if (!isset($b['location'])) {
-                    $b['location'] = 'Main Library';
                 }
             }
 
