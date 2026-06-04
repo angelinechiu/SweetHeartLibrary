@@ -61,7 +61,7 @@
           </div>
         </div>
 
-        <!-- ==================== 2. BORROWED BOOKS ==================== -->
+        <!-- ==================== 2. BORROWED BOOKS (VIEW ONLY) ==================== -->
         <div class="mb-5">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="fw-semibold mb-0" style="color: #2C2C2C;">
@@ -94,17 +94,14 @@
                     </div>
                   </div>
 
-                  <div class="mt-3 d-flex gap-2">
-                    <button class="btn btn-sm btn-outline-secondary flex-fill" @click="viewBookDetails(book)">Details</button>
-                    <!-- Users CANNOT cancel or return books - only renew if overdue -->
-                  </div>
+                  <!-- No Details button as requested - viewing only -->
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- ==================== 3. OVERDUE BOOKS ==================== -->
+        <!-- ==================== 3. OVERDUE BOOKS + RENEW (Already good) ==================== -->
         <div>
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="fw-semibold mb-0 text-danger">
@@ -160,6 +157,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
+import api from '../services/api.js'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -195,68 +193,60 @@ const calculateOverdueDays = (dueDate) => {
 }
 
 // Actions
-const viewRoomBooking = () => {
+const viewRoomBooking = (room) => {
   router.push('/my-bookings')
 }
 
 const cancelRoomBooking = async (room) => {
   if (!confirm(`Cancel booking for "${room.room_name}"?`)) return
-  // TODO: Call real API to cancel room booking
-  alert('Room booking cancelled. (Backend integration pending)')
-  // Refresh data
-  loadDashboardData()
+
+  try {
+    await api.post('/room-bookings.php?action=cancel', { booking_id: room.id })
+    alert('Room booking cancelled successfully!')
+    loadDashboardData() // refresh
+  } catch (error) {
+    console.error(error)
+    alert('Failed to cancel room booking. Please try again.')
+  }
 }
 
-const viewBookDetails = (book) => {
-  router.push(`/books/${book.id}`)
-}
-
-const renewOverdueBook = (book) => {
+const renewOverdueBook = async (book) => {
   if (!confirm(`Renew "${book.title}" for another 7 days?`)) return
 
-  const currentDue = new Date(book.due_date)
-  currentDue.setDate(currentDue.getDate() + 7)
-  const newDueDate = currentDue.toISOString().split('T')[0]
-
-  // Update local state
-  const index = overdueBooks.value.findIndex(b => b.id === book.id)
-  if (index !== -1) {
-    overdueBooks.value[index].due_date = newDueDate
-    // Move to borrowed books after renewal
-    borrowedBooks.value.push(overdueBooks.value[index])
-    overdueBooks.value.splice(index, 1)
+  try {
+    await api.post('/borrowings.php?action=renew', { 
+      borrowing_id: book.id 
+    })
+    alert(`"${book.title}" renewed successfully for 7 more days!`)
+    loadDashboardData()
+  } catch (error) {
+    console.error(error)
+    alert('Failed to renew book. Please try again.')
   }
-
-  alert(`"${book.title}" renewed successfully!\nNew due date: ${newDueDate}`)
-
-  // TODO: Call real API
-  // await api.post('/borrowings.php', { action: 'renew', borrowing_id: book.id, new_due_date: newDueDate })
 }
 
 // Load Data
 const loadDashboardData = async () => {
   loading.value = true
   try {
-    // TODO: Replace with real API calls
-    // const res = await api.get(`/dashboard.php?user_id=${authStore.user?.id}`)
+    // Load recent room bookings
+    const roomRes = await api.get('/room-bookings.php?action=my_recent')
+    recentRoomBookings.value = roomRes.data || []
 
-    // Mock data for demonstration
-    recentRoomBookings.value = [
-      { id: 101, room_name: "The Rose Study", date: "June 5, 2026", time: "14:00 - 16:00", status: "confirmed", location: "2nd Floor" },
-      { id: 102, room_name: "The Garden Room", date: "June 3, 2026", time: "10:00 - 12:00", status: "completed", location: "Ground Floor" }
-    ]
+    // Load borrowed books
+    const borrowRes = await api.get('/borrowings.php?action=my_borrowed')
+    borrowedBooks.value = borrowRes.data || []
 
-    borrowedBooks.value = [
-      { id: 1, title: "The Silent Patient", author: "Alex Michaelides", borrowed_date: "May 20, 2026", due_date: "June 10, 2026", status: "Borrowed" },
-      { id: 2, title: "Educated", author: "Tara Westover", borrowed_date: "May 25, 2026", due_date: "June 8, 2026", status: "Borrowed" }
-    ]
-
-    overdueBooks.value = [
-      { id: 3, title: "Dune", author: "Frank Herbert", borrowed_date: "May 10, 2026", due_date: "May 28, 2026", status: "Overdue" }
-    ]
+    // Load overdue books
+    const overdueRes = await api.get('/borrowings.php?action=my_overdue')
+    overdueBooks.value = overdueRes.data || []
 
   } catch (error) {
     console.error('Failed to load dashboard data:', error)
+    // Fallback to empty if API fails
+    recentRoomBookings.value = []
+    borrowedBooks.value = []
+    overdueBooks.value = []
   } finally {
     loading.value = false
   }
