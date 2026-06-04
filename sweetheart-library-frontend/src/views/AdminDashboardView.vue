@@ -398,7 +398,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import api from '../services/api.js'
 import axios from 'axios'
 
@@ -445,14 +445,14 @@ const loadAllData = async () => {
     books.value = b.data || []
     rooms.value = r.data || []
     events.value = e.data || []
-  } catch (e) { console.error(e) }
+  } catch (err) { console.error(err) }
 }
 
 const loadAnnouncements = async () => {
   try {
     const res = await api.get('/announcements.php?action=get_all')
     announcements.value = res.data || []
-  } catch (e) { console.error(e) }
+  } catch (err) { console.error(err) }
 }
 
 const fetchBookings = async () => {
@@ -462,7 +462,7 @@ const fetchBookings = async () => {
       activeBorrowings.value = res.data.borrowed_books || []
       roomBookings.value = res.data.room_bookings || []
     }
-  } catch (e) { console.error(e) }
+  } catch (err) { console.error(err) }
 }
 
 // ==================== ANNOUNCEMENTS ====================
@@ -472,7 +472,7 @@ const addAnnouncement = async () => {
     await api.post('/announcements.php', newAnnouncement.value)
     newAnnouncement.value = { title: '', type: 'Notice', message: '' }
     loadAnnouncements()
-  } catch (e) {
+  } catch (err) {
     alert('Failed to create announcement')
   }
 }
@@ -488,7 +488,7 @@ const saveAnnouncementEdit = async () => {
     editingAnnouncement.value = false
     newAnnouncement.value = { title: '', type: 'Notice', message: '' }
     loadAnnouncements()
-  } catch (e) {
+  } catch (err) {
     alert('Failed to update announcement')
   }
 }
@@ -498,7 +498,7 @@ const deleteAnnouncement = async (id) => {
     try {
       await api.delete(`/announcements.php?id=${id}`)
       loadAnnouncements()
-    } catch (e) {
+    } catch (err) {
       alert('Failed to delete announcement')
     }
   }
@@ -519,7 +519,7 @@ const sendReminder = async (booking) => {
     })
     alert('Reminder sent successfully!')
     fetchBookings()
-  } catch (e) {
+  } catch (err) {
     alert('Failed to send reminder')
   }
 }
@@ -531,7 +531,7 @@ const markRoomAvailable = async (booking) => {
     await axios.post(API_BASE + 'bookings.php?action=mark_room_available', { booking_id: booking.id })
     alert('Room marked as available!')
     fetchBookings()
-  } catch (e) {
+  } catch (err) {
     alert('Failed to update room')
   }
 }
@@ -552,7 +552,7 @@ const startEditEvent = (event) => { newEvent.value = { ...event }; editingEvent.
 const saveEventEdit = async () => { await api.post('/events.php', newEvent.value); editingEvent.value = false; loadAllData() }
 const deleteEvent = async (id) => { if (confirm('Delete event?')) { await api.delete(`/events.php?id=${id}`); loadAllData() } }
 
-const loadUsers = async () => { try { const res = await api.get('/users.php'); users.value = res.data || [] } catch(e){} }
+const loadUsers = async () => { try { const res = await api.get('/users.php'); users.value = res.data || [] } catch(err){} }
 const viewUser = (u) => { selectedUser.value = u; showUserModal.value = true }
 const closeUserModal = () => { showUserModal.value = false }
 const deleteUser = async (id) => { if (confirm('Delete user?')) { await api.delete(`/users.php?id=${id}`); loadUsers() } }
