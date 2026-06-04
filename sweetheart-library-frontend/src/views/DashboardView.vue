@@ -48,9 +48,9 @@
 
                   <div class="d-flex gap-2 mt-3">
                     <button class="btn btn-sm btn-outline-secondary flex-fill" @click="viewRoomBooking(room)">View</button>
-                    <button 
+                    <button
                       v-if="room.status !== 'completed' && room.status !== 'cancelled'"
-                      class="btn btn-sm btn-outline-danger flex-fill" 
+                      class="btn btn-sm btn-outline-danger flex-fill"
                       @click="cancelRoomBooking(room)">
                       Cancel
                     </button>
@@ -85,7 +85,7 @@
                     <div class="flex-grow-1">
                       <h6 class="fw-semibold mb-1 text-truncate" style="color: #2C2C2C;">{{ book.title }}</h6>
                       <p class="text-muted small mb-1">{{ book.author }}</p>
-                      
+
                       <div class="small">
                         <div><strong>Borrowed:</strong> {{ book.borrowed_date }}</div>
                         <div><strong>Due:</strong> {{ book.due_date }}</div>
@@ -128,7 +128,7 @@
                     <div class="flex-grow-1">
                       <h6 class="fw-semibold mb-1 text-truncate" style="color: #2C2C2C;">{{ book.title }}</h6>
                       <p class="text-muted small mb-1">{{ book.author }}</p>
-                      
+
                       <div class="small text-danger fw-semibold">
                         <div>Due: {{ book.due_date }}</div>
                         <div class="mt-1">Overdue by {{ calculateOverdueDays(book.due_date) }} days</div>
@@ -137,8 +137,8 @@
                   </div>
 
                   <div class="mt-3">
-                    <button 
-                      class="btn btn-sm btn-danger w-100" 
+                    <button
+                      class="btn btn-sm btn-danger w-100"
                       @click="renewOverdueBook(book)">
                       Renew for 7 More Days
                     </button>
@@ -159,7 +159,6 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
-import api from '../services/api.js'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 
 const router = useRouter()
@@ -229,7 +228,7 @@ const renewOverdueBook = (book) => {
   }
 
   alert(`"${book.title}" renewed successfully!\nNew due date: ${newDueDate}`)
-  
+
   // TODO: Call real API
   // await api.post('/borrowings.php', { action: 'renew', borrowing_id: book.id, new_due_date: newDueDate })
 }
