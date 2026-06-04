@@ -153,7 +153,7 @@
                 <tbody>
                   <tr v-for="room in rooms" :key="room.id">
                     <td class="fw-semibold">{{ room.name }}</td>
-                    <td><span class="badge bg-secondary">{{ room.capacity }} seats</span></td>
+                    <td><span class="badge bg-pink text-dark">{{ room.capacity }} seats</span></td>
                     <td>{{ room.equipment }}</td>
                     <td class="text-end">
                       <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditRoom(room)">Edit</button>
@@ -315,7 +315,7 @@
               <tr v-for="user in users" :key="user.id">
                 <td class="fw-semibold">{{ user.name }}</td>
                 <td>{{ user.email }}</td>
-                <td>{{ user.role || 'user' }}</td>
+                <td><span class="badge bg-pink text-dark">{{ user.role || 'User' }}</span></td>
                 <td class="text-end">
                   <button class="btn btn-sm action-btn edit-btn me-2" @click="viewUser(user)">View</button>
                   <button class="btn btn-sm action-btn delete-btn" @click="deleteUser(user.id)">Delete</button>
@@ -620,5 +620,36 @@ onMounted(() => {
 .delete-btn:hover {
   background-color: #f5c2c7;
   color: #58151c;
+}
+
+/* ==================== CONSISTENT BADGE STYLING ==================== */
+.badge {
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+}
+
+/* Status badges in Bookings */
+.badge.bg-success {
+  background-color: #D1E7DD !important;
+  color: #0f5132 !important;
+}
+
+.badge.bg-danger {
+  background-color: #F8D7DA !important;
+  color: #842029 !important;
+}
+
+/* Type / Role / Capacity badges - consistent soft pink */
+.badge.bg-pink {
+  background-color: #E8B4B8 !important;
+  color: #2C2C2C !important;
+}
+
+/* Capacity in Rooms */
+.badge.bg-secondary {
+  background-color: #E8B4B8 !important;
+  color: #2C2C2C !important;
 }
 </style>
