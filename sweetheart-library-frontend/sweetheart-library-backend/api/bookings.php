@@ -114,6 +114,16 @@ if ($method === 'POST') {
             jsonResponse(['success' => $result, 'message' => $result ? 'Book marked as returned' : 'Failed to update booking status']);
         }
 
+        if ($action === 'renew_book') {
+            // Renew: set status back to Borrowed and clear penalty
+            $stmt = $pdo->prepare("UPDATE borrowed_books 
+                                   SET status = 'Borrowed', has_penalty = 0, due_date = DATE_ADD(due_date, INTERVAL 7 DAY)
+                                   WHERE id = :id");
+            $stmt->bindParam(':id', $bookingId);
+            $result = $stmt->execute();
+            jsonResponse(['success' => $result, 'message' => $result ? 'Book renewed successfully' : 'Failed to renew book']);
+        }
+
         jsonResponse(['success' => false, 'message' => 'Unknown action']);
     }
 
