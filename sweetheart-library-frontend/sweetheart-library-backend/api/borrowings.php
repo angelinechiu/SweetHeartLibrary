@@ -36,9 +36,28 @@ if ($method === 'GET') {
             exit;
         }
 
-        $stmt = $pdo->prepare("SELECT * FROM borrowed_books WHERE user_id = ? AND status = 'Overdue' ORDER BY due_date ASC LIMIT 3");
+        // ✅ FIXED: Auto-detect overdue books (even if status is still 'Borrowed')
+        $stmt = $pdo->prepare("
+            SELECT * FROM borrowed_books 
+            WHERE user_id = ? 
+            AND due_date < CURDATE() 
+            AND status IN ('Borrowed', 'Overdue') 
+            ORDER BY due_date ASC 
+            LIMIT 3
+        ");
         $stmt->execute([$user_id]);
-        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        
+        $overdueBooks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Auto-update status to 'Overdue'
+        if (!empty($overdueBooks)) {
+            $ids = array_column($overdueBooks, 'id');
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $updateStmt = $pdo->prepare("UPDATE borrowed_books SET status = 'Overdue' WHERE id IN ($placeholders)");
+            $updateStmt->execute($ids);
+        }
+        
+        echo json_encode($overdueBooks);
         exit;
     }
 }
