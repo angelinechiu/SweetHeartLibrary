@@ -17,7 +17,12 @@ $data = json_decode(file_get_contents('php://input'), true);
 
 if ($method === 'GET') {
     if ($action === 'my_borrowed') {
-        $user_id = $_GET['user_id'] ?? 1;
+        $user_id = $_GET['user_id'] ?? 0;
+        if ($user_id <= 0) {
+            echo json_encode([]);
+            exit;
+        }
+
         $stmt = $pdo->prepare("SELECT * FROM borrowed_books WHERE user_id = ? AND status = 'Borrowed' ORDER BY due_date ASC LIMIT 3");
         $stmt->execute([$user_id]);
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
@@ -25,7 +30,12 @@ if ($method === 'GET') {
     }
 
     if ($action === 'my_overdue') {
-        $user_id = $_GET['user_id'] ?? 1;
+        $user_id = $_GET['user_id'] ?? 0;
+        if ($user_id <= 0) {
+            echo json_encode([]);
+            exit;
+        }
+
         $stmt = $pdo->prepare("SELECT * FROM borrowed_books WHERE user_id = ? AND status = 'Overdue' ORDER BY due_date ASC LIMIT 3");
         $stmt->execute([$user_id]);
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
@@ -41,7 +51,6 @@ if ($method === 'POST') {
             exit;
         }
 
-        // Extend due date by 7 days and change status back to Borrowed
         $stmt = $pdo->prepare("
             UPDATE borrowed_books 
             SET due_date = DATE_ADD(due_date, INTERVAL 7 DAY), 
