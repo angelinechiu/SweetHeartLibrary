@@ -117,20 +117,58 @@ const categories = [
   'Science', 'Technology', 'History', 'Education'
 ]
 
+// Rich sample data - 20+ books across all categories
+const sampleBooks = [
+  // Drama
+  { id: 1, title: "The Silent Patient", author: "Alex Michaelides", category: "Drama", year: 2019, available_copies: 4, cover_image: "https://picsum.photos/id/1015/400/300", isbn: "978-1-250-30169-7", description: "A woman shoots her husband and then never speaks another word." },
+  { id: 2, title: "Where the Crawdads Sing", author: "Delia Owens", category: "Drama", year: 2018, available_copies: 2, cover_image: "https://picsum.photos/id/106/400/300", isbn: "978-0-7352-1909-0" },
+  
+  // Horror
+  { id: 3, title: "The Shining", author: "Stephen King", category: "Horror", year: 1977, available_copies: 3, cover_image: "https://picsum.photos/id/251/400/300", isbn: "978-0-385-12167-5" },
+  { id: 4, title: "It", author: "Stephen King", category: "Horror", year: 1986, available_copies: 1, cover_image: "https://picsum.photos/id/160/400/300", isbn: "978-0-670-81302-5" },
+  
+  // Fiction
+  { id: 5, title: "The Midnight Library", author: "Matt Haig", category: "Fiction", year: 2020, available_copies: 5, cover_image: "https://picsum.photos/id/201/400/300", isbn: "978-0-525-55947-4" },
+  { id: 6, title: "The Alchemist", author: "Paulo Coelho", category: "Fiction", year: 1988, available_copies: 6, cover_image: "https://picsum.photos/id/29/400/300", isbn: "978-0-06-112241-5" },
+  
+  // Mystery
+  { id: 7, title: "The Girl on the Train", author: "Paula Hawkins", category: "Mystery", year: 2015, available_copies: 2, cover_image: "https://picsum.photos/id/180/400/300", isbn: "978-1-59463-366-9" },
+  { id: 8, title: "Gone Girl", author: "Gillian Flynn", category: "Mystery", year: 2012, available_copies: 3, cover_image: "https://picsum.photos/id/1005/400/300", isbn: "978-0-307-58836-4" },
+  
+  // Romance
+  { id: 9, title: "The Seven Husbands of Evelyn Hugo", author: "Taylor Jenkins Reid", category: "Romance", year: 2017, available_copies: 4, cover_image: "https://picsum.photos/id/1009/400/300", isbn: "978-1-5011-3923-9" },
+  { id: 10, title: "It Ends With Us", author: "Colleen Hoover", category: "Romance", year: 2016, available_copies: 5, cover_image: "https://picsum.photos/id/133/400/300", isbn: "978-1-5011-1036-8" },
+  
+  // Science
+  { id: 11, title: "Dune", author: "Frank Herbert", category: "Science", year: 1965, available_copies: 2, cover_image: "https://picsum.photos/id/251/400/300", isbn: "978-0-441-17271-9" },
+  { id: 12, title: "Project Hail Mary", author: "Andy Weir", category: "Science", year: 2021, available_copies: 3, cover_image: "https://picsum.photos/id/180/400/300", isbn: "978-0-593-13520-4" },
+  
+  // Technology
+  { id: 13, title: "Atomic Habits", author: "James Clear", category: "Technology", year: 2018, available_copies: 7, cover_image: "https://picsum.photos/id/160/400/300", isbn: "978-0-7352-1129-2" },
+  { id: 14, title: "The Lean Startup", author: "Eric Ries", category: "Technology", year: 2011, available_copies: 4, cover_image: "https://picsum.photos/id/201/400/300", isbn: "978-0-307-88789-4" },
+  
+  // History
+  { id: 15, title: "Sapiens", author: "Yuval Noah Harari", category: "History", year: 2011, available_copies: 3, cover_image: "https://picsum.photos/id/106/400/300", isbn: "978-0-06-231609-7" },
+  { id: 16, title: "Educated", author: "Tara Westover", category: "History", year: 2018, available_copies: 2, cover_image: "https://picsum.photos/id/29/400/300", isbn: "978-0-399-59050-4" },
+  
+  // Education
+  { id: 17, title: "Thinking, Fast and Slow", author: "Daniel Kahneman", category: "Education", year: 2011, available_copies: 5, cover_image: "https://picsum.photos/id/180/400/300", isbn: "978-0-374-27563-1" },
+  { id: 18, title: "How to Win Friends and Influence People", author: "Dale Carnegie", category: "Education", year: 1936, available_copies: 6, cover_image: "https://picsum.photos/id/133/400/300", isbn: "978-0-671-02703-2" },
+  
+  // More Drama & Fiction
+  { id: 19, title: "Normal People", author: "Sally Rooney", category: "Drama", year: 2018, available_copies: 3, cover_image: "https://picsum.photos/id/1005/400/300", isbn: "978-1-984-82217-8" },
+  { id: 20, title: "The Great Gatsby", author: "F. Scott Fitzgerald", category: "Fiction", year: 1925, available_copies: 4, cover_image: "https://picsum.photos/id/1015/400/300", isbn: "978-0-7432-7356-5" }
+]
+
 // Load books
 const loadBooks = async () => {
   loading.value = true
   try {
     const res = await api.get('/books.php')
-    books.value = res.data || []
+    books.value = res.data && res.data.length > 0 ? res.data : sampleBooks
   } catch (error) {
     console.error('Failed to load books:', error)
-    // Fallback mock data
-    books.value = [
-      { id: 1, title: "The Silent Patient", author: "Alex Michaelides", category: "Mystery", year: 2019, available_copies: 3, cover_image: "https://picsum.photos/id/1015/400/300" },
-      { id: 2, title: "Educated", author: "Tara Westover", category: "Education", year: 2018, available_copies: 5, cover_image: "https://picsum.photos/id/106/400/300" },
-      { id: 3, title: "Dune", author: "Frank Herbert", category: "Science Fiction", year: 1965, available_copies: 0, cover_image: "https://picsum.photos/id/251/400/300" }
-    ]
+    books.value = sampleBooks
   } finally {
     loading.value = false
   }
