@@ -17,8 +17,13 @@ $data = json_decode(file_get_contents('php://input'), true);
 
 if ($method === 'GET') {
     if ($action === 'my_recent') {
-        // Get recent room bookings for logged in user (last 3 only)
-        $user_id = $_GET['user_id'] ?? 1; // TODO: get from session/token
+        // Get real user_id from frontend
+        $user_id = $_GET['user_id'] ?? 0;
+
+        if ($user_id <= 0) {
+            echo json_encode([]);
+            exit;
+        }
 
         $stmt = $pdo->prepare("
             SELECT id, room_name, start_time, end_time, status, location
