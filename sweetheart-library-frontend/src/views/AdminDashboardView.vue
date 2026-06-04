@@ -566,7 +566,11 @@ const deleteUser = async (id) => { if (confirm('Delete user?')) { await api.dele
 const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-MY') : '-'
 const formatDateTime = (d) => d ? new Date(d).toLocaleString('en-MY') : '-'
 const getBookingStatusClass = (s) => s === 'Overdue' ? 'badge bg-danger' : 'badge bg-success'
-const canMarkRoomAvailable = (b) => new Date(b.end_time) < new Date()
+
+const canMarkRoomAvailable = (b) => {
+  // Show button for Active room bookings (admin can mark as completed anytime)
+  return b.status === 'Active' || !b.status || b.status === 'Pending'
+}
 
 onMounted(() => {
   loadAllData()
