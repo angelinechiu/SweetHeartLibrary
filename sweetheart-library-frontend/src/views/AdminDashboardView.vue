@@ -31,6 +31,7 @@
       </div>
     </div>
 
+    <!-- Desktop Tabs -->
     <div class="mb-4 d-none d-md-block">
       <ul class="nav nav-pills elegant-admin-tabs">
         <li class="nav-item" v-for="tab in tabs" :key="tab.key">
@@ -42,9 +43,10 @@
       </ul>
     </div>
 
-    <!-- BOOKS TAB -->
+    <!-- ==================== BOOKS ==================== -->
     <div v-if="activeTab === 'books'" class="tab-pane">
       <div class="row g-4">
+        <!-- Add/Edit Book Form -->
         <div class="col-xl-5">
           <div class="card elegant-card h-100">
             <div class="card-header elegant-card-header">
@@ -75,6 +77,7 @@
           </div>
         </div>
 
+        <!-- Books List -->
         <div class="col-xl-7">
           <div class="card elegant-card">
             <div class="card-header elegant-card-header d-flex justify-content-between">
@@ -98,12 +101,8 @@
                     <td>{{ book.copies }}</td>
                     <td>{{ book.availability_status }}</td>
                     <td class="text-end">
-                      <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditBook(book)">
-                        <i class="bi bi-pencil-square me-1"></i> Edit
-                      </button>
-                      <button class="btn btn-sm action-btn delete-btn" @click="deleteBook(book.id)">
-                        <i class="bi bi-trash3 me-1"></i> Delete
-                      </button>
+                      <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditBook(book)">Edit</button>
+                      <button class="btn btn-sm action-btn delete-btn" @click="deleteBook(book.id)">Delete</button>
                     </td>
                   </tr>
                 </tbody>
@@ -159,12 +158,8 @@
                     <td><span class="badge bg-secondary">{{ room.capacity }} seats</span></td>
                     <td>{{ room.equipment }}</td>
                     <td class="text-end">
-                      <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditRoom(room)">
-                        <i class="bi bi-pencil-square me-1"></i> Edit
-                      </button>
-                      <button class="btn btn-sm action-btn delete-btn" @click="deleteRoom(room.id)">
-                        <i class="bi bi-trash3 me-1"></i> Delete
-                      </button>
+                      <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditRoom(room)">Edit</button>
+                      <button class="btn btn-sm action-btn delete-btn" @click="deleteRoom(room.id)">Delete</button>
                     </td>
                   </tr>
                 </tbody>
@@ -222,12 +217,8 @@
                     <td>{{ event.event_date }}</td>
                     <td>{{ event.event_time }}</td>
                     <td class="text-end">
-                      <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditEvent(event)">
-                        <i class="bi bi-pencil-square me-1"></i> Edit
-                      </button>
-                      <button class="btn btn-sm action-btn delete-btn" @click="deleteEvent(event.id)">
-                        <i class="bi bi-trash3 me-1"></i> Delete
-                      </button>
+                      <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditEvent(event)">Edit</button>
+                      <button class="btn btn-sm action-btn delete-btn" @click="deleteEvent(event.id)">Delete</button>
                     </td>
                   </tr>
                 </tbody>
@@ -247,6 +238,7 @@
         <li class="nav-item"><button class="nav-link" :class="{active: bookingSubTab === 'rooms'}" @click="bookingSubTab = 'rooms'">Room Bookings</button></li>
       </ul>
 
+      <!-- Borrowed Books -->
       <div v-if="bookingSubTab === 'books'">
         <div class="card elegant-card">
           <div class="card-header elegant-card-header"><h5><i class="bi bi-book me-2"></i>Borrowed Books</h5></div>
@@ -254,7 +246,11 @@
             <table class="table table-hover mb-0">
               <thead>
                 <tr>
-                  <th>User</th><th>Book</th><th>Due Date</th><th>Status</th><th>Actions</th>
+                  <th>User</th>
+                  <th>Book</th>
+                  <th>Due Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -273,6 +269,7 @@
         </div>
       </div>
 
+      <!-- Room Bookings -->
       <div v-if="bookingSubTab === 'rooms'">
         <div class="card elegant-card">
           <div class="card-header elegant-card-header"><h5><i class="bi bi-door-open me-2"></i>Active Room Bookings</h5></div>
@@ -442,7 +439,7 @@ const roomBookings = ref([])
 
 const API_BASE = 'http://localhost/sweetheart-library-backend/api/'
 
-// Load functions
+// ==================== LOAD DATA ====================
 const loadAllData = async () => {
   try {
     const [b, r, e] = await Promise.all([api.get('/books.php'), api.get('/rooms.php'), api.get('/events.php')])
@@ -469,7 +466,7 @@ const fetchBookings = async () => {
   } catch (e) { console.error(e) }
 }
 
-// Announcement methods
+// ==================== ANNOUNCEMENTS ====================
 const addAnnouncement = async () => {
   if (!newAnnouncement.value.title || !newAnnouncement.value.message) return alert('Title and message required')
   await api.post('/announcements.php', newAnnouncement.value)
@@ -496,7 +493,7 @@ const deleteAnnouncement = async (id) => {
   }
 }
 
-// Booking reminder
+// ==================== SEND REMINDER ====================
 const sendReminder = async (booking) => {
   if (!booking?.id) return
   if (!confirm(`Send reminder for ${booking.book_title}?`)) return
@@ -509,23 +506,26 @@ const sendReminder = async (booking) => {
       due_date: booking.due_date,
       is_published: 1
     })
-    alert('Reminder sent!')
+    alert('Reminder sent successfully!')
     fetchBookings()
   } catch (e) {
     alert('Failed to send reminder')
   }
 }
 
-const markRoomAvailable = async (booking) => { /* ... */ }
+const markRoomAvailable = async (booking) => {
+  if (!booking?.id) return
+  if (!confirm(`Mark room as available?`)) return
+  try {
+    await axios.post(API_BASE + 'bookings.php?action=mark_room_available', { booking_id: booking.id })
+    alert('Room marked as available!')
+    fetchBookings()
+  } catch (e) {
+    alert('Failed to update room')
+  }
+}
 
-const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-MY') : '-'
-const formatDateTime = (d) => d ? new Date(d).toLocaleString('en-MY') : '-'
-
-const getBookingStatusClass = (s) => s === 'Overdue' ? 'badge bg-danger' : 'badge bg-success'
-
-const canMarkRoomAvailable = (b) => new Date(b.end_time) < new Date()
-
-// CRUD methods
+// ==================== CRUD ====================
 const addBook = async () => { await api.post('/books.php', newBook.value); loadAllData() }
 const startEditBook = (book) => { newBook.value = { ...book }; editingBook.value = true }
 const saveBookEdit = async () => { await api.post('/books.php', newBook.value); editingBook.value = false; loadAllData() }
@@ -546,6 +546,12 @@ const viewUser = (u) => { selectedUser.value = u; showUserModal.value = true }
 const closeUserModal = () => { showUserModal.value = false }
 const deleteUser = async (id) => { if (confirm('Delete user?')) { await api.delete(`/users.php?id=${id}`); loadUsers() } }
 
+// Helpers
+const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-MY') : '-'
+const formatDateTime = (d) => d ? new Date(d).toLocaleString('en-MY') : '-'
+const getBookingStatusClass = (s) => s === 'Overdue' ? 'badge bg-danger' : 'badge bg-success'
+const canMarkRoomAvailable = (b) => new Date(b.end_time) < new Date()
+
 onMounted(() => {
   loadAllData()
   loadUsers()
@@ -555,99 +561,15 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* ==================== ELEGANT ADMIN STYLING ==================== */
-.elegant-admin-tabs .nav-link {
-  color: #2C2C2C;
-  font-weight: 600;
-  padding: 10px 24px;
-  border-radius: 50px;
-  margin-right: 8px;
-  border: 2px solid #E8B4B8;
-  background: white;
-  transition: all 0.3s ease;
-}
+.elegant-admin-tabs .nav-link { color: #2C2C2C; font-weight: 600; padding: 10px 24px; border-radius: 50px; margin-right: 8px; border: 2px solid #E8B4B8; background: white; transition: all 0.3s ease; }
+.elegant-admin-tabs .nav-link.active { background-color: #E8B4B8; color: #2C2C2C; border-color: #E8B4B8; box-shadow: 0 4px 15px rgba(232, 180, 184, 0.4); }
 
-.elegant-admin-tabs .nav-link.active {
-  background-color: #E8B4B8;
-  color: #2C2C2C;
-  border-color: #E8B4B8;
-  box-shadow: 0 4px 15px rgba(232, 180, 184, 0.4);
-}
+.elegant-card { border: none; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
+.elegant-card-header { background: linear-gradient(#2C2C2C, #1F1F1F); color: #F8F4F0; padding: 16px 20px; font-weight: 600; }
 
-.elegant-card {
-  border: none;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-}
-
-.elegant-card-header {
-  background: linear-gradient(#2C2C2C, #1F1F1F);
-  color: #F8F4F0;
-  padding: 16px 20px;
-  font-weight: 600;
-}
-
-/* Action Buttons */
-.action-btn {
-  border-radius: 8px;
-  padding: 6px 14px;
-  font-weight: 600;
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
-  border: none;
-}
-
-.edit-btn {
-  background-color: #FFF3CD;
-  color: #856404;
-}
-.edit-btn:hover {
-  background-color: #ffe69c;
-  color: #664d03;
-}
-
-.delete-btn {
-  background-color: #F8D7DA;
-  color: #842029;
-}
-.delete-btn:hover {
-  background-color: #f5c2c7;
-  color: #58151c;
-}
-
-/* Table */
-.table th, .table td {
-  padding: 12px 15px;
-  vertical-align: middle;
-}
-
-/* Dropdown */
-.dropdown-menu {
-  border-radius: 12px;
-  padding: 8px 0;
-}
-
-.dropdown-item {
-  padding: 10px 16px;
-  font-weight: 500;
-}
-
-/* Modal */
-.admin-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-}
-
-.admin-modal {
-  background: white;
-  padding: 24px;
-  border-radius: 16px;
-  width: 340px;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.2);
-}
+.action-btn { border-radius: 8px; padding: 6px 14px; font-weight: 600; font-size: 0.875rem; transition: all 0.2s ease; border: none; }
+.edit-btn { background-color: #FFF3CD; color: #856404; }
+.edit-btn:hover { background-color: #ffe69c; color: #664d03; }
+.delete-btn { background-color: #F8D7DA; color: #842029; }
+.delete-btn:hover { background-color: #f5c2c7; color: #58151c; }
 </style>
