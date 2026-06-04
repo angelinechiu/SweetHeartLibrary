@@ -26,14 +26,52 @@ function jsonResponse($data) {
 if ($method === 'GET') {
     if ($action === 'get') {
         $response = ['success' => true];
+        $user_id = $_GET['user_id'] ?? null;
 
-        $stmtBooks = $pdo->prepare("SELECT * FROM borrowed_books ORDER BY due_date ASC");
-        $stmtBooks->execute();
-        $response['borrowed_books'] = $stmtBooks->fetchAll(PDO::FETCH_ASSOC);
+        if ($user_id) {
+            $stmtBooks = $pdo->prepare("SELECT * FROM borrowed_books WHERE user_id = ? ORDER BY borrow_date DESC");
+            $stmtBooks->execute([$user_id]);
+            $response['borrowed_books'] = $stmtBooks->fetchAll(PDO::FETCH_ASSOC);
 
-        $stmtRooms = $pdo->prepare("SELECT * FROM room_bookings WHERE status = 'Active' ORDER BY start_time ASC");
-        $stmtRooms->execute();
-        $response['room_bookings'] = $stmtRooms->fetchAll(PDO::FETCH_ASSOC);
+            $stmtRooms = $pdo->prepare("SELECT * FROM room_bookings WHERE user_id = ? ORDER BY start_time ASC");
+            $stmtRooms->execute([$user_id]);
+            $response['room_bookings'] = $stmtRooms->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            $stmtBooks = $pdo->prepare("SELECT * FROM borrowed_books ORDER BY due_date ASC");
+            $stmtBooks->execute();
+            $response['borrowed_books'] = $stmtBooks->fetchAll(PDO::FETCH_ASSOC);
+
+            $stmtRooms = $pdo->prepare("SELECT * FROM room_bookings WHERE status = 'Active' ORDER BY start_time ASC");
+            $stmtRooms->execute();
+            $response['room_bookings'] = $stmtRooms->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        $response['combined_bookings'] = [];
+        foreach ($response['borrowed_books'] as $book) {
+            $response['combined_bookings'][] = [
+                'id' => $book['id'],
+                'type' => 'book',
+                'title' => $book['book_title'],
+                'author' => $book['author'],
+                'date' => $book['borrow_date'],
+                'time' => 'Due ' . ($book['due_date'] ?? ''),
+                'status' => $book['status'],
+                'details' => $book,
+            ];
+        }
+
+        foreach ($response['room_bookings'] as $room) {
+            $startDate = date('Y-m-d', strtotime($room['start_time']));
+            $response['combined_bookings'][] = [
+                'id' => $room['id'],
+                'type' => 'room',
+                'room_name' => $room['room_name'],
+                'date' => $startDate,
+                'time' => date('H:i', strtotime($room['start_time'])) . ' - ' . date('H:i', strtotime($room['end_time'])),
+                'status' => $room['status'],
+                'details' => $room,
+            ];
+        }
 
         jsonResponse($response);
     }

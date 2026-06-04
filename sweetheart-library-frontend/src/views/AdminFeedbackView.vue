@@ -1,13 +1,16 @@
 <template>
   <div class="admin-feedback-page">
     <!-- Page Header -->
-    <div class="admin-header mb-4">
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+    <div class="page-header mb-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
         <div>
-          <h1 class="fw-bold mb-1" style="color: #2C2C2C; font-size: 2.3rem;">User Feedback</h1>
-          <p class="text-muted mb-0 fs-5">View and manage feedback from library users</p>
+          <h1 class="fw-bold mb-1" style="color: #2C2C2C; font-size: 2.4rem;">
+            <i class="bi bi-chat-heart-fill me-2" style="color: #E8B4B8;"></i>
+            User Feedback
+          </h1>
+          <p class="text-muted mb-0 fs-5">View all feedback submitted by users</p>
         </div>
-        <div>
+        <div class="mt-3 mt-md-0">
           <span class="badge px-4 py-2 fs-6"
                 style="background-color: #E8B4B8; color: #2C2C2C; font-weight: 700; border-radius: 50px;">
             {{ feedbacks.length }} Feedbacks
@@ -16,19 +19,59 @@
       </div>
     </div>
 
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-4">
+        <div class="summary-card">
+          <div class="d-flex align-items-center">
+            <div class="summary-icon bg-pink">
+              <i class="bi bi-chat-dots-fill"></i>
+            </div>
+            <div class="ms-3">
+              <div class="text-muted small">Total Feedback</div>
+              <h3 class="fw-bold mb-0">{{ feedbacks.length }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="summary-card">
+          <div class="d-flex align-items-center">
+            <div class="summary-icon bg-success">
+              <i class="bi bi-star-fill"></i>
+            </div>
+            <div class="ms-3">
+              <div class="text-muted small">Average Rating</div>
+              <h3 class="fw-bold mb-0">{{ averageRating }} ★</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="summary-card">
+          <div class="d-flex align-items-center">
+            <div class="summary-icon bg-info">
+              <i class="bi bi-lightbulb-fill"></i>
+            </div>
+            <div class="ms-3">
+              <div class="text-muted small">Suggestions</div>
+              <h3 class="fw-bold mb-0">{{ suggestionCount }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Feedback Table -->
     <div class="card elegant-card">
-      <div class="card-header elegant-card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="bi bi-chat-left-text-fill me-2"></i>All User Feedback</h5>
-        <span v-if="feedbacks.length > 0" class="badge bg-light text-dark px-3 py-2">
-          {{ feedbacks.length }} total
-        </span>
+      <div class="card-header elegant-card-header">
+        <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>All User Feedback</h5>
       </div>
 
       <div v-if="feedbacks.length === 0" class="card-body text-center py-5">
         <i class="bi bi-inbox display-4 text-muted mb-3"></i>
         <h5 class="text-muted">No feedback yet</h5>
-        <p class="text-muted">Feedback submitted by users will appear here.</p>
+        <p class="text-muted">Feedback from users will appear here.</p>
       </div>
 
       <div v-else class="card-body p-0">
@@ -36,20 +79,18 @@
           <table class="table table-hover align-middle mb-0">
             <thead>
               <tr>
-                <th>Date</th>
+                <th style="width: 140px;">Date</th>
                 <th>User</th>
                 <th>Type</th>
                 <th>Message</th>
-                <th>Status</th>
-                <th class="text-end pe-4">Action</th>
+                <th style="width: 100px;">Rating</th>
+                <th style="width: 110px;">Status</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="fb in feedbacks" :key="fb.id">
                 <td class="text-muted small">
-                  {{ new Date(fb.created_at).toLocaleDateString('en-MY', {
-                    month: 'short', day: 'numeric', year: 'numeric'
-                  }) }}
+                  {{ formatDate(fb.created_at) }}
                 </td>
                 <td>
                   <div class="fw-semibold">{{ fb.name }}</div>
@@ -61,25 +102,17 @@
                     {{ fb.type }}
                   </span>
                 </td>
-                <td style="max-width: 320px;">
-                  <div class="text-truncate" style="max-height: 60px; overflow: hidden;">
-                    {{ fb.message }}
+                <td style="max-width: 420px; white-space: pre-wrap; line-height: 1.5;">
+                  {{ fb.message }}
+                </td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <span class="fw-bold me-1">{{ fb.rating }}</span>
+                    <i class="bi bi-star-fill text-warning"></i>
                   </div>
                 </td>
                 <td>
-                  <select
-                    v-model="fb.status"
-                    @change="updateStatus(fb)"
-                    class="form-select form-select-sm elegant-select">
-                    <option value="New">New</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Resolved">Resolved</option>
-                  </select>
-                </td>
-                <td class="text-end pe-4">
-                  <button class="btn btn-sm btn-outline-danger px-3" @click="deleteFeedback(fb.id)">
-                    <i class="bi bi-trash3 me-1"></i> Delete
-                  </button>
+                  <span class="badge bg-success px-3 py-2">Reviewed</span>
                 </td>
               </tr>
             </tbody>
@@ -91,105 +124,99 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import api from '../services/api.js'
+import { ref, computed, onMounted } from 'vue'
+import axios from 'axios'
 
 const feedbacks = ref([])
 
-const getTypeColor = (type) => {
-  if (type === 'Suggestion') return '#E8B4B8'
-  if (type === 'Complaint') return '#F8D7DA'
-  if (type === 'Praise') return '#D4EDDA'
-  return '#E8B4B8'
-}
+const API_URL = 'http://localhost/sweetheart-library-backend/api/feedback.php'
 
-const loadFeedback = async () => {
+// Fetch all feedback
+const fetchFeedbacks = async () => {
   try {
-    const res = await api.get('/feedback.php')
+    const res = await axios.get(API_URL)
     feedbacks.value = res.data || []
   } catch (error) {
-    console.error('Failed to load feedback', error)
+    console.error('Failed to load feedbacks:', error)
+    alert('Could not load feedback from server')
   }
 }
 
-const updateStatus = async (feedback) => {
-  try {
-    await api.put('/feedback.php', {
-      id: feedback.id,
-      status: feedback.status
-    })
-    // Optional: show toast instead of alert
-    alert('Status updated successfully')
-  } catch (error) {
-    console.error('Failed to update status', error)
-    alert('Failed to update status')
-  }
+// Computed values
+const averageRating = computed(() => {
+  if (feedbacks.value.length === 0) return '0.0'
+  const total = feedbacks.value.reduce((sum, fb) => sum + parseFloat(fb.rating || 0), 0)
+  return (total / feedbacks.value.length).toFixed(1)
+})
+
+const suggestionCount = computed(() => {
+  return feedbacks.value.filter(fb => fb.type === 'Suggestion').length
+})
+
+const formatDate = (date) => {
+  if (!date) return '-'
+  return new Date(date).toLocaleDateString('en-MY', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  })
 }
 
-const deleteFeedback = async (id) => {
-  if (!confirm('Are you sure you want to delete this feedback?')) return
-
-  try {
-    await api.delete(`/feedback.php?id=${id}`)
-    feedbacks.value = feedbacks.value.filter(f => f.id !== id)
-  } catch (error) {
-    console.error('Failed to delete feedback', error)
-    alert('Failed to delete feedback')
-  }
+const getTypeColor = (type) => {
+  if (type === 'Suggestion') return '#E8B4B8'
+  if (type === 'Complaint') return '#FF6B6B'
+  if (type === 'Praise') return '#A8DADC'
+  return '#B8B8B8'
 }
 
-onMounted(loadFeedback)
+onMounted(() => {
+  fetchFeedbacks()
+})
 </script>
 
 <style scoped>
-/* ==================== ELEGANT ADMIN FEEDBACK STYLES ==================== */
 .admin-feedback-page {
-  max-width: 1400px;
-  margin: 0 auto;
+  padding: 25px 30px;
 }
+
+.summary-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+  border: 1px solid #f0f0f0;
+}
+
+.summary-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  color: white;
+}
+
+.bg-pink { background-color: #E8B4B8; }
+.bg-success { background-color: #4CAF50; }
+.bg-info { background-color: #5BC0DE; }
 
 .elegant-card {
   border: none;
-  border-radius: 18px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.07);
-  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
 }
 
 .elegant-card-header {
-  background: linear-gradient(#2C2C2C, #1F1F1F);
-  color: #F8F4F0;
+  background-color: #fff;
+  border-bottom: 1px solid #f0f0f0;
   padding: 18px 24px;
-  font-weight: 700;
 }
 
 .table th {
-  background-color: #f8f9fa;
-  font-weight: 700;
-  color: #2C2C2C;
-  padding: 16px 20px;
-}
-
-.table td {
-  padding: 16px 20px;
-  vertical-align: middle;
-}
-
-.elegant-select {
-  border: 2px solid #E8B4B8;
-  border-radius: 8px;
+  background-color: #fafafa;
   font-weight: 600;
-}
-
-.elegant-select:focus {
-  border-color: #D89CA1;
-  box-shadow: 0 0 0 0.2rem rgba(232, 180, 184, 0.25);
-}
-
-.btn-outline-danger {
-  transition: all 0.2s ease;
-}
-
-.btn-outline-danger:hover {
-  transform: translateY(-1px);
+  color: #555;
 }
 </style>

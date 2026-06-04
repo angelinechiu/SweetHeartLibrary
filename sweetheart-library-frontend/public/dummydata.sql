@@ -74,11 +74,12 @@ CREATE TABLE events (
 CREATE TABLE feedback (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NULL,
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(150) NOT NULL,
     email VARCHAR(150) NOT NULL,
-    type VARCHAR(50) NOT NULL,
+    type ENUM('Suggestion', 'Complaint', 'Praise', 'Other') DEFAULT 'Other',
     message TEXT NOT NULL,
-    status VARCHAR(20) DEFAULT 'New',
+    rating DECIMAL(2,1) DEFAULT 5.0,
+    status VARCHAR(20) DEFAULT 'Reviewed',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -196,3 +197,15 @@ INSERT INTO room_bookings (user_id, user_name, room_id, room_name, start_time, e
 VALUES 
 (3, 'John Doe', 1, 'Study Room A', '2026-06-04 10:00:00', '2026-06-04 12:00:00'),
 (4, 'Aisyah Lee', 2, 'Study Room B', '2026-06-03 08:00:00', '2026-06-03 10:00:00');
+
+INSERT INTO feedback (name, email, type, message, rating) VALUES
+('Aisyah Rahman', 'aisyah.rahman@student.edu.my', 'Praise', 'The library website is very clean and easy to use. I love the booking system!', 5.0),
+('Muhammad Faris', 'faris.muhammad@gmail.com', 'Suggestion', 'It would be great if we can see the availability of rooms in real-time on the calendar.', 4.0),
+('Nur Aina', 'nuraina98@yahoo.com', 'Complaint', 'Sometimes the system is slow when I try to book a room during peak hours.', 2.5),
+('Daniel Tan', 'daniel.tan@outlook.com', 'Praise', 'The book catalog search is very fast and accurate. Good job!', 5.0),
+('Siti Aminah', 'siti.aminah@student.edu.my', 'Suggestion', 'Please add a dark mode option. It will be easier on the eyes during night study.', 4.5),
+('Ahmad Zulkifli', 'zulkifli.ahmad@gmail.com', 'Other', 'The library should consider extending the operating hours during exam week.', 3.5),
+('Lim Wei Ling', 'weiling.lim@student.edu.my', 'Praise', 'I really like the modern design and the pink theme. It feels premium!', 5.0),
+('Ravi Kumar', 'ravi.kumar@hotmail.com', 'Complaint', 'I faced an error when trying to submit feedback. It kept loading forever.', 2.0),
+('Fatimah Zahra', 'fatimah.zahra@gmail.com', 'Suggestion', 'Can we have a feature to save favorite books or create reading lists?', 4.0),
+('Joshua Lim', 'joshua.lim@student.edu.my', 'Praise', 'Admin dashboard looks professional. Everything is well organized.', 4.5);
