@@ -257,18 +257,11 @@
                   <td>{{ booking.book_title }}</td>
                   <td>{{ formatDate(booking.due_date) }}</td>
                   <td><span :class="getBookingStatusClass(booking.status)">{{ booking.status }}</span></td>
-                  <td class="d-flex gap-1 flex-wrap">
-                    <!-- Renew button (for Overdue books) -->
-                    <button v-if="booking.status === 'Overdue'" 
-                            class="btn btn-sm btn-warning" 
-                            @click="renewBook(booking)">
-                      Renew
-                    </button>
-                    
-                    <!-- Mark as Returned button -->
+                  <td>
+                    <!-- Only Mark as Returned button (Renew will be on user side) -->
                     <button class="btn btn-sm btn-success" 
                             @click="markBookReturned(booking)">
-                      Mark Returned
+                      Mark as Returned
                     </button>
                   </td>
                 </tr>
@@ -553,24 +546,7 @@ const markRoomAvailable = async (booking) => {
 }
 
 // ==================== BORROWED BOOKS ACTIONS ====================
-// Renew book (sets status back to Borrowed, clears overdue)
-const renewBook = async (booking) => {
-  if (!booking?.id) return
-  if (!confirm(`Renew this book for ${booking.user_name}?`)) return
-
-  try {
-    await axios.post(API_BASE + 'bookings.php?action=renew_book', { 
-      booking_id: booking.id 
-    })
-    alert('Book renewed successfully! Status set to Borrowed.')
-    fetchBookings()
-  } catch (error) {
-    console.error(error)
-    alert('Failed to renew book')
-  }
-}
-
-// Mark book as returned (removes from active borrowed list)
+// Mark book as returned (book will disappear from the list)
 const markBookReturned = async (booking) => {
   if (!booking?.id) return
   if (!confirm(`Mark "${booking.book_title}" as returned by ${booking.user_name}?`)) return
