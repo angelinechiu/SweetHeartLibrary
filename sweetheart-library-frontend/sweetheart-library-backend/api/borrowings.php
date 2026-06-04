@@ -18,7 +18,7 @@ $data = json_decode(file_get_contents('php://input'), true);
 if ($method === 'GET') {
     if ($action === 'my_borrowed') {
         $user_id = $_GET['user_id'] ?? 1;
-        $stmt = $pdo->prepare("SELECT * FROM borrowed_books WHERE user_id = ? AND status = 'Borrowed' ORDER BY due_date ASC");
+        $stmt = $pdo->prepare("SELECT * FROM borrowed_books WHERE user_id = ? AND status = 'Borrowed' ORDER BY due_date ASC LIMIT 3");
         $stmt->execute([$user_id]);
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         exit;
@@ -26,7 +26,7 @@ if ($method === 'GET') {
 
     if ($action === 'my_overdue') {
         $user_id = $_GET['user_id'] ?? 1;
-        $stmt = $pdo->prepare("SELECT * FROM borrowed_books WHERE user_id = ? AND status = 'Overdue' ORDER BY due_date ASC");
+        $stmt = $pdo->prepare("SELECT * FROM borrowed_books WHERE user_id = ? AND status = 'Overdue' ORDER BY due_date ASC LIMIT 3");
         $stmt->execute([$user_id]);
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         exit;
