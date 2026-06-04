@@ -18,7 +18,7 @@
 
       <div v-if="!loading">
 
-        <!-- ==================== 1. RECENTLY BOOKED ROOMS ==================== -->
+        <!-- ==================== 1. RECENTLY BOOKED ROOMS (max 3) ==================== -->
         <div class="mb-5">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="fw-semibold mb-0" style="color: #2C2C2C;">
@@ -61,7 +61,7 @@
           </div>
         </div>
 
-        <!-- ==================== 2. BORROWED BOOKS (VIEW ONLY) ==================== -->
+        <!-- ==================== 2. BORROWED BOOKS (VIEW ONLY - max 3) ==================== -->
         <div class="mb-5">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="fw-semibold mb-0" style="color: #2C2C2C;">
@@ -94,14 +94,14 @@
                     </div>
                   </div>
 
-                  <!-- No Details button as requested - viewing only -->
+                  <!-- No Details button - viewing only -->
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- ==================== 3. OVERDUE BOOKS + RENEW (Already good) ==================== -->
+        <!-- ==================== 3. OVERDUE BOOKS + RENEW (max 3) ==================== -->
         <div>
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="fw-semibold mb-0 text-danger">
@@ -203,7 +203,7 @@ const cancelRoomBooking = async (room) => {
   try {
     await api.post('/room-bookings.php?action=cancel', { booking_id: room.id })
     alert('Room booking cancelled successfully!')
-    loadDashboardData() // refresh
+    loadDashboardData()
   } catch (error) {
     console.error(error)
     alert('Failed to cancel room booking. Please try again.')
@@ -214,9 +214,7 @@ const renewOverdueBook = async (book) => {
   if (!confirm(`Renew "${book.title}" for another 7 days?`)) return
 
   try {
-    await api.post('/borrowings.php?action=renew', { 
-      borrowing_id: book.id 
-    })
+    await api.post('/borrowings.php?action=renew', { borrowing_id: book.id })
     alert(`"${book.title}" renewed successfully for 7 more days!`)
     loadDashboardData()
   } catch (error) {
@@ -229,21 +227,20 @@ const renewOverdueBook = async (book) => {
 const loadDashboardData = async () => {
   loading.value = true
   try {
-    // Load recent room bookings
+    // Load recent room bookings (force max 3)
     const roomRes = await api.get('/room-bookings.php?action=my_recent')
-    recentRoomBookings.value = roomRes.data || []
+    recentRoomBookings.value = (roomRes.data || []).slice(0, 3)
 
-    // Load borrowed books
+    // Load borrowed books (force max 3)
     const borrowRes = await api.get('/borrowings.php?action=my_borrowed')
-    borrowedBooks.value = borrowRes.data || []
+    borrowedBooks.value = (borrowRes.data || []).slice(0, 3)
 
-    // Load overdue books
+    // Load overdue books (force max 3)
     const overdueRes = await api.get('/borrowings.php?action=my_overdue')
-    overdueBooks.value = overdueRes.data || []
+    overdueBooks.value = (overdueRes.data || []).slice(0, 3)
 
   } catch (error) {
     console.error('Failed to load dashboard data:', error)
-    // Fallback to empty if API fails
     recentRoomBookings.value = []
     borrowedBooks.value = []
     overdueBooks.value = []
