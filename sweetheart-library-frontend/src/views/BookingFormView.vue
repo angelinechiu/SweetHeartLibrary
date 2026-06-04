@@ -1,32 +1,46 @@
 <template>
   <div style="background-color: #F8F4F0;" class="py-5">
     <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-lg-6">
-          <div class="card shadow-lg border-0">
-            <div class="card-body p-5" style="background-color: #F8F4F0;">
-              <h3 class="text-center mb-4" style="color: #2C2C2C;">Complete Your Booking</h3>
+      <div class="text-center mb-4">
+        <h3 class="fw-bold">Book {{ roomName }}</h3>
+        <p class="text-muted">Maximum <strong>2 hours</strong> per day</p>
+      </div>
 
-              <form @submit.prevent="submitBooking">
-                <div class="mb-3">
-                  <label class="form-label">Date</label>
-                  <input v-model="form.date" type="date" class="form-control form-control-lg" required>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Time</label>
-                  <input v-model="form.time" type="time" class="form-control form-control-lg" required>
-                </div>
-                <div class="mb-4">
-                  <label class="form-label">Purpose</label>
-                  <textarea v-model="form.purpose" class="form-control" rows="3" required></textarea>
-                </div>
-                <button type="submit" class="btn btn-pink btn-lg w-100" :disabled="loading">
-                  <LoadingSpinner v-if="loading" :loading="true" message="Saving booking..." />
-                  <span v-else>Confirm Booking</span>
-                </button>
-              </form>
+      <div class="card border-0 shadow-sm mx-auto" style="max-width: 600px;">
+        <div class="card-body p-4">
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Date</label>
+            <input type="date" v-model="bookingDate" class="form-control" required>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">Start Time</label>
+              <input type="time" v-model="startTime" class="form-control" @change="validateDuration">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">End Time</label>
+              <input type="time" v-model="endTime" class="form-control" @change="validateDuration">
             </div>
           </div>
+
+          <div v-if="duration > 0" class="mb-3">
+            <div class="alert" :class="isValidDuration ? 'alert-success' : 'alert-danger'">
+              Duration: <strong>{{ duration.toFixed(1) }} hour(s)</strong>
+              <span v-if="!isValidDuration" class="d-block text-danger mt-1">
+                You cannot book more than 2 hours.
+              </span>
+            </div>
+          </div>
+
+          <button
+            class="btn btn-pink w-100"
+            :disabled="!isFormValid"
+            @click="checkAndProceed">
+            Continue
+          </button>
+
         </div>
       </div>
     </div>
@@ -34,83 +48,70 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
+import { ref, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import api from '../services/api.js'
-import LoadingSpinner from '../components/LoadingSpinner.vue'
+import { useAuthStore } from '../stores/auth'   // ✅ Added
 
-const router = useRouter()
 const route = useRoute()
-const authStore = useAuthStore()
+const router = useRouter()
+const authStore = useAuthStore()                 // ✅ Added
 
-const form = ref({ date: '', time: '', purpose: '' })
-const loading = ref(false)
+const roomName = route.query.roomName || 'Study Room'
+const bookingDate = ref('')
+const startTime = ref('')
+const endTime = ref('')
+const duration = ref(0)
+const isValidDuration = ref(true)
 
-const submitBooking = async () => {
-  if (!authStore.user) {
-    alert('Please login first')
-    return router.push('/login')
+const isFormValid = computed(() => {
+  return bookingDate.value && startTime.value && endTime.value && isValidDuration.value
+})
+
+const validateDuration = () => {
+  if (!startTime.value || !endTime.value) {
+    duration.value = 0
+    isValidDuration.value = true
+    return
   }
 
-  // === Room Booking: Max 2 hours per day ===
-  if (route.query.type === 'room') {
-    const start = form.value.startTime
-    const end = form.value.endTime
+  const [sh, sm] = startTime.value.split(':').map(Number)
+  const [eh, em] = endTime.value.split(':').map(Number)
 
-    // Calculate duration in hours
-    const startHour = parseInt(start.split(':')[0])
-    const endHour = parseInt(end.split(':')[0])
-    const duration = endHour - startHour
+  let diff = ((eh * 60 + em) - (sh * 60 + sm)) / 60
+  if (diff < 0) diff += 24
 
-    if (duration > 2) {
-      alert('You can only book a room for a maximum of 2 hours per day.')
+  duration.value = diff
+  isValidDuration.value = diff > 0 && diff <= 2
+}
+
+const checkAndProceed = async () => {
+  if (!isFormValid.value) return
+
+  try {
+    // Check daily limit from backend
+    const res = await api.get(
+      `/bookings.php?action=check_daily_limit&user_id=${authStore.user.id}&date=${bookingDate.value}`
+    )
+
+    if (res.data.total_hours >= 2) {
+      alert('You have reached the maximum 2 hours booking limit for today.')
       return
     }
-  }
-
-  // === Book Borrowing: Max 3 books per week (Basic Check) ===
-  if (route.query.type === 'book') {
-    try {
-      const res = await api.get(`/bookings.php?user_id=${authStore.user.id}`)
-      const thisWeekBookings = res.data.filter(b => {
-        const bookingDate = new Date(b.booking_date)
-        const today = new Date()
-        const diffDays = (today - bookingDate) / (1000 * 60 * 60 * 24)
-        return diffDays <= 7 && b.status === 'confirmed'
-      })
-
-      if (thisWeekBookings.length >= 3) {
-        alert('You have reached the limit of 3 book borrowings per week.')
-        return
-      }
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  loading.value = true
-  try {
-    await api.post('/bookings.php', {
-      user_id: authStore.user.id,
-      booking_date: form.value.date,
-      booking_time: form.value.time,
-      purpose: form.value.purpose
-    })
 
     router.push({
       path: '/booking-confirmation',
       query: {
-        date: form.value.date,
-        time: form.value.time,
-        purpose: form.value.purpose
+        roomId: route.query.roomId,
+        roomName: roomName,
+        date: bookingDate.value,
+        startTime: startTime.value,
+        endTime: endTime.value
       }
     })
   } catch (error) {
-    console.error('Booking failed:', error)
-    alert('Failed to save booking. Please try again.')
-  } finally {
-    loading.value = false
+    console.error(error)
+    alert('Error checking booking limit.')
   }
 }
 </script>

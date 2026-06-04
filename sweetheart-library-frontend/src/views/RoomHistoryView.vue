@@ -5,7 +5,7 @@
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h2 class="fw-bold mb-1" style="color: #2C2C2C;">Study Room Booking History</h2>
-          <p class="text-muted mb-0">All your past and upcoming room bookings</p>
+          <p class="text-muted mb-0">All your room booking records</p>
         </div>
         <router-link to="/rooms" class="btn btn-pink">
           <i class="bi bi-plus-lg me-1"></i> Book New Room
@@ -43,11 +43,10 @@
 
               <!-- Action Buttons -->
               <div class="d-flex gap-2 mt-auto">
-                <button class="btn btn-sm btn-outline-secondary flex-fill">View</button>
-
+                <!-- View button removed -->
                 <button
+                  v-if="canCancel(booking)"
                   class="btn btn-sm btn-outline-danger flex-fill"
-                  :disabled="!canCancel(booking)"
                   @click="cancelRoomBooking(booking)">
                   Cancel
                 </button>
@@ -80,6 +79,7 @@ const loading = ref(true)
 
 const roomHistory = computed(() => {
   if (!allBookings.value || !Array.isArray(allBookings.value)) return []
+
   return allBookings.value.filter(b => {
     const purpose = (b.purpose || b.room_name || '').toLowerCase()
     return purpose.includes('room') || purpose.includes('study')
@@ -120,7 +120,7 @@ const cancelRoomBooking = async (booking) => {
   if (!confirm(`Cancel booking for "${roomName}"?`)) return
 
   try {
-    await api.post('/room-bookings.php?action=cancel', { booking_id: booking.id })
+    await api.post('/bookings.php?action=cancel_room', { booking_id: booking.id })
     alert('Room booking cancelled successfully!')
     await loadBookings()
   } catch (error) {

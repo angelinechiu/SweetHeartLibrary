@@ -1,61 +1,98 @@
 <template>
-  <div style="background-color: #F8F4F0;" class="py-5 text-center">
-    <div class="container">
-      <div class="card shadow-lg mx-auto" style="max-width: 600px; background-color: #D9CFC2;">
-        <div class="card-body p-5">
-          <h1 class="display-1" style="color: #E8B4B8;">✓</h1>
-          <h2 class="fw-bold" style="color: #2C2C2C;">Booking Confirmed!</h2>
-          <p class="lead">Thank you for choosing Sweetheart Library</p>
+  <div style="background-color: #F8F4F0;" class="py-5">
+    <div class="container text-center">
 
-          <!-- Booking Details -->
-          <div class="text-start mt-4 p-4 rounded" style="background-color: #F8F4F0;">
-            <p><strong>Date:</strong> {{ booking.date }}</p>
-            <p><strong>Time:</strong> {{ booking.startTime }} — {{ booking.endTime }}</p>
-            <p><strong>Purpose:</strong> {{ booking.purpose }}</p>
+      <!-- Success Icon -->
+      <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+      <h2 class="fw-bold mt-4" style="color: #2C2C2C;">Booking Confirmation</h2>
+      <p class="text-muted">Please review your booking details before confirming.</p>
+
+      <!-- Booking Summary Card -->
+      <div class="card border-0 shadow-sm mx-auto mt-4" style="max-width: 520px;">
+        <div class="card-body text-start p-4">
+          <h6 class="fw-bold mb-3">Booking Summary</h6>
+
+          <div class="row mb-2">
+            <div class="col-5 text-muted">Room</div>
+            <div class="col-7 fw-semibold">{{ roomName }}</div>
           </div>
-
-          <!-- Reminder if booking is soon -->
-          <div v-if="isSoon" class="alert alert-warning mt-4 text-start">
-            <strong>Reminder:</strong> Your booking is in {{ daysLeft }} day(s). Please arrive on time!
+          <div class="row mb-2">
+            <div class="col-5 text-muted">Date</div>
+            <div class="col-7 fw-semibold">{{ date }}</div>
           </div>
-
-          <div class="mt-4">
-            <router-link to="/my-bookings" class="btn btn-pink btn-lg me-2">View My Bookings</router-link>
-            <router-link to="/dashboard" class="btn btn-outline-dark btn-lg">Go to Dashboard</router-link>
+          <div class="row mb-2">
+            <div class="col-5 text-muted">Time</div>
+            <div class="col-7 fw-semibold">{{ startTime }} — {{ endTime }}</div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-5 text-muted">Duration</div>
+            <div class="col-7 fw-semibold">2 hours</div>
+          </div>
+          <div class="row">
+            <div class="col-5 text-muted">Status</div>
+            <div class="col-7">
+              <span class="badge bg-warning text-dark px-3 py-1">Pending Confirmation</span>
+            </div>
           </div>
         </div>
       </div>
+
+      <!-- Confirm Button -->
+      <div class="mt-4">
+        <button
+          class="btn btn-pink px-5 py-2"
+          @click="confirmBooking"
+          :disabled="isSubmitting"
+        >
+          <span v-if="isSubmitting">Confirming...</span>
+          <span v-else>Confirm Booking</span>
+        </button>
+      </div>
+
+      <p class="text-muted small mt-3">You must confirm this booking to complete the process.</p>
+
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import api from '../services/api.js'
+import { useAuthStore } from '../stores/auth'
 
 const route = useRoute()
+const router = useRouter()
+const authStore = useAuthStore()
 
-const booking = ref({
-  date: route.query.date || '',
-  startTime: route.query.startTime || '',
-  endTime: route.query.endTime || '',
-  purpose: route.query.purpose || ''
-})
+const isSubmitting = ref(false)
 
-const isSoon = computed(() => {
-  if (!booking.value.date) return false
-  const bookingDate = new Date(booking.value.date)
-  const today = new Date()
-  const diffTime = bookingDate - today
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  return diffDays <= 3 && diffDays >= 0
-})
+const roomName = route.query.roomName || 'Study Room'
+const date = route.query.date || ''
+const startTime = route.query.startTime || ''
+const endTime = route.query.endTime || ''
 
-const daysLeft = computed(() => {
-  if (!booking.value.date) return 0
-  const bookingDate = new Date(booking.value.date)
-  const today = new Date()
-  const diffTime = bookingDate - today
-  return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-})
+const confirmBooking = async () => {
+  isSubmitting.value = true
+
+  try {
+    await api.post('/bookings.php', {
+      action: 'create_room_booking',
+      user_id: authStore.user.id,
+      room_id: route.query.roomId,
+      booking_date: date,
+      start_time: startTime,
+      end_time: endTime
+    })
+
+    alert('Booking confirmed successfully!')
+    router.push('/my-bookings')   // Redirect after confirmation
+
+  } catch (error) {
+    console.error(error)
+    alert('Failed to confirm booking. Please try again.')
+  } finally {
+    isSubmitting.value = false
+  }
+}
 </script>

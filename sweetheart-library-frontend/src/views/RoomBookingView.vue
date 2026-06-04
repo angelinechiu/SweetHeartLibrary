@@ -1,130 +1,190 @@
 <template>
   <div style="background-color: #F8F4F0;" class="py-5">
     <div class="container">
-      <h2 class="fw-bold mb-4" style="color: #2C2C2C;">Study Room Booking</h2>
 
-      <!-- Operating Hours Notice -->
-      <div class="alert alert-info mb-4">
-        <strong>Operating Hours:</strong> Monday – Saturday, <strong>10:00 AM – 11:00 PM</strong><br>
-        <small>Closed on Sundays. Bookings must be within operating hours.</small>
+      <!-- Header -->
+      <div class="text-center mb-4">
+        <h2 class="fw-bold" style="color: #2C2C2C;">Sweetheart Library Map</h2>
+        <p class="text-muted">Level 2 & Level 3 • Study Rooms • <strong>8:00 AM – 10:00 PM</strong></p>
+        <div class="alert alert-warning py-2 px-3 d-inline-block mt-2 small">
+          Each user can only book a maximum of <strong>2 hours per day</strong>.
+        </div>
       </div>
 
-      <!-- ==================== 2D FLOOR MAP ==================== -->
-      <div class="card mb-5 shadow-sm">
-        <div class="card-header" style="background-color: #2C2C2C; color: #F8F4F0;">
-          <h5 class="mb-0">Library Floor Map - 2nd Floor</h5>
-        </div>
-        <div class="card-body p-4">
-          <div class="floor-map-container" style="position: relative; width: 100%; max-width: 900px; margin: 0 auto; border: 3px solid #2C2C2C; border-radius: 12px; background-color: #f8f9fa; height: 520px;">
+      <!-- Library Map -->
+      <div class="card border-0 shadow-sm p-4 mb-5" style="background-color: #fff;">
+        <div class="row">
 
-            <!-- Rooms -->
-            <div class="room-box" style="top: 40px; left: 40px;" @click="bookRoom(rooms[0])">
-              <div class="room-label">Rose Room<br><small>4 pax</small></div>
-            </div>
-            <div class="room-box" style="top: 40px; left: 230px;" @click="bookRoom(rooms[1])">
-              <div class="room-label">Lily Room<br><small>6 pax</small></div>
-            </div>
-            <div class="room-box" style="top: 40px; left: 420px;" @click="bookRoom(rooms[2])">
-              <div class="room-label">Orchid Room<br><small>8 pax</small></div>
-            </div>
-            <div class="room-box" style="top: 280px; left: 40px;" @click="bookRoom(rooms[3])">
-              <div class="room-label">Jasmine Room<br><small>3 pax</small></div>
-            </div>
-            <div class="room-box" style="top: 280px; left: 230px;" @click="bookRoom(rooms[4])">
-              <div class="room-label">Lavender Room<br><small>10 pax</small></div>
-            </div>
-
-            <!-- Main Study Area -->
-            <div class="area-box" style="top: 180px; left: 420px; width: 200px; height: 210px; background-color: #D9CFC2;">
-              <div class="area-label">Main Study Area</div>
-            </div>
-
-            <!-- Legend -->
-            <div style="position: absolute; bottom: 12px; right: 15px; font-size: 0.85rem; background: white; padding: 6px 12px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-              <span style="color: #E8B4B8;">■</span> Study Room
+          <!-- Level 2 -->
+          <div class="col-md-6 mb-4">
+            <h5 class="fw-semibold mb-3 text-center">Level 2</h5>
+            <div class="border rounded-3 p-3" style="background-color: #fdfaf5;">
+              <div class="row g-3">
+                <div class="col-6">
+                  <div class="p-3 rounded-3 text-center border" style="background-color: #E8B4B8; color: #2C2C2C;">
+                    <strong>The Rose Study</strong><br>
+                    <small>4 seats • WiFi, Whiteboard, AC</small>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="p-3 rounded-3 text-center border" style="background-color: #D4E6C3; color: #2C2C2C;">
+                    <strong>The Garden Room</strong><br>
+                    <small>6 seats • Projector, Printer, AC</small>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="p-3 rounded-3 text-center border" style="background-color: #F5B7B1; color: #2C2C2C;">
+                    <strong>The Silent Room</strong><br>
+                    <small>2 seats • WiFi, Power Outlets</small>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="p-3 rounded-3 text-center border" style="background-color: #AED6F1; color: #2C2C2C;">
+                    <strong>The Focus Pod</strong><br>
+                    <small>3 seats • Charging Station, AC</small>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+
+          <!-- Level 3 -->
+          <div class="col-md-6 mb-4">
+            <h5 class="fw-semibold mb-3 text-center">Level 3 (Quiet Zone)</h5>
+            <div class="border rounded-3 p-3" style="background-color: #fdfaf5;">
+              <div class="row g-3">
+                <div class="col-6">
+                  <div class="p-3 rounded-3 text-center border border-warning" style="background-color: #FFF3CD;">
+                    <strong>Quiet Corner</strong><br>
+                    <small class="text-danger">★ Recommended</small><br>
+                    <small>2 seats • Noise-Cancelling, Desk Lamp</small>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="p-3 rounded-3 text-center border" style="background-color: #D6EAF8;">
+                    <strong>The Study Pod</strong><br>
+                    <small>3 seats • Charging Station, AC</small>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="p-3 rounded-3 text-center border" style="background-color: #FADBD8; color: #2C2C2C;">
+                    <strong>The Creative Corner</strong><br>
+                    <small>4 seats • WiFi, Whiteboard, Projector</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
-      <!-- Room List -->
-      <h5 class="mb-3" style="color: #2C2C2C;">Available Study Rooms</h5>
-      <div class="row g-4">
-        <div class="col-md-4" v-for="room in rooms" :key="room.id">
-          <div class="card border-0 shadow-sm hover-card h-100" style="background-color: #D9CFC2;">
+      <!-- Available Rooms -->
+      <h5 class="fw-semibold mb-3">Available Rooms</h5>
+
+      <div v-if="loading" class="text-center py-5">
+        <div class="spinner-border text-pink" role="status"></div>
+        <p class="mt-2 text-muted">Loading available rooms...</p>
+      </div>
+
+      <div v-else class="row g-3">
+        <div
+          v-for="room in availableRooms"
+          :key="room.id"
+          class="col-md-6 col-lg-4"
+        >
+          <div class="card border-0 shadow-sm h-100" :class="{ 'border-warning border-2': room.recommended }">
             <div class="card-body">
-              <h5>{{ room.name }}</h5>
-              <p>Capacity: <strong>{{ room.capacity }}</strong> people</p>
-              <button class="btn btn-pink w-100 mt-2" @click="bookRoom(room)">Book This Room</button>
+              <!-- Header -->
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="badge bg-info text-white px-3 py-1">{{ room.capacity }} seats</span>
+                <span v-if="room.recommended" class="badge bg-warning text-dark px-3 py-1">Recommended</span>
+                <span class="badge bg-success text-white">Available</span>
+              </div>
+
+              <!-- Room Info -->
+              <h5 class="fw-semibold mb-1">{{ room.name }}</h5>
+              <p class="text-muted small mb-2">{{ room.location }}</p>
+
+              <!-- Facilities -->
+              <div class="mb-3">
+                <strong class="small d-block mb-1">Facilities:</strong>
+                <div class="d-flex flex-wrap gap-1">
+                  <span
+                    v-for="facility in getFacilities(room)"
+                    :key="facility"
+                    class="badge bg-light text-dark small"
+                  >
+                    {{ facility.trim() }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Book Button -->
+              <button class="btn btn-pink w-100" @click="selectRoom(room)">
+                Book This Room
+              </button>
             </div>
           </div>
         </div>
+
+        <!-- Empty State -->
+        <div v-if="availableRooms.length === 0 && !loading" class="col-12">
+          <div class="text-center py-5 bg-white rounded-3 shadow-sm">
+            <i class="bi bi-door-closed fs-1 text-muted d-block mb-2"></i>
+            <p class="text-muted mb-0">No available rooms at the moment.</p>
+          </div>
+        </div>
       </div>
+
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import api from '../services/api.js'
 
 const router = useRouter()
+const allRooms = ref([])
+const loading = ref(true)
 
-const rooms = ref([
-  { id: 1, name: "Rose Room", capacity: 4, equipment: "Whiteboard, Projector" },
-  { id: 2, name: "Lily Room", capacity: 6, equipment: "TV, Speakers" },
-  { id: 3, name: "Orchid Room", capacity: 8, equipment: "Projector, Coffee Machine" },
-  { id: 4, name: "Jasmine Room", capacity: 3, equipment: "Whiteboard" },
-  { id: 5, name: "Lavender Room", capacity: 10, equipment: "TV, Projector, Table" }
-])
+// Fetch rooms from database
+const fetchRooms = async () => {
+  loading.value = true
+  try {
+    const res = await api.get('/rooms.php')
+    allRooms.value = res.data || []
+  } catch (error) {
+    console.error('Failed to fetch rooms:', error)
+    allRooms.value = []
+  } finally {
+    loading.value = false
+  }
+}
 
-const bookRoom = (room) => {
+// Get facilities as array (handles both string and array)
+const getFacilities = (room) => {
+  if (!room.facilities) return []
+  if (Array.isArray(room.facilities)) return room.facilities
+  return room.facilities.split(',')
+}
+
+// Only show available rooms
+const availableRooms = computed(() => {
+  return allRooms.value.filter(room => {
+    if (room.available === undefined || room.available === null) return true
+    return room.available === true || room.available === 1 || room.available === '1'
+  })
+})
+
+const selectRoom = (room) => {
   router.push({
     path: '/booking-form',
-    query: {
-      type: 'room',
-      roomId: room.id,
-      roomName: room.name
-    }
+    query: { roomId: room.id, roomName: room.name }
   })
 }
-</script>
 
-<style scoped>
-.room-box {
-  position: absolute;
-  width: 160px;
-  height: 110px;
-  background-color: #E8B4B8;
-  border: 2px solid #2C2C2C;
-  border-radius: 10px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: 0.3s;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-.room-box:hover {
-  background-color: #D89CA1;
-  transform: scale(1.03);
-}
-.room-label {
-  text-align: center;
-  font-weight: 600;
-  color: #2C2C2C;
-  font-size: 0.95rem;
-}
-.area-box {
-  position: absolute;
-  border: 2px solid #8B7D6B;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.area-label {
-  font-weight: 600;
-  color: #2C2C2C;
-}
-</style>
+onMounted(fetchRooms)
+</script>

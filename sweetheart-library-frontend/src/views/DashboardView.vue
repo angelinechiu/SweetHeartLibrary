@@ -8,23 +8,22 @@
           <h1 class="fw-bold mb-1" style="color: #2C2C2C;">Welcome back, {{ userName }} 💕</h1>
           <p class="text-muted mb-0">Your personal library overview</p>
         </div>
-        <div class="mt-2 mt-md-0 d-flex gap-2">
-          <router-link to="/announcements" class="btn btn-outline-dark px-3">View Announcements</router-link>
-          <router-link to="/my-bookings" class="btn btn-pink px-4">Manage All</router-link>
-        </div>
+        <!-- Manage All button removed -->
       </div>
 
       <LoadingSpinner :loading="loading" />
 
       <div v-if="!loading">
 
-        <!-- ==================== 1. RECENTLY BOOKED ROOMS (max 3) ==================== -->
+        <!-- RECENTLY BOOKED ROOMS -->
         <div class="mb-5">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="fw-semibold mb-0" style="color: #2C2C2C;">
               <i class="bi bi-door-open me-2"></i> Recently Booked Rooms
             </h4>
-            <router-link to="/room-history" class="text-decoration-none small fw-semibold" style="color: #E8B4B8;">See all room bookings →</router-link>
+            <router-link to="/room-history" class="text-decoration-none small fw-semibold" style="color: #E8B4B8;">
+              See all room bookings →
+            </router-link>
           </div>
 
           <div v-if="recentRoomBookings.length === 0" class="text-center py-4 bg-white rounded-3 shadow-sm">
@@ -47,7 +46,7 @@
                   </p>
 
                   <div class="d-flex gap-2 mt-3">
-                    <button class="btn btn-sm btn-outline-secondary flex-fill" @click="viewRoomBooking(room)">View</button>
+                    <!-- View button removed -->
                     <button
                       v-if="room.status !== 'completed' && room.status !== 'cancelled'"
                       class="btn btn-sm btn-outline-danger flex-fill"
@@ -61,13 +60,15 @@
           </div>
         </div>
 
-        <!-- ==================== 2. BORROWED BOOKS (VIEW ONLY - max 3) ==================== -->
+        <!-- BORROWED BOOKS -->
         <div class="mb-5">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="fw-semibold mb-0" style="color: #2C2C2C;">
               <i class="bi bi-book me-2"></i> Borrowed Books
             </h4>
-            <router-link to="/history" class="text-decoration-none small fw-semibold" style="color: #E8B4B8;">View borrowing history →</router-link>
+            <router-link to="/history" class="text-decoration-none small fw-semibold" style="color: #E8B4B8;">
+              View borrowing history →
+            </router-link>
           </div>
 
           <div v-if="borrowedBooks.length === 0" class="text-center py-4 bg-white rounded-3 shadow-sm">
@@ -93,15 +94,13 @@
                       </div>
                     </div>
                   </div>
-
-                  <!-- No Details button - viewing only -->
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- ==================== 3. OVERDUE BOOKS + RENEW (max 3) ==================== -->
+        <!-- OVERDUE BOOKS -->
         <div>
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="fw-semibold mb-0 text-danger">
@@ -154,23 +153,19 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import api from '../services/api.js'
 
-const router = useRouter()
 const authStore = useAuthStore()
 
 const loading = ref(true)
 const userName = computed(() => authStore.user?.name || 'Reader')
 
-// Data
 const recentRoomBookings = ref([])
 const borrowedBooks = ref([])
 const overdueBooks = ref([])
 
-// Helpers
 const getStatusBadgeClass = (status) => {
   if (status === 'confirmed' || status === 'active') return 'bg-success text-white'
   if (status === 'pending') return 'bg-warning text-dark'
@@ -192,16 +187,11 @@ const calculateOverdueDays = (dueDate) => {
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 }
 
-// Actions
-const viewRoomBooking = () => {
-  router.push('/my-bookings')
-}
-
 const cancelRoomBooking = async (booking) => {
   if (!confirm(`Cancel booking for "${booking.room_name}"?`)) return
 
   try {
-    await api.post('/room-bookings.php?action=cancel', { booking_id: booking.id })
+    await api.post('/bookings.php?action=cancel_room', { booking_id: booking.id })
     alert('Room booking cancelled successfully!')
     loadDashboardData()
   } catch (error) {
@@ -214,7 +204,7 @@ const renewOverdueBook = async (book) => {
   if (!confirm(`Renew "${book.title}" for another 7 days?`)) return
 
   try {
-    await api.post('/borrowings.php?action=renew', { borrowing_id: book.id })
+    await api.post('/bookings.php?action=renew_book', { borrowing_id: book.id })
     alert(`"${book.title}" renewed successfully for 7 more days!`)
     loadDashboardData()
   } catch (error) {
@@ -223,7 +213,6 @@ const renewOverdueBook = async (book) => {
   }
 }
 
-// Load Data
 const loadDashboardData = async () => {
   if (!authStore.user?.id) {
     loading.value = false
@@ -234,17 +223,36 @@ const loadDashboardData = async () => {
   try {
     const userId = authStore.user.id
 
-    // Load recent room bookings (real data + max 3)
-    const roomRes = await api.get(`/room-bookings.php?action=my_recent&user_id=${userId}`)
-    recentRoomBookings.value = (roomRes.data || []).slice(0, 3)
+    // Recent Room Bookings
+    const roomRes = await api.get(`/bookings.php?action=get&user_id=${userId}`)
+    const allRooms = roomRes.data?.room_bookings || []
+    recentRoomBookings.value = allRooms
+      .filter(r => !['completed', 'cancelled'].includes((r.status || '').toLowerCase()))
+      .sort((a, b) => new Date(b.start_time) - new Date(a.start_time))
+      .slice(0, 3)
+      .map(room => ({
+        id: room.id,
+        room_name: room.room_name,
+        date: new Date(room.start_time).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
+        time: `${new Date(room.start_time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} - ${new Date(room.end_time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`,
+        status: room.status,
+        location: room.location || 'Main Library'
+      }))
 
-    // Load borrowed books (real data + max 3)
-    const borrowRes = await api.get(`/borrowings.php?action=my_borrowed&user_id=${userId}`)
-    borrowedBooks.value = (borrowRes.data || []).slice(0, 3)
+    // Borrowed Books
+    const allBorrowed = roomRes.data?.borrowed_books || []
+    borrowedBooks.value = allBorrowed
+      .filter(b => ['borrowed', 'overdue'].includes((b.status || '').toLowerCase()))
+      .sort((a, b) => new Date(b.borrow_date) - new Date(a.borrow_date))
+      .slice(0, 3)
 
-    // Load overdue books (real data + max 3)
-    const overdueRes = await api.get(`/borrowings.php?action=my_overdue&user_id=${userId}`)
-    overdueBooks.value = (overdueRes.data || []).slice(0, 3)
+    // Overdue Books
+    const today = new Date()
+    overdueBooks.value = allBorrowed.filter(book => {
+      if (!book.due_date) return false
+      const due = new Date(book.due_date)
+      return due < today && book.status !== 'Returned'
+    }).slice(0, 3)
 
   } catch (error) {
     console.error('Failed to load dashboard data:', error)

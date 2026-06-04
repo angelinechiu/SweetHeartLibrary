@@ -19,12 +19,12 @@
         <div class="row justify-content-center mb-4">
           <div class="col-md-8 col-lg-6">
             <div class="input-group input-group-lg shadow-sm" style="border-radius: 50px; overflow: hidden;">
-              <input 
-                v-model="searchQuery" 
+              <input
+                v-model="searchQuery"
                 @keyup.enter="performSearch"
-                type="text" 
-                class="form-control border-0 ps-4" 
-                placeholder="Search books by title, author or ISBN..." 
+                type="text"
+                class="form-control border-0 ps-4"
+                placeholder="Search books by title, author or ISBN..."
                 style="background-color: #F8F4F0; color: #2C2C2C;"
               >
               <button @click="performSearch" class="btn btn-pink px-4" style="border-radius: 0 50px 50px 0;">
@@ -117,7 +117,7 @@
                   <span class="badge bg-success">Featured</span>
                 </div>
                 <p class="text-muted small mb-2"><i class="bi bi-geo-alt"></i> {{ room.location }} • Capacity: {{ room.capacity }}</p>
-                
+
                 <div class="mb-3">
                   <span v-for="facility in room.facilities" :key="facility" class="badge me-1 mb-1" style="background-color: #E8B4B8; color: #2C2C2C; font-size: 0.75rem;">
                     {{ facility }}

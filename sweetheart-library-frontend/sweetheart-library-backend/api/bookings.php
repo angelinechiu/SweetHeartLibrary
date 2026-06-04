@@ -142,7 +142,17 @@ if ($method === 'POST') {
         $data['end_time'], 
         $data['purpose']
     ]);
-    jsonResponse(['success' => true]);
+    // Check if user already booked 2 hours today
+$stmt = $pdo->prepare("
+    SELECT SUM(TIMESTAMPDIFF(HOUR, start_time, end_time)) as total_hours 
+    FROM room_bookings 
+    WHERE user_id = ? AND DATE(start_time) = CURDATE()
+");
+$stmt->execute([$user_id]);
+$result = $stmt->fetch();
+
+if ($result['total_hours'] >= 2) {
+    jsonResponse(['success' => false, 'message' => 'You have reached the 2-hour daily booking limit.']);
 }
 
 if ($method === 'DELETE') {
