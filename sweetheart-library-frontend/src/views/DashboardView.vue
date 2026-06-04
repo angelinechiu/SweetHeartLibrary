@@ -225,18 +225,25 @@ const renewOverdueBook = async (book) => {
 
 // Load Data
 const loadDashboardData = async () => {
+  if (!authStore.user?.id) {
+    loading.value = false
+    return
+  }
+
   loading.value = true
   try {
-    // Load recent room bookings (force max 3)
-    const roomRes = await api.get('/room-bookings.php?action=my_recent')
+    const userId = authStore.user.id
+
+    // Load recent room bookings (real data + max 3)
+    const roomRes = await api.get(`/room-bookings.php?action=my_recent&user_id=${userId}`)
     recentRoomBookings.value = (roomRes.data || []).slice(0, 3)
 
-    // Load borrowed books (force max 3)
-    const borrowRes = await api.get('/borrowings.php?action=my_borrowed')
+    // Load borrowed books (real data + max 3)
+    const borrowRes = await api.get(`/borrowings.php?action=my_borrowed&user_id=${userId}`)
     borrowedBooks.value = (borrowRes.data || []).slice(0, 3)
 
-    // Load overdue books (force max 3)
-    const overdueRes = await api.get('/borrowings.php?action=my_overdue')
+    // Load overdue books (real data + max 3)
+    const overdueRes = await api.get(`/borrowings.php?action=my_overdue&user_id=${userId}`)
     overdueBooks.value = (overdueRes.data || []).slice(0, 3)
 
   } catch (error) {
@@ -250,11 +257,7 @@ const loadDashboardData = async () => {
 }
 
 onMounted(() => {
-  if (authStore.user) {
-    loadDashboardData()
-  } else {
-    loading.value = false
-  }
+  loadDashboardData()
 })
 </script>
 
