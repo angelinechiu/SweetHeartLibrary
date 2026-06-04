@@ -341,8 +341,8 @@
                 <div class="col-12">
                   <select v-model="newAnnouncement.type" class="form-select">
                     <option value="Notice">Notice</option>
-                    <option value="Reminder">Reminder</option>
                     <option value="Event">Event</option>
+                    <option value="Maintenance">Maintenance</option>
                   </select>
                 </div>
                 <div class="col-12"><textarea v-model="newAnnouncement.message" class="form-control" rows="3" placeholder="Message"></textarea></div>
@@ -371,7 +371,7 @@
                   <tr v-for="ann in announcements" :key="ann.id">
                     <td class="fw-semibold">{{ ann.title }}</td>
                     <td><span class="badge bg-pink text-dark">{{ ann.type }}</span></td>
-                    <td>{{ ann.created_at }}</td>
+                    <td>{{ ann.created_at || ann.published_at }}</td>
                     <td class="text-end">
                       <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditAnnouncement(ann)">Edit</button>
                       <button class="btn btn-sm action-btn delete-btn" @click="deleteAnnouncement(ann.id)">Delete</button>
@@ -468,9 +468,13 @@ const fetchBookings = async () => {
 // ==================== ANNOUNCEMENTS ====================
 const addAnnouncement = async () => {
   if (!newAnnouncement.value.title || !newAnnouncement.value.message) return alert('Title and message required')
-  await api.post('/announcements.php', newAnnouncement.value)
-  newAnnouncement.value = { title: '', type: 'Notice', message: '' }
-  loadAnnouncements()
+  try {
+    await api.post('/announcements.php', newAnnouncement.value)
+    newAnnouncement.value = { title: '', type: 'Notice', message: '' }
+    loadAnnouncements()
+  } catch (e) {
+    alert('Failed to create announcement')
+  }
 }
 
 const startEditAnnouncement = (ann) => {
@@ -479,16 +483,24 @@ const startEditAnnouncement = (ann) => {
 }
 
 const saveAnnouncementEdit = async () => {
-  await api.post('/announcements.php', newAnnouncement.value)
-  editingAnnouncement.value = false
-  newAnnouncement.value = { title: '', type: 'Notice', message: '' }
-  loadAnnouncements()
+  try {
+    await api.post('/announcements.php?action=update', newAnnouncement.value)
+    editingAnnouncement.value = false
+    newAnnouncement.value = { title: '', type: 'Notice', message: '' }
+    loadAnnouncements()
+  } catch (e) {
+    alert('Failed to update announcement')
+  }
 }
 
 const deleteAnnouncement = async (id) => {
   if (confirm('Delete this announcement?')) {
-    await api.delete(`/announcements.php?id=${id}`)
-    loadAnnouncements()
+    try {
+      await api.delete(`/announcements.php?id=${id}`)
+      loadAnnouncements()
+    } catch (e) {
+      alert('Failed to delete announcement')
+    }
   }
 }
 
