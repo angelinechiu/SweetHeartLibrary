@@ -73,37 +73,11 @@ const isAdmin = computed(() => authStore.user?.role === 'admin')
 const loadAnnouncements = async () => {
   loading.value = true
   try {
-    // TODO: Replace with real API endpoint when backend is ready
-    // const res = await api.get('/announcements.php?action=get_published')
-    // announcements.value = res.data
-
-    // Mock data for now
-    announcements.value = [
-      {
-        id: 1,
-        title: "Library Hours Extended",
-        message: "Starting next week, Sweetheart Library will be open until 10:00 PM on weekdays to support your exam preparation.",
-        type: "Notice",
-        published_at: "June 3, 2026"
-      },
-      {
-        id: 2,
-        title: "Overdue Book Reminder",
-        message: "You have 2 overdue books. Please return them as soon as possible to avoid penalties. You may renew eligible books directly from your dashboard.",
-        type: "Overdue Reminder",
-        published_at: "June 2, 2026",
-        due_date: "June 10, 2026"
-      },
-      {
-        id: 3,
-        title: "New Collection Arrived",
-        message: "We have added 50+ new titles across Drama, Mystery, and Technology categories. Explore the updated catalog now!",
-        type: "Notice",
-        published_at: "June 1, 2026"
-      }
-    ]
+    const res = await api.get('/announcements.php?action=get_published')
+    announcements.value = res.data
   } catch (error) {
     console.error('Failed to load announcements:', error)
+    announcements.value = []
   } finally {
     loading.value = false
   }
