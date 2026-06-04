@@ -195,7 +195,7 @@ const calculateOverdueDays = (dueDate) => {
 }
 
 // Actions
-const viewRoomBooking = (room) => {
+const viewRoomBooking = () => {
   router.push('/my-bookings')
 }
 
