@@ -17,7 +17,6 @@ $data = json_decode(file_get_contents('php://input'), true);
 
 if ($method === 'GET') {
     if ($action === 'my_recent') {
-        // Get real user_id from frontend
         $user_id = $_GET['user_id'] ?? 0;
 
         if ($user_id <= 0) {
@@ -25,23 +24,42 @@ if ($method === 'GET') {
             exit;
         }
 
-        $stmt = $pdo->prepare("
-            SELECT id, room_name, start_time, end_time, status, location
-            FROM room_bookings 
-            WHERE user_id = ? 
-            ORDER BY start_time DESC 
-            LIMIT 3
-        ");
-        $stmt->execute([$user_id]);
-        $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $stmt = $pdo->prepare("
+                SELECT 
+                    id, 
+                    room_name, 
+                    start_time, 
+                    end_time, 
+                    status, 
+                    COALESCE(location, 'Main Library') AS location
+                FROM room_bookings 
+                WHERE user_id = ? 
+                ORDER BY start_time DESC 
+                LIMIT 3
+            ");
+            $stmt->execute([$user_id]);
+            $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Format for frontend
-        foreach ($bookings as &$b) {
-            $b['date'] = date('M j, Y', strtotime($b['start_time']));
-            $b['time'] = date('H:i', strtotime($b['start_time'])) . ' - ' . date('H:i', strtotime($b['end_time']));
+            // Safe formatting for frontend
+            foreach ($bookings as &$b) {
+                if (!empty($b['start_time']) && !empty($b['end_time'])) {
+                    $b['date'] = date('M j, Y', strtotime($b['start_time']));
+                    $b['time'] = date('H:i', strtotime($b['start_time'])) . ' - ' . date('H:i', strtotime($b['end_time']));
+                } else {
+                    $b['date'] = 'N/A';
+                    $b['time'] = 'N/A';
+                }
+                // Ensure location always exists
+                if (!isset($b['location'])) {
+                    $b['location'] = 'Main Library';
+                }
+            }
+
+            echo json_encode($bookings);
+        } catch (Exception $e) {
+            echo json_encode(['error' => true, 'message' => $e->getMessage()]);
         }
-
-        echo json_encode($bookings);
         exit;
     }
 }
@@ -54,10 +72,13 @@ if ($method === 'POST') {
             exit;
         }
 
-        $stmt = $pdo->prepare("UPDATE room_bookings SET status = 'cancelled' WHERE id = ?");
-        $success = $stmt->execute([$booking_id]);
-
-        echo json_encode(['success' => $success]);
+        try {
+            $stmt = $pdo->prepare("UPDATE room_bookings SET status = 'cancelled' WHERE id = ?");
+            $success = $stmt->execute([$booking_id]);
+            echo json_encode(['success' => $success]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
         exit;
     }
 }
