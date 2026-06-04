@@ -16,6 +16,7 @@ header('Content-Type: application/json');
 
 $method = $_SERVER['REQUEST_METHOD'];
 
+// ==================== GET ====================
 if ($method === 'GET') {
     $action = $_GET['action'] ?? 'get_published';
 
@@ -37,21 +38,64 @@ if ($method === 'GET') {
     exit;
 }
 
+// ==================== POST (Create or Update) ====================
 if ($method === 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
-    
-    $stmt = $pdo->prepare("INSERT INTO announcements (title, message, type, due_date, is_published, created_by) 
-                           VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->execute([
-        $data['title'],
-        $data['message'],
-        $data['type'] ?? 'Notice',
-        $data['due_date'] ?? null,
-        $data['is_published'] ?? 1,
-        $data['created_by'] ?? null
-    ]);
-    
-    echo json_encode(['success' => true, 'id' => $pdo->lastInsertId()]);
+    $action = $_GET['action'] ?? 'create';
+
+    if ($action === 'update' || isset($data['id'])) {
+        // UPDATE existing announcement
+        if (empty($data['id'])) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Missing id for update']);
+            exit;
+        }
+
+        $stmt = $pdo->prepare("UPDATE announcements 
+                               SET title = ?, message = ?, type = ?, due_date = ?, is_published = ? 
+                               WHERE id = ?");
+        $success = $stmt->execute([
+            $data['title'],
+            $data['message'],
+            $data['type'] ?? 'Notice',
+            $data['due_date'] ?? null,
+            $data['is_published'] ?? 1,
+            $data['id']
+        ]);
+
+        echo json_encode(['success' => $success]);
+    } else {
+        // CREATE new announcement
+        $stmt = $pdo->prepare("INSERT INTO announcements (title, message, type, due_date, is_published, created_by) 
+                               VALUES (?, ?, ?, ?, ?, ?)");
+        $success = $stmt->execute([
+            $data['title'],
+            $data['message'],
+            $data['type'] ?? 'Notice',
+            $data['due_date'] ?? null,
+            $data['is_published'] ?? 1,
+            $data['created_by'] ?? null
+        ]);
+
+        echo json_encode(['success' => $success, 'id' => $pdo->lastInsertId()]);
+    }
+    exit;
+}
+
+// ==================== DELETE ====================
+if ($method === 'DELETE') {
+    $id = $_GET['id'] ?? null;
+
+    if (!$id) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Missing id']);
+        exit;
+    }
+
+    $stmt = $pdo->prepare("DELETE FROM announcements WHERE id = ?");
+    $success = $stmt->execute([$id]);
+
+    echo json_encode(['success' => $success]);
     exit;
 }
 
