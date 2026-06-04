@@ -257,8 +257,19 @@
                   <td>{{ booking.book_title }}</td>
                   <td>{{ formatDate(booking.due_date) }}</td>
                   <td><span :class="getBookingStatusClass(booking.status)">{{ booking.status }}</span></td>
-                  <td>
-                    <button class="btn btn-sm btn-warning" :disabled="booking.status !== 'Overdue'" @click="sendReminder(booking)">Send Reminder</button>
+                  <td class="d-flex gap-1 flex-wrap">
+                    <!-- Renew button (for Overdue books) -->
+                    <button v-if="booking.status === 'Overdue'" 
+                            class="btn btn-sm btn-warning" 
+                            @click="renewBook(booking)">
+                      Renew
+                    </button>
+                    
+                    <!-- Mark as Returned button -->
+                    <button class="btn btn-sm btn-success" 
+                            @click="markBookReturned(booking)">
+                      Mark Returned
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -541,6 +552,41 @@ const markRoomAvailable = async (booking) => {
   }
 }
 
+// ==================== BORROWED BOOKS ACTIONS ====================
+// Renew book (sets status back to Borrowed, clears overdue)
+const renewBook = async (booking) => {
+  if (!booking?.id) return
+  if (!confirm(`Renew this book for ${booking.user_name}?`)) return
+
+  try {
+    await axios.post(API_BASE + 'bookings.php?action=renew_book', { 
+      booking_id: booking.id 
+    })
+    alert('Book renewed successfully! Status set to Borrowed.')
+    fetchBookings()
+  } catch (error) {
+    console.error(error)
+    alert('Failed to renew book')
+  }
+}
+
+// Mark book as returned (removes from active borrowed list)
+const markBookReturned = async (booking) => {
+  if (!booking?.id) return
+  if (!confirm(`Mark "${booking.book_title}" as returned by ${booking.user_name}?`)) return
+
+  try {
+    await axios.post(API_BASE + 'bookings.php?action=mark_returned', { 
+      booking_id: booking.id 
+    })
+    alert('Book marked as returned!')
+    fetchBookings()
+  } catch (error) {
+    console.error(error)
+    alert('Failed to mark book as returned')
+  }
+}
+
 // ==================== CRUD ====================
 const addBook = async () => { await api.post('/books.php', newBook.value); loadAllData() }
 const startEditBook = (book) => { newBook.value = { ...book }; editingBook.value = true }
@@ -568,7 +614,6 @@ const formatDateTime = (d) => d ? new Date(d).toLocaleString('en-MY') : '-'
 const getBookingStatusClass = (s) => s === 'Overdue' ? 'badge bg-danger' : 'badge bg-success'
 
 const canMarkRoomAvailable = (b) => {
-  // Show button for Active room bookings (admin can mark as completed anytime)
   return b.status === 'Active' || !b.status || b.status === 'Pending'
 }
 
