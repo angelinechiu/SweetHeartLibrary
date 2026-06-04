@@ -96,12 +96,6 @@ const routes = [
     meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
-    path: '/admin/announcements',
-    name: 'AdminAnnouncements',
-    component: () => import('../views/AdminAnnouncementsView.vue'),
-    meta: { requiresAuth: true, requiresAdmin: true }
-  },
-  {
     path: '/forgot-password',
     name: 'ForgotPassword',
     component: () => import('../views/ForgotPasswordView.vue')
