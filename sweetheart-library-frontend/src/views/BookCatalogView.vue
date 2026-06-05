@@ -1,8 +1,12 @@
 <template>
   <div style="background-color: #F8F4F0;" class="py-5">
     <div class="container">
+      <!-- Header -->
       <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold mb-0" style="color: #2C2C2C;">Our Elegant Collection</h2>
+        <div>
+          <h2 class="fw-bold mb-1" style="color: #2C2C2C;">Our Elegant Collection</h2>
+          <p class="text-muted mb-0">Discover our curated selection of books</p>
+        </div>
         <span class="text-muted">{{ filteredBooks.length }} books</span>
       </div>
 
@@ -29,54 +33,77 @@
       <!-- Loading -->
       <LoadingSpinner :loading="loading" message="Loading beautiful books..." />
 
-      <!-- Book Grid -->
-      <div v-if="!loading" class="row g-4">
-        <div class="col-6 col-md-4 col-lg-3" v-for="book in paginatedBooks" :key="book.id">
-          <div class="card border-0 shadow-sm hover-card h-100" style="background-color: #D9CFC2; border-radius: 16px; overflow: hidden;">
-            <div class="position-relative">
-              <img
-                :src="book.cover_image || 'https://picsum.photos/id/201/400/300'"
-                class="card-img-top"
-                style="height: 240px; object-fit: cover;"
-                alt="Book cover"
-              >
-              <span 
-                class="position-absolute top-0 end-0 m-2 badge"
-                :class="book.available_copies > 0 ? 'bg-success' : 'bg-secondary'"
-              >
-                {{ book.available_copies > 0 ? 'Available' : 'Unavailable' }}
-              </span>
-            </div>
-            
-            <div class="card-body d-flex flex-column p-3">
-              <h6 class="fw-semibold mb-1 text-truncate" style="color: #2C2C2C;">{{ book.title }}</h6>
-              <p class="text-muted small mb-2">{{ book.author }}</p>
-              
-              <div class="mb-2">
-                <span class="badge" style="background-color: #E8B4B8; color: #2C2C2C; font-size: 0.75rem;">{{ book.category }}</span>
+      <!-- Book Grid - Now matches My Bookings card layout -->
+      <div v-if="!loading" class="row g-3">
+        <div
+          v-for="book in paginatedBooks"
+          :key="book.id"
+          class="col-md-6 col-lg-4"
+        >
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex flex-column">
+              <!-- Top badges row (matching MyBookings style) -->
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <span 
+                  class="badge px-3 py-1" 
+                  style="background-color: #E8B4B8; color: #2C2C2C;"
+                >
+                  📖 {{ book.category }}
+                </span>
+                <span 
+                  class="badge px-3 py-1"
+                  :class="book.available_copies > 0 ? 'bg-success text-white' : 'bg-secondary text-white'"
+                >
+                  {{ book.available_copies > 0 ? 'Available' : 'Unavailable' }}
+                </span>
               </div>
 
-              <div class="mt-auto">
-                <router-link :to="`/books/${book.id}`" class="btn btn-sm btn-outline-dark w-100 mb-2">View Details</router-link>
+              <!-- Title -->
+              <h5 class="fw-semibold mb-1">{{ book.title }}</h5>
+              
+              <!-- Author -->
+              <p class="text-muted small mb-1">{{ book.author }}</p>
+
+              <!-- Additional info -->
+              <div class="small mb-3">
+                <div class="text-muted">Published: {{ book.year || 'N/A' }}</div>
+                <div class="text-muted">Copies available: <strong>{{ book.available_copies }}</strong></div>
+              </div>
+
+              <!-- Action buttons (pushed to bottom) -->
+              <div class="mt-auto d-flex gap-2">
+                <router-link 
+                  :to="`/books/${book.id}`" 
+                  class="btn btn-sm btn-outline-dark flex-fill"
+                >
+                  View Details
+                </router-link>
                 
                 <button 
                   v-if="book.available_copies > 0"
-                  class="btn btn-sm btn-pink w-100"
-                  @click="borrowBook(book)">
-                  Borrow This Book
+                  class="btn btn-sm btn-pink flex-fill"
+                  @click="borrowBook(book)"
+                >
+                  Borrow Book
                 </button>
-                <button v-else class="btn btn-sm btn-secondary w-100" disabled>
+                <button 
+                  v-else 
+                  class="btn btn-sm btn-secondary flex-fill" 
+                  disabled
+                >
                   Currently Unavailable
                 </button>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Empty State -->
-      <div v-if="!loading && filteredBooks.length === 0" class="text-center py-5">
-        <p class="text-muted">No books found matching your filters.</p>
+        <!-- Empty state for no results -->
+        <div v-if="filteredBooks.length === 0" class="col-12">
+          <div class="text-center py-5 bg-white rounded-3 shadow-sm">
+            <p class="text-muted mb-0">No books found matching your filters.</p>
+          </div>
+        </div>
       </div>
 
       <!-- Pagination -->
@@ -214,13 +241,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.hover-card {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.hover-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1) !important;
-}
 .btn-pink {
   background-color: #E8B4B8;
   color: #2C2C2C;
