@@ -209,3 +209,128 @@ INSERT INTO feedback (name, email, type, message, rating) VALUES
 ('Ravi Kumar', 'ravi.kumar@hotmail.com', 'Complaint', 'I faced an error when trying to submit feedback. It kept loading forever.', 2.0),
 ('Fatimah Zahra', 'fatimah.zahra@gmail.com', 'Suggestion', 'Can we have a feature to save favorite books or create reading lists?', 4.0),
 ('Joshua Lim', 'joshua.lim@student.edu.my', 'Praise', 'Admin dashboard looks professional. Everything is well organized.', 4.5);
+
+
+
+
+
+
+
+
+
+
+-- =============================================
+-- INSERT FRESH DATA FOR ALL TABLES
+-- =============================================
+
+-- 1. USERS
+INSERT INTO users (id, name, email, password, role, created_at) VALUES
+(1, 'Jeff Liew', 'jeff@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'user', NOW()),
+(2, 'Sarah Tan', 'sarah@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'user', NOW()),
+(3, 'Admin User', 'admin@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', NOW()),
+(4, 'Michael Wong', 'michael@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'user', NOW()),
+(5, 'Emily Chen', 'emily@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'user', NOW());
+
+-- 2. BOOKS (50 Books)
+INSERT INTO books (title, author, isbn, category, publication_year, copies, description, availability_status) VALUES
+('The Silent Patient', 'Alex Michaelides', '978-1250301697', 'Thriller', 2019, 5, 'A woman shoots her husband and then never speaks another word.', 'Available'),
+('Educated', 'Tara Westover', '978-0399590504', 'Memoir', 2018, 4, 'A woman leaves her survivalist family and earns a PhD from Cambridge University.', 'Available'),
+('The Midnight Library', 'Matt Haig', '978-0525559474', 'Fiction', 2020, 6, 'Between life and death there is a library where you can live other lives.', 'Available'),
+('Atomic Habits', 'James Clear', '978-0735211292', 'Self-Help', 2018, 7, 'Tiny changes, remarkable results. Build good habits and break bad ones.', 'Available'),
+('Dune', 'Frank Herbert', '978-0441172719', 'Science Fiction', 1965, 3, 'Paul Atreides unites the Fremen on the desert planet Arrakis.', 'Available'),
+('Project Hail Mary', 'Andy Weir', '978-0593135204', 'Science Fiction', 2021, 4, 'A lone astronaut must save Earth from disaster.', 'Available'),
+('The Alchemist', 'Paulo Coelho', '978-0062315007', 'Fiction', 1988, 5, 'A philosophical story about following your dreams.', 'Available'),
+('The Seven Husbands of Evelyn Hugo', 'Taylor Jenkins Reid', '978-1501161933', 'Romance', 2017, 2, 'A reclusive Hollywood icon finally tells her life story.', 'Available'),
+('Pride and Prejudice', 'Jane Austen', '978-0141439518', 'Classic', 1813, 3, 'Elizabeth Bennet and Mr. Darcy in this classic romance.', 'Available'),
+('Where the Crawdads Sing', 'Delia Owens', '978-0735219090', 'Fiction', 2018, 5, 'A young woman raised in the marshes becomes a murder suspect.', 'Available'),
+('The Housemaid', 'Freida McFadden', '978-1804050000', 'Thriller', 2022, 4, 'A domestic thriller about a housemaid with a dark past.', 'Available'),
+('It Ends With Us', 'Colleen Hoover', '978-1501110368', 'Romance', 2016, 6, 'A heartbreaking story about love and difficult choices.', 'Available'),
+('The Psychology of Money', 'Morgan Housel', '978-0857197689', 'Self-Help', 2020, 5, 'Timeless lessons on wealth, greed, and happiness.', 'Available'),
+('Fourth Wing', 'Rebecca Yarros', '978-1649374042', 'Fantasy', 2023, 3, 'A young woman enters a deadly war college where dragons choose riders.', 'Available'),
+('Lessons in Chemistry', 'Bonnie Garmus', '978-0385549400', 'Fiction', 2022, 4, 'A brilliant chemist becomes an unlikely TV cooking show host.', 'Available'),
+('The Woman in the Window', 'A.J. Finn', '978-0062678416', 'Thriller', 2018, 3, 'An agoraphobic woman believes she witnessed a murder.', 'Available'),
+('Sapiens', 'Yuval Noah Harari', '978-0062316097', 'History', 2011, 5, 'A brief history of humankind.', 'Available'),
+('The Great Gatsby', 'F. Scott Fitzgerald', '978-0743273565', 'Classic', 1925, 4, 'The story of the mysterious Jay Gatsby.', 'Available'),
+('Verity', 'Colleen Hoover', '978-1538724736', 'Thriller', 2018, 5, 'A struggling writer is hired to finish the books of an injured author.', 'Available'),
+('The Song of Achilles', 'Madeline Miller', '978-0062060624', 'Fantasy', 2011, 3, 'A retelling of the Iliad from Patroclus’s perspective.', 'Available'),
+('Normal People', 'Sally Rooney', '978-0571334650', 'Fiction', 2018, 4, 'A story of mutual fascination between two teenagers.', 'Available'),
+('The 48 Laws of Power', 'Robert Greene', '978-0140280197', 'Self-Help', 1998, 2, 'Understanding and using power in daily life.', 'Available'),
+('Dune Messiah', 'Frank Herbert', '978-0593098233', 'Science Fiction', 1969, 3, 'Paul Atreides faces political challenges as emperor.', 'Available'),
+('The Love Hypothesis', 'Ali Hazelwood', '978-0593336823', 'Romance', 2021, 5, 'A fake dating romance between a PhD student and a professor.', 'Available'),
+('The Mountain Is You', 'Brianna Wiest', '978-1949759228', 'Self-Help', 2020, 4, 'Transforming self-sabotage into self-mastery.', 'Available'),
+('The Guest List', 'Lucy Foley', '978-0062868930', 'Thriller', 2020, 3, 'A wedding on a remote island turns deadly.', 'Available'),
+('Circe', 'Madeline Miller', '978-0316556347', 'Fantasy', 2018, 4, 'The story of the witch Circe from Greek mythology.', 'Available'),
+('The Nightingale', 'Kristin Hannah', '978-1250080400', 'Historical Fiction', 2015, 4, 'Two sisters in France during World War II.', 'Available'),
+('The Vanishing Half', 'Brit Bennett', '978-0525536291', 'Fiction', 2020, 3, 'Twin sisters choose very different paths in life.', 'Available'),
+('The Push', 'Ashley Audrain', '978-1984881663', 'Thriller', 2021, 2, 'A psychological thriller about motherhood.', 'Available'),
+('The Four Agreements', 'Don Miguel Ruiz', '978-1878424310', 'Self-Help', 1997, 6, 'Ancient Toltec wisdom for personal freedom.', 'Available'),
+('The Book Thief', 'Markus Zusak', '978-0375842207', 'Historical Fiction', 2005, 4, 'A story narrated by Death during WWII.', 'Available'),
+('The House in the Cerulean Sea', 'TJ Klune', '978-1250217288', 'Fantasy', 2020, 3, 'A magical story about an orphanage for magical children.', 'Available'),
+('The Lincoln Highway', 'Amor Towles', '978-0735222359', 'Fiction', 2021, 2, 'Three young men on an unexpected road trip in 1950s America.', 'Available'),
+('The Maid', 'Nita Prose', '978-0593356159', 'Mystery', 2022, 4, 'A hotel maid becomes the main suspect in a murder.', 'Available'),
+('The Paris Apartment', 'Lucy Foley', '978-0063039131', 'Thriller', 2022, 3, 'A woman searches for her brother in Paris.', 'Available'),
+('The Dictionary of Lost Words', 'Pip Williams', '978-0593230367', 'Historical Fiction', 2020, 2, 'Women who helped compile the Oxford English Dictionary.', 'Available'),
+('The Invisible Life of Addie LaRue', 'V.E. Schwab', '978-0765387561', 'Fantasy', 2020, 5, 'A young woman makes a deal to live forever but is forgotten by everyone.', 'Available'),
+('Pachinko', 'Min Jin Lee', '978-1455563920', 'Fiction', 2017, 3, 'A Korean family saga across four generations.', 'Available'),
+('The Covenant of Water', 'Abraham Verghese', '978-0802162175', 'Fiction', 2023, 2, 'A sweeping multigenerational family saga in Kerala, India.', 'Available'),
+('The 7 Habits of Highly Effective People', 'Stephen R. Covey', '978-1982137274', 'Self-Help', 1989, 5, 'Classic book on personal and professional effectiveness.', 'Available'),
+('Atomic Habits (Deluxe Edition)', 'James Clear', '978-0593189641', 'Self-Help', 2018, 0, 'Special collector’s edition.', 'Not Available'),
+('The Silent Patient (Collector’s Edition)', 'Alex Michaelides', '978-1250301697', 'Thriller', 2022, 0, 'Limited edition with bonus material.', 'Not Available'),
+('Dune (Special Edition)', 'Frank Herbert', '978-0441172719', 'Science Fiction', 1965, 1, 'Last remaining copy.', 'Available'),
+('The Midnight Library (Limited)', 'Matt Haig', '978-0525559474', 'Fiction', 2020, 0, 'Limited edition copy.', 'Not Available'),
+('It Ends With Us (Special)', 'Colleen Hoover', '978-1501110368', 'Romance', 2016, 2, 'Special edition.', 'Available'),
+('The Housemaid (Hardcover)', 'Freida McFadden', '978-1804050000', 'Thriller', 2022, 3, 'Hardcover edition.', 'Available'),
+('Fourth Wing (Deluxe)', 'Rebecca Yarros', '978-1649374042', 'Fantasy', 2023, 2, 'Deluxe edition with sprayed edges.', 'Available'),
+('The Alchemist (Anniversary)', 'Paulo Coelho', '978-0062315007', 'Fiction', 2014, 4, '25th Anniversary Edition.', 'Available'),
+('Sapiens (Illustrated)', 'Yuval Noah Harari', '978-0062316097', 'History', 2022, 3, 'Illustrated edition.', 'Available');
+
+-- 3. BORROWINGS
+INSERT INTO borrowings (user_id, book_id, status, due_date, has_penalty) VALUES
+(1, 1, 'borrowed', '2026-06-10', 0),
+(1, 3, 'borrowed', '2026-06-12', 0),
+(2, 5, 'borrowed', '2026-06-05', 1),
+(2, 7, 'returned', '2026-05-20', 0),
+(3, 2, 'borrowed', '2026-06-15', 0),
+(3, 4, 'borrowed', '2026-06-08', 0),
+(4, 8, 'returned', '2026-05-28', 0),
+(5, 10, 'borrowed', '2026-06-18', 0);
+
+-- 4. BORROWED_BOOKS (if you use this table too)
+INSERT INTO borrowed_books (user_id, book_id, status, due_date, has_penalty) VALUES
+(1, 1, 'borrowed', '2026-06-10', 0),
+(1, 3, 'borrowed', '2026-06-12', 0),
+(2, 5, 'borrowed', '2026-06-05', 1),
+(2, 7, 'returned', '2026-05-20', 0);
+
+-- 5. ROOMS
+INSERT INTO rooms (id, name, capacity, equipment, created_at) VALUES
+(1, 'Study Room A', 4, 'Whiteboard, Projector, WiFi', NOW()),
+(2, 'Study Room B', 6, 'Whiteboard, TV Screen, WiFi', NOW()),
+(3, 'Discussion Room 1', 8, 'Whiteboard, Video Conference, WiFi', NOW()),
+(4, 'Quiet Study Pod', 2, 'Desk Lamp, Power Outlets', NOW()),
+(5, 'Group Study Room', 10, 'Projector, Whiteboard, WiFi', NOW());
+
+-- 6. ROOM_BOOKINGS
+INSERT INTO room_bookings (user_id, room_id, booking_date, start_time, end_time, status) VALUES
+(1, 1, '2026-06-07', '10:00:00', '12:00:00', 'confirmed'),
+(2, 2, '2026-06-08', '14:00:00', '16:00:00', 'confirmed'),
+(3, 3, '2026-06-09', '09:00:00', '11:00:00', 'pending'),
+(1, 4, '2026-06-10', '15:00:00', '17:00:00', 'confirmed');
+
+-- 7. ANNOUNCEMENTS
+INSERT INTO announcements (title, content, created_at) VALUES
+('Library Extended Hours', 'The library will be open until 10 PM during exam week (10 - 20 June 2026).', NOW()),
+('New Book Arrival', 'We have added 50 new titles including "Fourth Wing" and "The Covenant of Water".', NOW()),
+('Maintenance Notice', 'Study Room C will be closed for maintenance on 8 June 2026.', NOW());
+
+-- 8. EVENTS
+INSERT INTO events (title, description, event_date, location, created_at) VALUES
+('Book Club: The Silent Patient', 'Monthly book club discussion. All members are welcome!', '2026-06-15', 'Discussion Room 1', NOW()),
+('Author Talk: Local Writers Series', 'Meet local authors and discuss their latest works.', '2026-06-22', 'Main Hall', NOW()),
+('Study Skills Workshop', 'Learn effective study techniques for exams.', '2026-06-12', 'Study Room B', NOW());
+
+-- 9. FEEDBACK
+INSERT INTO feedback (user_id, subject, message, rating, created_at) VALUES
+(1, 'Great Service', 'The new book collection is amazing! Very satisfied.', 5, NOW()),
+(2, 'Room Booking Issue', 'Had trouble booking a room through the app.', 3, NOW()),
+(3, 'Suggestion', 'Would love to see more self-help books.', 4, NOW());

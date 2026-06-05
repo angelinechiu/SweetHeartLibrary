@@ -4,7 +4,7 @@ header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
 $host = 'localhost';
-$dbname = 'sweetheart_library';
+$dbname = 'SHL';
 $username = 'root';
 $password = ''; // Change if you set a password in XAMPP
 

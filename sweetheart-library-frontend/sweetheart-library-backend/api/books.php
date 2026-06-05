@@ -65,4 +65,24 @@ if ($method === 'DELETE') {
         echo json_encode(['success' => true]);
     }
 }
+
+// Borrow book - Reduce available_copies by 1
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $data = json_decode(file_get_contents("php://input"), true);
+
+    if (isset($data['action']) && $data['action'] === 'borrow_book') {
+        $book_id = intval($data['book_id']);
+
+        $sql = "UPDATE books 
+                SET available_copies = available_copies - 1 
+                WHERE id = $book_id AND available_copies > 0";
+
+        if (mysqli_query($conn, $sql)) {
+            echo json_encode(["success" => true, "message" => "Book borrowed successfully"]);
+        } else {
+            echo json_encode(["success" => false, "message" => "Failed to borrow book"]);
+        }
+        exit;
+    }
+}  
 ?>
