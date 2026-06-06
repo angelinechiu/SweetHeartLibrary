@@ -35,6 +35,9 @@ CREATE TABLE books (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 );
+ALTER TABLE books 
+ADD COLUMN is_featured TINYINT(1) DEFAULT 0,
+ADD COLUMN is_popular  TINYINT(1) DEFAULT 0;
 
 -- 3. BORROWINGS
 CREATE TABLE borrowings (
@@ -197,6 +200,36 @@ INSERT INTO books (title, author, isbn, category, year, description, available_c
 ('Fourth Wing (Deluxe Edition)', 'Rebecca Yarros', '978-1649374042', 'Fantasy', 2023, 'Deluxe edition with sprayed edges and bonus content.', 2, 2),
 ('The Alchemist (25th Anniversary)', 'Paulo Coelho', '978-0062315007', 'Fiction', 2014, '25th Anniversary Edition with new foreword.', 4, 4),
 ('Sapiens (Illustrated Edition)', 'Yuval Noah Harari', '978-0062316097', 'History', 2022, 'Illustrated edition with beautiful visuals.', 3, 3);
+
+-- Set 10 books as FEATURED
+UPDATE books SET is_featured = 1 
+WHERE title IN (
+  'Dune', 
+  'Atomic Habits', 
+  'The Silent Patient', 
+  'Educated', 
+  'Project Hail Mary',
+  'The Midnight Library',
+  'Sapiens',
+  'The Alchemist',
+  'The Psychology of Money',
+  'Thinking, Fast and Slow'
+);
+
+-- Set 10 books as POPULAR
+UPDATE books SET is_popular = 1 
+WHERE title IN (
+  'The Seven Husbands of Evelyn Hugo', 
+  'It Ends With Us', 
+  'The Song of Achilles', 
+  'Circe', 
+  'Normal People',
+  'The Vanishing Half',
+  'Pachinko',
+  'The House of the Spirits',
+  'The Night Circus',
+  'Where the Crawdads Sing'
+);
 -- BORROWINGS
 INSERT INTO borrowings (user_id, book_id, borrowed_date, due_date, status, renewal_count) VALUES
 (1, 1, '2026-05-20', '2026-06-03', 'Borrowed', 0),

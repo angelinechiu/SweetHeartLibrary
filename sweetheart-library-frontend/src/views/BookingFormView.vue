@@ -51,11 +51,11 @@
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../services/api.js'
-import { useAuthStore } from '../stores/auth'   // ✅ Added
+import { useAuthStore } from '../stores/auth'
 
 const route = useRoute()
 const router = useRouter()
-const authStore = useAuthStore()                 // ✅ Added
+const authStore = useAuthStore()
 
 const roomName = route.query.roomName || 'Study Room'
 const bookingDate = ref('')
@@ -89,10 +89,14 @@ const checkAndProceed = async () => {
   if (!isFormValid.value) return
 
   try {
-    // Check daily limit from backend
     const res = await api.get(
       `/bookings.php?action=check_daily_limit&user_id=${authStore.user.id}&date=${bookingDate.value}`
     )
+
+    if (res.data.success === false) {
+      alert('Error checking booking limit: ' + (res.data.message || 'Unknown error'))
+      return
+    }
 
     if (res.data.total_hours >= 2) {
       alert('You have reached the maximum 2 hours booking limit for today.')
@@ -110,8 +114,8 @@ const checkAndProceed = async () => {
       }
     })
   } catch (error) {
-    console.error(error)
-    alert('Error checking booking limit.')
+    console.error('Booking limit check failed:', error)
+    alert('Network error. Please check if the backend is running.')
   }
 }
 </script>
