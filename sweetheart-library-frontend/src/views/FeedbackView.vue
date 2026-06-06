@@ -47,7 +47,8 @@
                 </div>
 
                 <div class="d-grid mt-4">
-                  <button type="submit" class="btn btn-lg py-3 fw-bold" :disabled="loading"
+                  <button type="submit" class="btn btn-lg py-3 fw-bold"
+                          :disabled="loading"
                           style="background-color: #E8B4B8; color: #2C2C2C; border: none; border-radius: 12px;">
                     <span v-if="!loading">Submit Feedback</span>
                     <span v-else>Submitting...</span>
@@ -60,8 +61,8 @@
       </div>
     </div>
 
-    <!-- Success Modal -->
-    <div class="modal fade" id="successModal" tabindex="-1">
+    <!-- Success Modal (Controlled by Vue) -->
+    <div v-if="showSuccessModal" class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 20px;">
           <div class="modal-body text-center p-5">
@@ -69,8 +70,8 @@
             <h3 class="fw-bold mt-4 mb-3">Thank You!</h3>
             <p class="text-muted fs-5">Your feedback has been submitted successfully.</p>
             <button type="button" class="btn px-5 py-2 fw-bold mt-3"
-                    style="background-color: #E8B4B8; color: #2C2C2C; border-radius: 50px;"
-                    data-bs-dismiss="modal">
+                    @click="closeSuccessModal"
+                    style="background-color: #E8B4B8; color: #2C2C2C; border-radius: 50px;">
               Close
             </button>
           </div>
@@ -83,7 +84,6 @@
 <script setup>
 import { ref } from 'vue'
 import axios from 'axios'
-import * as bootstrap from 'bootstrap'
 
 const form = ref({
   name: '',
@@ -94,9 +94,11 @@ const form = ref({
 })
 
 const loading = ref(false)
+const showSuccessModal = ref(false)
 
 const submitFeedback = async () => {
   loading.value = true
+
   try {
     const res = await axios.post(
       'http://localhost/sweetheart-library-backend/api/feedback.php',
@@ -104,12 +106,10 @@ const submitFeedback = async () => {
     )
 
     if (res.data.success) {
-      const modal = new bootstrap.Modal(document.getElementById('successModal'))
-      modal.show()
-
+      showSuccessModal.value = true
       form.value = { name: '', email: '', type: '', message: '', rating: 5 }
     } else {
-      alert(res.data.message)
+      alert(res.data.message || 'Failed to submit feedback.')
     }
   } catch (error) {
     console.error('Failed to submit feedback:', error)
@@ -117,5 +117,9 @@ const submitFeedback = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const closeSuccessModal = () => {
+  showSuccessModal.value = false
 }
 </script>

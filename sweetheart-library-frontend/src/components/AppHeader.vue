@@ -4,7 +4,7 @@
 
     <div class="container-fluid px-4">
 
-      <!-- Logo - Left -->
+      <!-- Logo -->
       <router-link class="navbar-brand fw-bold d-flex align-items-center" to="/">
         <img src="../assets/images/logo.png" alt="Sweetheart Library" class="navbar-logo me-2">
         <span style="color: #F8F4F0; font-size: 1.45rem; letter-spacing: 0.5px; margin-left: 8px;">
@@ -12,11 +12,14 @@
         </span>
       </router-link>
 
-      <!-- Main Navigation + Profile Group -->
       <div class="d-flex align-items-center ms-auto">
 
-        <!-- Desktop Navigation Links -->
-        <div class="collapse navbar-collapse d-lg-block justify-content-end" id="navbarNav">
+        <!-- Collapsible Menu -->
+        <div
+          ref="navbarCollapseEl"
+          class="collapse navbar-collapse d-lg-block justify-content-end"
+          id="navbarNav"
+        >
           <ul class="navbar-nav me-4 text-end">
             <li class="nav-item">
               <router-link class="nav-link text-light px-3" to="/books">Books</router-link>
@@ -30,9 +33,8 @@
           </ul>
         </div>
 
-        <!-- Profile Dropdown - Always Far Right -->
+        <!-- Profile -->
         <div class="dropdown">
-          <!-- Not Logged In -->
           <router-link
             v-if="!authStore.token"
             to="/login"
@@ -41,9 +43,9 @@
             Login
           </router-link>
 
-          <!-- Logged In -->
           <div v-else>
             <button
+              ref="profileDropdownEl"
               class="btn p-0 border-0 bg-transparent profile-btn"
               data-bs-toggle="dropdown"
             >
@@ -54,19 +56,12 @@
               >
             </button>
 
-            <!-- Dark Dropdown -->
             <ul class="dropdown-menu dropdown-menu-end shadow elegant-dropdown">
               <li class="px-3 py-2">
                 <div class="fw-semibold" style="color: #E8B4B8;">
                   {{ authStore.user?.name || 'User' }}
                 </div>
                 <small class="text-muted">{{ authStore.user?.email }}</small>
-                <div v-if="authStore.isAdmin" class="mt-1">
-                  <span class="badge px-2 py-1"
-                        style="background-color: #E8B4B8; color: #2C2C2C; font-size: 0.7rem;">
-                    ADMIN
-                  </span>
-                </div>
               </li>
               <li><hr class="dropdown-divider"></li>
 
@@ -75,9 +70,6 @@
               </li>
               <li v-if="authStore.isUser">
                 <router-link class="dropdown-item" to="/my-bookings">My Bookings</router-link>
-              </li>
-              <li v-if="authStore.isUser">
-                <router-link class="dropdown-item" to="/announcements">Announcements</router-link>
               </li>
               <li>
                 <router-link class="dropdown-item" to="/profile">My Profile</router-link>
@@ -103,6 +95,7 @@
           </div>
         </div>
 
+        <!-- Hamburger -->
         <button
           class="navbar-toggler border-0 d-lg-none ms-2"
           type="button"
@@ -121,9 +114,9 @@
 </template>
 
 <script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import defaultAvatar from '../assets/images/profile-avatar.png'
-
 
 const authStore = useAuthStore()
 
@@ -131,9 +124,46 @@ const logout = () => {
   authStore.logout()
   window.location.href = '/login'
 }
+
+const profileDropdownEl = ref(null)
+const navbarCollapseEl = ref(null)
+
+let handlers = []
+
+onMounted(() => {
+  // Close hamburger when profile dropdown opens
+  const closeHamburger = () => {
+    if (navbarCollapseEl.value) {
+      const collapse = window.bootstrap?.Collapse.getOrCreateInstance(navbarCollapseEl.value)
+      collapse?.hide()
+    }
+  }
+
+  // Close profile dropdown when hamburger opens
+  const closeProfile = () => {
+    if (profileDropdownEl.value) {
+      const dropdown = window.bootstrap?.Dropdown.getOrCreateInstance(profileDropdownEl.value)
+      dropdown?.hide()
+    }
+  }
+
+  // Use document-level listeners (more reliable)
+  document.addEventListener('show.bs.dropdown', closeHamburger)
+  document.addEventListener('show.bs.collapse', closeProfile)
+
+  handlers = [
+    () => document.removeEventListener('show.bs.dropdown', closeHamburger),
+    () => document.removeEventListener('show.bs.collapse', closeProfile)
+  ]
+})
+
+onUnmounted(() => {
+  handlers.forEach(fn => fn())
+})
 </script>
 
 <style scoped>
+/* Your existing styles */
 .profile-avatar {
   width: 42px;
   height: 42px;
@@ -155,10 +185,6 @@ const logout = () => {
   border-color: #D89CA1;
 }
 
-.navbar {
-  position: relative;
-}
-
 @media (max-width: 991.98px) {
   .navbar-collapse {
     position: absolute;
@@ -172,10 +198,6 @@ const logout = () => {
     border-radius: 0;
     padding: 0.5rem 0;
     z-index: 1050;
-  }
-
-  .navbar-collapse .navbar-nav {
-    margin: 0;
   }
 
   .navbar-collapse .nav-link {

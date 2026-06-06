@@ -127,7 +127,6 @@ CREATE TABLE feedback (
     type ENUM('Suggestion','Complaint','Praise','Other') DEFAULT 'Other',
     message TEXT NOT NULL,
     rating DECIMAL(2,1) DEFAULT 5.0,
-    status VARCHAR(20) DEFAULT 'Reviewed',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 );
@@ -270,6 +269,6 @@ INSERT INTO events (title, event_date, event_time, description) VALUES
 ('Study Skills Workshop', '2026-06-12', '15:00:00', 'Learn effective study techniques for exams.');
 
 -- FEEDBACK
-INSERT INTO feedback (user_id, name, email, type, message, rating, status) VALUES
-(1, 'Angeline Chiu', 'angeline@example.com', 'Praise', 'The new book collection is amazing!', 5.0, 'Reviewed'),
-(2, 'Sarah Tan', 'sarah@example.com', 'Complaint', 'Had trouble booking a room.', 3.0, 'Reviewed');
+INSERT INTO feedback (user_id, name, email, type, message, rating) VALUES
+(1, 'Angeline Chiu', 'angeline@example.com', 'Praise', 'The new book collection is amazing!', 5.0),
+(2, 'Sarah Tan', 'sarah@example.com', 'Complaint', 'Had trouble booking a room.', 3.0);

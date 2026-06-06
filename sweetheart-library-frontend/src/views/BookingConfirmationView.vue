@@ -6,7 +6,7 @@
       <h2 class="fw-bold mt-4" style="color: #2C2C2C;">Booking Confirmation</h2>
       <p class="text-muted">Please review your booking details before confirming.</p>
 
-      <!-- ==================== BOOK BORROWING ==================== -->
+      <!-- Book Borrowing Summary -->
       <div v-if="isBookBorrow" class="card border-0 shadow-sm mx-auto mt-4" style="max-width: 520px;">
         <div class="card-body text-start p-4">
           <h6 class="fw-bold mb-3">Book Borrowing Summary</h6>
@@ -32,10 +32,10 @@
         </div>
       </div>
 
-      <!-- ==================== ROOM BOOKING (Your Original) ==================== -->
+      <!-- Room Booking Summary -->
       <div v-else class="card border-0 shadow-sm mx-auto mt-4" style="max-width: 520px;">
         <div class="card-body text-start p-4">
-          <h6 class="fw-bold mb-3">Booking Summary</h6>
+          <h6 class="fw-bold mb-3">Room Booking Summary</h6>
 
           <div class="row mb-2">
             <div class="col-5 text-muted">Room</div>
@@ -48,10 +48,6 @@
           <div class="row mb-2">
             <div class="col-5 text-muted">Time</div>
             <div class="col-7 fw-semibold">{{ startTime }} — {{ endTime }}</div>
-          </div>
-          <div class="row mb-2">
-            <div class="col-5 text-muted">Duration</div>
-            <div class="col-7 fw-semibold">2 hours</div>
           </div>
           <div class="row">
             <div class="col-5 text-muted">Status</div>
@@ -82,9 +78,11 @@
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../services/api.js'
+import { useAuthStore } from '../stores/auth'   // ← Added
 
 const route = useRoute()
 const router = useRouter()
+const authStore = useAuthStore()                 // ← Added
 const isSubmitting = ref(false)
 
 // Detect booking type
@@ -101,7 +99,7 @@ const dueDate = computed(() => {
   return date.toISOString().split('T')[0]
 })
 
-// Room data (your original)
+// Room data
 const roomName = route.query.roomName || 'Study Room'
 const date = route.query.date || ''
 const startTime = route.query.startTime || ''
@@ -115,21 +113,21 @@ const confirmBooking = async () => {
       // === BOOK BORROWING ===
       await api.post('/books.php', {
         action: 'borrow_book',
-        book_id: bookId
+        book_id: bookId,
+        user_id: authStore.user?.id          // ← Now using authStore
       })
 
       alert('Book borrowed successfully!')
       router.push('/my-bookings')
 
     } else {
-      // === ROOM BOOKING (Your original logic) ===
+      // === ROOM BOOKING ===
       await api.post('/bookings.php', {
         action: 'create_room_booking',
-        user_id: 1, // You can replace with actual user ID from store
-        room_id: route.query.roomId,
-        booking_date: date,
-        start_time: startTime,
-        end_time: endTime
+        user_id: authStore.user?.id,
+        room_name: roomName,
+        start_time: `${date} ${startTime}:00`,
+        end_time: `${date} ${endTime}:00`
       })
 
       alert('Room booking confirmed successfully!')

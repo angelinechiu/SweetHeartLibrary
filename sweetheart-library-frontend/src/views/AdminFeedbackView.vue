@@ -84,7 +84,6 @@
                 <th>Type</th>
                 <th>Message</th>
                 <th style="width: 100px;">Rating</th>
-                <th style="width: 110px;">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -110,9 +109,6 @@
                     <span class="fw-bold me-1">{{ fb.rating }}</span>
                     <i class="bi bi-star-fill text-warning"></i>
                   </div>
-                </td>
-                <td>
-                  <span class="badge bg-success px-3 py-2">Reviewed</span>
                 </td>
               </tr>
             </tbody>
