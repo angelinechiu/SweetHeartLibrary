@@ -88,7 +88,7 @@
                       <p class="text-muted small mb-1">{{ book.author }}</p>
 
                       <div class="small">
-                        <div><strong>Borrowed:</strong> {{ book.borrowed_date }}</div>
+                        <div><strong>Borrowed:</strong> {{ book.borrow_date || book.borrowed_date }}</div>
                         <div><strong>Due:</strong> {{ book.due_date }}</div>
                         <span class="badge mt-1" :class="getBorrowStatusClass(book.status)">{{ book.status }}</span>
                       </div>
@@ -122,7 +122,7 @@
                       <span class="text-white fw-bold" style="font-size: 1.1rem;">⚠️</span>
                     </div>
                     <div class="flex-grow-1">
-                      <h6 class="fw-semibold mb-1 text-truncate" style="color: #2C2C2C;">{{ book.title }}</h6>
+                      <h6 class="fw-semibold mb-1 text-truncate" style="color: #2C2C2C;">{{ book.book_title || book.title }}</h6>
                       <p class="text-muted small mb-1">{{ book.author }}</p>
 
                       <div class="small text-danger fw-semibold">
@@ -132,7 +132,7 @@
                     </div>
                   </div>
 
-                  <div class="mt-3">
+                  <div class="mt-3">w
                     <button
                       class="btn btn-sm btn-danger w-100"
                       @click="renewOverdueBook(book)">
@@ -202,7 +202,8 @@ const cancelRoomBooking = async (booking) => {
 }
 
 const renewOverdueBook = async (book) => {
-  if (!confirm(`Renew "${book.title}" for another 7 days?`)) return
+  const bookTitle = book.book_title || book.title
+  if (!confirm(`Renew "${bookTitle}" for another 7 days?`)) return
 
   try {
     await api.post('/bookings.php?action=renew_book', { borrowing_id: book.id })

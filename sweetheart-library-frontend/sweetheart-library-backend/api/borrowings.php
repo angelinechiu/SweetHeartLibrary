@@ -23,7 +23,19 @@ if ($method === 'GET') {
             exit;
         }
 
-        $stmt = $pdo->prepare("SELECT * FROM borrowed_books WHERE user_id = ? AND status = 'Borrowed' ORDER BY due_date ASC LIMIT 3");
+        // FIXED: Join to guarantee book_title
+        $stmt = $pdo->prepare("
+            SELECT 
+                bb.*,
+                COALESCE(bb.book_title, b.title) AS book_title,
+                COALESCE(bb.author, b.author) AS author
+            FROM borrowed_books bb
+            LEFT JOIN books b ON bb.book_id = b.id
+            WHERE bb.user_id = ? 
+              AND bb.status = 'Borrowed' 
+            ORDER BY bb.due_date ASC 
+            LIMIT 3
+        ");
         $stmt->execute([$user_id]);
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         exit;
@@ -36,20 +48,25 @@ if ($method === 'GET') {
             exit;
         }
 
-        // ✅ FIXED: Auto-detect overdue books (even if status is still 'Borrowed')
+        // FIXED: Join to guarantee book_title + auto-detect overdue
         $stmt = $pdo->prepare("
-            SELECT * FROM borrowed_books 
-            WHERE user_id = ? 
-            AND due_date < CURDATE() 
-            AND status IN ('Borrowed', 'Overdue') 
-            ORDER BY due_date ASC 
+            SELECT 
+                bb.*,
+                COALESCE(bb.book_title, b.title) AS book_title,
+                COALESCE(bb.author, b.author) AS author
+            FROM borrowed_books bb
+            LEFT JOIN books b ON bb.book_id = b.id
+            WHERE bb.user_id = ? 
+              AND bb.due_date < CURDATE() 
+              AND bb.status IN ('Borrowed', 'Overdue') 
+            ORDER BY bb.due_date ASC 
             LIMIT 3
         ");
         $stmt->execute([$user_id]);
         
         $overdueBooks = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        // Auto-update status to 'Overdue'
+        // Auto-update status to 'Overdue' (unchanged)
         if (!empty($overdueBooks)) {
             $ids = array_column($overdueBooks, 'id');
             $placeholders = implode(',', array_fill(0, count($ids), '?'));

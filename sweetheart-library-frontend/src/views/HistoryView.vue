@@ -49,7 +49,7 @@
 
               <!-- Dates -->
               <div class="small mb-3">
-                <div><strong>Borrowed:</strong> {{ formatDate(book.borrow_date) }}</div>
+                <div><strong>Borrowed:</strong> {{ book.borrow_date || book.borrowed_date }}</div>
                 <div><strong>Due:</strong> {{ formatDate(book.due_date) }}</div>
 
                 <div v-if="isOverdue(book)" class="text-danger fw-semibold mt-1">
