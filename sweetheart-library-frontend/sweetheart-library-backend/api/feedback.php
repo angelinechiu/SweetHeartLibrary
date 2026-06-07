@@ -1,73 +1,66 @@
 <?php
+/**
+ * Improved feedback.php (Safe version)
+ * - Kept all original functionality
+ * - Better error handling (no exposing DB errors)
+ * - Added proper OPTIONS handling
+ * - Added basic validation
+ */
+
 header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Content-Type: application/json");
 
-include_once '../config/db.php';
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
 
-$db = $pdo;
+require_once '../config/db.php';
+
 $method = $_SERVER['REQUEST_METHOD'];
 
-if ($method === 'GET') {
-    $stmt = $db->prepare("SELECT * FROM feedback ORDER BY created_at DESC");
-    $stmt->execute();
-    echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
-
-} elseif ($method === 'POST') {
-    $data = json_decode(file_get_contents("php://input"), true);
-
-    // Debug: Log what we received
-    error_log("Feedback received: " . json_encode($data));
-
-    if (
-        empty($data['name']) ||
-        empty($data['email']) ||
-        empty($data['type']) ||
-        empty($data['message'])
-    ) {
-        echo json_encode([
-            "success" => false,
-            "message" => "Please fill in all required fields."
-        ]);
+try {
+    if ($method === 'GET') {
+        $stmt = $pdo->query("SELECT * FROM feedback ORDER BY created_at DESC");
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         exit;
     }
 
-    try {
-        $query = "INSERT INTO feedback 
-                  (name, email, type, message, rating, user_id) 
-                  VALUES 
-                  (:name, :email, :type, :message, :rating, :user_id)";
+    if ($method === 'POST') {
+        $data = json_decode(file_get_contents("php://input"), true) ?? [];
 
-        $stmt = $db->prepare($query);
-
-        $success = $stmt->execute([
-            ':name'    => $data['name'],
-            ':email'   => $data['email'],
-            ':type'    => $data['type'],
-            ':message' => $data['message'],
-            ':rating'  => floatval($data['rating'] ?? 5),
-            ':user_id' => $data['user_id'] ?? null
-        ]);
-
-        if ($success) {
-            echo json_encode([
-                "success" => true,
-                "message" => "Feedback submitted successfully!"
-            ]);
-        } else {
-            // Get the actual database error
-            $errorInfo = $stmt->errorInfo();
-            echo json_encode([
-                "success" => false,
-                "message" => "Database error: " . ($errorInfo[2] ?? 'Unknown error')
-            ]);
+        // Basic validation
+        if (empty($data['name']) || empty($data['email']) || empty($data['type']) || empty($data['message'])) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Please fill in all required fields.']);
+            exit;
         }
 
-    } catch (Exception $e) {
-        echo json_encode([
-            "success" => false,
-            "message" => "Exception: " . $e->getMessage()
+        $stmt = $pdo->prepare("
+            INSERT INTO feedback (name, email, type, message, rating, user_id, created_at) 
+            VALUES (?, ?, ?, ?, ?, ?, NOW())
+        ");
+        
+        $stmt->execute([
+            $data['name'],
+            $data['email'],
+            $data['type'],
+            $data['message'],
+            floatval($data['rating'] ?? 5),
+            $data['user_id'] ?? null
         ]);
+
+        echo json_encode(['success' => true, 'message' => 'Feedback submitted successfully!']);
+        exit;
     }
+
+    http_response_code(405);
+    echo json_encode(['success' => false, 'message' => 'Method not allowed']);
+
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Something went wrong. Please try again later.']);
 }
 ?>
