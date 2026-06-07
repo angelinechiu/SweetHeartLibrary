@@ -72,6 +72,43 @@
           </div>
         </div>
       </div>
+
+      <!-- ==================== PAGINATION ==================== -->
+      <div v-if="totalPages > 1" class="d-flex justify-content-center mt-5">
+        <nav aria-label="Book pagination">
+          <ul class="pagination pagination-lg custom-pagination">
+            <!-- Previous -->
+            <li class="page-item" :class="{ disabled: currentPage === 1 }">
+              <button class="page-link" @click="prevPage">
+                ← Previous
+              </button>
+            </li>
+
+            <!-- Page Numbers -->
+            <li
+              v-for="page in totalPages"
+              :key="page"
+              class="page-item"
+              :class="{ active: currentPage === page }"
+            >
+              <button class="page-link" @click="goToPage(page)">
+                {{ page }}
+              </button>
+            </li>
+
+            <!-- Next -->
+            <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+              <button class="page-link" @click="nextPage">
+                Next →
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      <div v-if="totalPages > 1" class="text-center text-muted small mt-2">
+        Page {{ currentPage }} of {{ totalPages }} • {{ filteredBooks.length }} books
+      </div>
     </div>
   </div>
 
@@ -122,7 +159,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import api from '../services/api.js'
@@ -132,12 +169,12 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 const books = ref([])
-const borrowedBookIds = ref(new Set())   // ← NEW: track books user already borrowed
+const borrowedBookIds = ref(new Set())
 const loading = ref(true)
 const searchQuery = ref('')
 const selectedCategory = ref('')
 const currentPage = ref(1)
-const pageSize = 12
+const pageSize = ref(12)
 
 // Modal states
 const showTermsModal = ref(false)
@@ -154,10 +191,11 @@ const fetchBooks = async () => {
   } catch (error) {
     console.error('Failed to fetch books:', error)
     books.value = []
+  }finally {
+    loading.value = false
   }
 }
 
-// NEW: Fetch user's active borrowed books
 const fetchUserBorrowedBooks = async () => {
   if (!authStore.user?.id) return
   try {
@@ -190,15 +228,35 @@ const filteredBooks = computed(() => {
 })
 
 const paginatedBooks = computed(() => {
-  const start = (currentPage.value - 1) * pageSize
-  return filteredBooks.value.slice(start, start + pageSize)
+  const start = (currentPage.value - 1) * pageSize.value
+  return filteredBooks.value.slice(start, start + pageSize.value)
 })
+
+const totalPages = computed(() => {
+  return Math.ceil(filteredBooks.value.length / pageSize.value) || 1
+})
+
+const goToPage = (page) => {
+  currentPage.value = page
+}
+
+const prevPage = () => {
+  if (currentPage.value > 1) currentPage.value--
+}
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) currentPage.value++
+}
 
 const resetFilters = () => {
   searchQuery.value = ''
   selectedCategory.value = ''
   currentPage.value = 1
 }
+
+watch([searchQuery, selectedCategory], () => {
+  currentPage.value = 1
+})
 
 // Open T&C Modal
 const borrowBook = (book) => {
@@ -213,7 +271,6 @@ const closeModal = () => {
   selectedBook.value = null
 }
 
-// Go to Confirmation Page
 const proceedToConfirmation = () => {
   if (!agreedToTerms.value || !selectedBook.value) return
 
@@ -246,5 +303,42 @@ onMounted(async () => {
 }
 .btn-pink:hover {
   background-color: #D89CA1;
+}
+
+/* ==================== THEME-MATCHED PAGINATION ==================== */
+.custom-pagination .page-link {
+  color: #2C2C2C;
+  background-color: #fff;
+  border: 1px solid #E8B4B8;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.custom-pagination .page-item.active .page-link {
+  background-color: #E8B4B8;
+  border-color: #E8B4B8;
+  color: #2C2C2C;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(232, 180, 184, 0.3);
+}
+
+.custom-pagination .page-link:hover {
+  background-color: #F8E8EA;
+  border-color: #D89CA1;
+  color: #2C2C2C;
+}
+
+.custom-pagination .page-item.disabled .page-link {
+  background-color: #f8f4f0;
+  border-color: #E8B4B8;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+/* Make pagination buttons slightly rounded like your theme */
+.custom-pagination .page-link {
+  border-radius: 30px !important;
+  margin: 0 4px;
 }
 </style>
