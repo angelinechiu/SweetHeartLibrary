@@ -131,6 +131,17 @@ CREATE TABLE feedback (
     PRIMARY KEY (id)
 );
 
+CREATE TABLE `password_resets` (
+    `id` INT(11) NOT NULL AUTO_INCREMENT,
+    `email` VARCHAR(255) NOT NULL,
+    `token` VARCHAR(255) NOT NULL,
+    `expires_at` DATETIME NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    INDEX `email` (`email`),
+    INDEX `token` (`token`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- =============================================
 -- INSERT DATA
 -- =============================================

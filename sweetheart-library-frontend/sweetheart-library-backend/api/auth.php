@@ -36,50 +36,87 @@ if ($action === 'login' && $method === 'POST') {
 if ($action === 'register' && $method === 'POST') {
     $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
 
-    $stmt = $pdo->prepare("INSERT INTO users (name, email, password, student_id, role) 
-                           VALUES (?, ?, ?, ?, 'user')");
+    // student_id removed
+    $stmt = $pdo->prepare("INSERT INTO users (name, email, password, role) 
+                           VALUES (?, ?, ?, 'user')");
     
     $success = $stmt->execute([
         $data['name'],
         $data['email'],
-        $hashedPassword,
-        $data['student_id']
+        $hashedPassword
     ]);
 
-    echo json_encode(['success' => $success]);
+    if ($success) {
+        echo json_encode([
+            'success' => true, 
+            'message' => 'Registration successful'
+        ]);
+    } else {
+        // Better error handling
+        $errorInfo = $stmt->errorInfo();
+        $message = 'Registration failed';
+
+        // Detect duplicate email error (MySQL error code 1062)
+        if (isset($errorInfo[1]) && $errorInfo[1] == 1062) {
+            $message = 'This email is already registered. Please use another email.';
+        }
+
+        echo json_encode([
+            'success' => false, 
+            'message' => $message
+        ]);
+    }
 }
 
-// ==================== FORGOT PASSWORD (Without PHPMailer) ====================
+// ==================== FORGOT PASSWORD (Improved) ====================
 if ($action === 'forgot_password' && $method === 'POST') {
-    $email = $data['email'] ?? '';
+    try {
+        $email = $data['email'] ?? '';
 
-    if (empty($email)) {
-        echo json_encode(['success' => false, 'message' => 'Email is required']);
-        exit;
+        if (empty($email)) {
+            echo json_encode(['success' => false, 'message' => 'Email is required']);
+            exit;
+        }
+
+        // Check if user exists
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch();
+
+        $resetLink = null;
+        $message = 'Email not registered. Unable to generate a password reset link.';
+
+        if ($user) {
+            $token = bin2hex(random_bytes(32));
+            $expires = date('Y-m-d H:i:s', strtotime('+1 hour'));
+
+            // Delete old tokens for this email
+            $pdo->prepare("DELETE FROM password_resets WHERE email = ?")->execute([$email]);
+
+            // Insert new reset token
+            $pdo->prepare("INSERT INTO password_resets (email, token, expires_at) VALUES (?, ?, ?)")
+                ->execute([$email, $token, $expires]);
+
+            // For development/testing only
+            $resetLink = "http://localhost:5173/reset-password?token=" . $token;
+
+            $message = 'Reset link generated successfully.';
+        }
+
+        echo json_encode([
+            'success' => true,
+            'message' => $message,
+            'reset_link' => $resetLink
+        ]);
+
+    } catch (Exception $e) {
+        // Catch any database or other errors
+        echo json_encode([
+            'success' => false,
+            'message' => 'An error occurred while processing your request.',
+            'debug' => $e->getMessage()   // Remove this line in production
+        ]);
     }
-
-    // Check if user exists
-    $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
-    $stmt->execute([$email]);
-    $user = $stmt->fetch();
-
-    $resetLink = null;
-
-    if ($user) {
-        $token = bin2hex(random_bytes(32));
-        $expires = date('Y-m-d H:i:s', strtotime('+1 hour'));
-
-        $pdo->prepare("DELETE FROM password_resets WHERE email = ?")->execute([$email]);
-        $pdo->prepare("INSERT INTO password_resets (email, token, expires_at) VALUES (?, ?, ?)")
-            ->execute([$email, $token, $expires]);
-
-        $resetLink = "http://localhost:5173/reset-password?token=" . $token;
-    }
-
-    echo json_encode([
-        'success' => true,
-        'reset_link' => $resetLink
-    ]);
 }
 
 // ==================== RESET PASSWORD (Improved) ====================

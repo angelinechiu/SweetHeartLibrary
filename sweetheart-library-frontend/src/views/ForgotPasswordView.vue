@@ -8,24 +8,22 @@
               <h2 class="text-center fw-bold mb-2" style="color: #2C2C2C;">Forgot Password?</h2>
               <p class="text-center text-muted mb-4">Enter your email to receive a password reset link.</p>
 
-              <!-- Success State -->
-              <div v-if="resetLink" class="alert alert-success text-center">
-                <h5>Password reset link generated!</h5>
-                <p class="mt-3">For testing on localhost, click the button below:</p>
+              <!-- Result Message -->
+              <div v-if="message" :class="['alert', isSuccess ? 'alert-success' : 'alert-danger']">
+                {{ message }}
+              </div>
 
-                <a
-                  :href="resetLink"
-                  target="_blank"
-                  class="btn btn-success px-4 py-2 mt-2"
-                >
+              <!-- Testing Reset Link -->
+              <div v-if="resetLink" class="alert alert-info text-center">
+                <p class="mb-2"><strong>Development Mode</strong></p>
+                <a :href="resetLink" target="_blank" class="btn btn-success">
                   Click here to Reset Password
                 </a>
-
-                <p class="small text-muted mt-3 mb-0">This link will expire in 1 hour.</p>
+                <p class="small mt-2 mb-0">Link expires in 1 hour</p>
               </div>
 
               <!-- Form -->
-              <form v-else @submit.prevent="handleForgotPassword">
+              <form v-if="!message || !isSuccess" @submit.prevent="handleForgotPassword">
                 <div class="mb-4">
                   <input
                     v-model="email"
@@ -36,7 +34,11 @@
                   >
                 </div>
 
-                <button type="submit" class="btn btn-pink btn-lg w-100" :disabled="loading">
+                <button
+                  type="submit"
+                  class="btn btn-pink btn-lg w-100"
+                  :disabled="loading"
+                >
                   {{ loading ? 'Processing...' : 'Send Reset Link' }}
                 </button>
               </form>
@@ -59,24 +61,46 @@ import api from '../services/api.js'
 
 const email = ref('')
 const loading = ref(false)
+const message = ref('')
+const isSuccess = ref(false)
 const resetLink = ref('')
 
 const handleForgotPassword = async () => {
+  message.value = ''
+  resetLink.value = ''
   loading.value = true
+
   try {
     const res = await api.post('/auth.php?action=forgot_password', {
       email: email.value
     })
 
-    if (res.data.success && res.data.reset_link) {
-    // Use the real link returned by backend
-    resetLink.value = res.data.reset_link;
+    console.log('Backend response:', res.data) // For debugging
+
+    if (res.data.success) {
+      isSuccess.value = true
+      message.value = res.data.message || 'Request processed successfully.'
+
+      if (res.data.reset_link) {
+        resetLink.value = res.data.reset_link
+      }
     } else {
-        alert("Failed to generate reset link. Please try again.");
+      isSuccess.value = false
+      message.value = res.data.message || 'Something went wrong.'
     }
   } catch (error) {
-    console.error('Failed to send reset link', error)
-    alert('Failed to process request. Please try again.')
+    console.error('Full error:', error)
+
+    isSuccess.value = false
+
+    if (error.response) {
+      // Backend returned error response
+      message.value = error.response.data?.message || 'Server error occurred.'
+    } else if (error.request) {
+      message.value = 'Cannot connect to server. Is the backend running?'
+    } else {
+      message.value = 'Failed to send request. Check console for details.'
+    }
   } finally {
     loading.value = false
   }
