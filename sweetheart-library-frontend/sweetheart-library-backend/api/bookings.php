@@ -108,6 +108,53 @@ if ($method === 'POST') {
                 respond(['success' => $success, 'message' => $success ? 'Book marked as returned' : 'Failed']);
                 break;
 
+            case 'borrow_book':
+                $book_id = $data['book_id'] ?? null;
+                $user_id = $data['user_id'] ?? null;
+
+                if (!$book_id || !$user_id) {
+                    respond(['success' => false, 'message' => 'book_id and user_id are required'], 400);
+                }
+
+                try {
+                    // Optional: Check if user already has this book borrowed
+                    $check = $pdo->prepare("
+                        SELECT id FROM borrowed_books 
+                        WHERE user_id = ? AND book_id = ? AND status IN ('Borrowed', 'Overdue')
+                    ");
+                    $check->execute([$user_id, $book_id]);
+                    if ($check->fetch()) {
+                        respond(['success' => false, 'message' => 'You have already borrowed this book'], 400);
+                    }
+
+                    // 1. Insert into borrowed_books
+                    $stmt = $pdo->prepare("
+                        INSERT INTO borrowed_books 
+                        (user_id, book_id, borrow_date, due_date, status) 
+                        VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 14 DAY), 'Borrowed')
+                    ");
+                    $success = $stmt->execute([$user_id, $book_id]);
+
+                    // 2. (Recommended) Decrease available copies
+                    if ($success) {
+                        $update = $pdo->prepare("
+                            UPDATE books 
+                            SET available_copies = GREATEST(available_copies - 1, 0) 
+                            WHERE id = ?
+                        ");
+                        $update->execute([$book_id]);
+                    }
+
+                    respond([
+                        'success' => $success,
+                        'message' => $success ? 'Book borrowed successfully' : 'Failed to borrow book'
+                    ]);
+
+                } catch (Exception $e) {
+                    respond(['success' => false, 'message' => $e->getMessage()], 500);
+                }
+                break;
+                
             case 'mark_room_available':
                 if (!$bookingId) respond(['success' => false, 'message' => 'Booking ID required'], 400);
                 $stmt = $pdo->prepare("UPDATE room_bookings SET status = 'Completed' WHERE id = ?");

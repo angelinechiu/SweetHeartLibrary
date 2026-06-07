@@ -79,7 +79,6 @@ import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../services/api.js'
 import { useAuthStore } from '../stores/auth'
-import { toast } from 'vue3-toastify'
 
 const route = useRoute()
 const router = useRouter()
@@ -112,17 +111,22 @@ const confirmBooking = async () => {
   try {
     if (isBookBorrow.value) {
       // === BOOK BORROWING ===
-      await api.post('/books.php', {
+      const response = await api.post('/bookings.php', {   // ← Changed to /bookings.php
         action: 'borrow_book',
         book_id: bookId,
         user_id: authStore.user?.id
       })
 
-      toast.success('Book borrowed successfully!', { autoClose: 2500 })
-      router.push('/my-bookings')
+      if (response.data.success) {
+        alert('Book borrowed successfully!')
+        router.push('/my-bookings')
+      } else {
+        // Show the real error from backend
+        alert(response.data.message || 'Failed to borrow book')
+      }
 
     } else {
-      // === ROOM BOOKING ===
+      // === ROOM BOOKING (unchanged) ===
       await api.post('/bookings.php', {
         action: 'create_room_booking',
         user_id: authStore.user?.id,
@@ -131,13 +135,16 @@ const confirmBooking = async () => {
         end_time: `${date} ${endTime}:00`
       })
 
-      toast.success('Room booking confirmed successfully!', { autoClose: 2500 })
+      alert('Room booking confirmed successfully!')
       router.push('/my-bookings')
     }
 
   } catch (error) {
-    console.error(error)
-    toast.error('Failed to confirm booking. Please try again.', { autoClose: 3000 })
+    console.error('Borrow error:', error)
+
+    // Better error message
+    const message = error.response?.data?.message || 'Failed to confirm booking. Please try again.'
+    alert(message)
   } finally {
     isSubmitting.value = false
   }
