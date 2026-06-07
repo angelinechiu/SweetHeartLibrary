@@ -203,8 +203,8 @@
                     <button v-if="b.status !== 'Returned'" class="btn btn-sm btn-success me-1" @click="markBookReturned(b)">
                       Mark Returned
                     </button>
-                    <button v-if="b.status === 'Overdue'" class="btn btn-sm btn-warning" @click="sendReminder(b)">
-                      Send Reminder
+                    <button v-if="b.status === 'Overdue'" class="btn btn-sm btn-warning" @click="sendPersonalReminder(b)">
+                      Send Personal Reminder
                     </button>
                   </td>
                 </tr>
@@ -874,17 +874,22 @@ const markBookReturned = async (borrowing) => {
   }
 }
 
-const sendReminder = async (borrowing) => {
+const sendPersonalReminder = async (borrowing) => {
   try {
-    await api.post('/bookings.php', {
-      action: 'send_reminder',
-      borrowing_id: borrowing.id
+    const reminderMessage = `Reminder: Your borrowed book "${borrowing.book_title}" is overdue. Please return it as soon as possible to avoid penalties.`
+
+    await api.post('/announcements.php', {
+      title: 'Overdue Book Reminder',
+      message: reminderMessage,
+      type: 'Important',
+      is_published: 1,
+      user_id: borrowing.user_id   // ← This makes it personal
     })
 
-    toast.success('Reminder sent successfully!')
+    toast.success(`Personal reminder sent to ${borrowing.user_name || 'user'}!`)
   } catch (error) {
     console.error(error)
-    toast.error('Failed to send reminder')
+    toast.error('Failed to send personal reminder')
   }
 }
 

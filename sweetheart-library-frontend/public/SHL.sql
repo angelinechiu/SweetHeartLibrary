@@ -106,7 +106,16 @@ CREATE TABLE announcements (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 );
+-- Add user_id column to support personal reminders
+ALTER TABLE `announcements` 
+ADD COLUMN `user_id` INT(11) NULL AFTER `id`,
+ADD INDEX `user_id` (`user_id`);
 
+-- Optional: Add foreign key (recommended)
+ALTER TABLE `announcements` 
+ADD CONSTRAINT `fk_announcements_user` 
+FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) 
+ON DELETE SET NULL;
 -- 8. EVENTS
 CREATE TABLE events (
     id INT(11) NOT NULL AUTO_INCREMENT,

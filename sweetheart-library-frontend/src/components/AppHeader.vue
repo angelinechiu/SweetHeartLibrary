@@ -72,6 +72,9 @@
                 <router-link class="dropdown-item" to="/my-bookings">My Bookings</router-link>
               </li>
               <li>
+                <router-link class="dropdown-item" to="/announcements">Announcements</router-link>
+              </li>
+              <li>
                 <router-link class="dropdown-item" to="/profile">My Profile</router-link>
               </li>
               <li v-if="authStore.isUser">
