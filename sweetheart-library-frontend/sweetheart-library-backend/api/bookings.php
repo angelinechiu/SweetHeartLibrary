@@ -34,14 +34,7 @@ if ($method === 'GET') {
         $user_id = $_GET['user_id'] ?? null;
 
         if ($user_id) {
-            $stmt = $pdo->prepare("
-                SELECT b.*, u.name as user_name, bk.title as book_title 
-                FROM borrowings b
-                LEFT JOIN users u ON b.user_id = u.id
-                LEFT JOIN books bk ON b.book_id = bk.id
-                WHERE b.user_id = ? 
-                ORDER BY b.due_date ASC
-            ");
+            $stmt = $pdo->prepare("SELECT * FROM borrowed_books WHERE user_id = ? ORDER BY borrow_date DESC");
             $stmt->execute([$user_id]);
             $response['borrowed_books'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -49,18 +42,11 @@ if ($method === 'GET') {
             $stmt->execute([$user_id]);
             $response['room_bookings'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
         } else {
-            // Admin view
-            $stmt = $pdo->prepare("
-                SELECT b.*, u.name as user_name, bk.title as book_title 
-                FROM borrowings b
-                LEFT JOIN users u ON b.user_id = u.id
-                LEFT JOIN books bk ON b.book_id = bk.id
-                ORDER BY b.due_date ASC
-            ");
+            $stmt = $pdo->prepare("SELECT * FROM borrowed_books ORDER BY due_date ASC");
             $stmt->execute();
             $response['borrowed_books'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            $stmt = $pdo->prepare("SELECT * FROM room_bookings WHERE status = 'Active' ORDER BY start_time ASC");
+            $stmt = $pdo->prepare("SELECT * FROM room_bookings WHERE status = 'Active   ' ORDER BY start_time ASC");
             $stmt->execute();
             $response['room_bookings'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
@@ -94,6 +80,16 @@ if ($method === 'GET') {
             respond(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
+
+    // Fallback (old bookings table)
+    $user_id = $_GET['user_id'] ?? null;
+    if ($user_id) {
+        $stmt = $pdo->prepare("SELECT * FROM bookings WHERE user_id = ? ORDER BY booking_date DESC");
+        $stmt->execute([$user_id]);
+    } else {
+        $stmt = $pdo->query("SELECT * FROM bookings ORDER BY created_at DESC");
+    }
+    respond($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
 // ====================== POST REQUESTS ======================
@@ -105,7 +101,14 @@ if ($method === 'POST') {
 
         switch ($action) {
 
-            // ==================== BORROW BOOK (Updated to borrowings table) ====================
+            // ==================== EXISTING ACTIONS ====================
+            case 'mark_returned':
+                if (!$bookingId) respond(['success' => false, 'message' => 'Booking ID required'], 400);
+                $stmt = $pdo->prepare("UPDATE borrowed_books SET status = 'Returned' WHERE id = ?");
+                $success = $stmt->execute([$bookingId]);
+                respond(['success' => $success, 'message' => $success ? 'Book marked as returned' : 'Failed']);
+                break;
+
             case 'borrow_book':
                 $book_id = $data['book_id'] ?? null;
                 $user_id = $data['user_id'] ?? null;
@@ -115,10 +118,10 @@ if ($method === 'POST') {
                 }
 
                 try {
-                    // Check max 3 active borrows
+                    // === NEW: Check max 3 active borrows ===
                     $countStmt = $pdo->prepare("
                         SELECT COUNT(*) as total 
-                        FROM borrowings 
+                        FROM borrowed_books 
                         WHERE user_id = ? AND status IN ('Borrowed', 'Overdue')
                     ");
                     $countStmt->execute([$user_id]);
@@ -131,9 +134,9 @@ if ($method === 'POST') {
                         ], 400);
                     }
 
-                    // Check if already borrowed
+                    // Check if already borrowed this book
                     $check = $pdo->prepare("
-                        SELECT id FROM borrowings 
+                        SELECT id FROM borrowed_books 
                         WHERE user_id = ? AND book_id = ? AND status IN ('Borrowed', 'Overdue')
                     ");
                     $check->execute([$user_id, $book_id]);
@@ -142,7 +145,7 @@ if ($method === 'POST') {
                     }
 
                     // Get book details
-                    $bookStmt = $pdo->prepare("SELECT title FROM books WHERE id = ?");
+                    $bookStmt = $pdo->prepare("SELECT title, author FROM books WHERE id = ?");
                     $bookStmt->execute([$book_id]);
                     $book = $bookStmt->fetch(PDO::FETCH_ASSOC);
 
@@ -150,13 +153,18 @@ if ($method === 'POST') {
                         respond(['success' => false, 'message' => 'Book not found'], 404);
                     }
 
-                    // Insert into borrowings table
+                    // Insert borrowing record
                     $stmt = $pdo->prepare("
-                        INSERT INTO borrowings 
-                        (user_id, book_id, borrowed_date, due_date, status) 
-                        VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 14 DAY), 'Borrowed')
+                        INSERT INTO borrowed_books 
+                        (user_id, book_id, book_title, author, borrow_date, due_date, status) 
+                        VALUES (?, ?, ?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 14 DAY), 'Borrowed')
                     ");
-                    $success = $stmt->execute([$user_id, $book_id]);
+                    $success = $stmt->execute([
+                        $user_id, 
+                        $book_id, 
+                        $book['title'], 
+                        $book['author']
+                    ]);
 
                     // Decrease available copies
                     if ($success) {
@@ -178,60 +186,31 @@ if ($method === 'POST') {
                 }
                 break;
 
-            // ==================== MARK RETURNED (Updated) ====================
-            case 'mark_returned':
+            case 'mark_room_available':
                 if (!$bookingId) respond(['success' => false, 'message' => 'Booking ID required'], 400);
-                $stmt = $pdo->prepare("
-                    UPDATE borrowings 
-                    SET status = 'Returned', returned_date = NOW() 
-                    WHERE id = ?
-                ");
+                $stmt = $pdo->prepare("UPDATE room_bookings SET status = 'Completed' WHERE id = ?");
                 $success = $stmt->execute([$bookingId]);
-                respond(['success' => $success, 'message' => $success ? 'Book marked as returned' : 'Failed']);
+                respond(['success' => $success, 'message' => $success ? 'Room marked as completed' : 'Failed']);
                 break;
 
-            // ==================== SEND REMINDER (Updated) ====================
             case 'send_reminder':
                 if (!$bookingId) respond(['success' => false, 'message' => 'Booking ID required'], 400);
-                $stmt = $pdo->prepare("UPDATE borrowings SET status = 'Overdue' WHERE id = ?");
+                $stmt = $pdo->prepare("UPDATE borrowed_books SET has_penalty = 1, status = 'Overdue' WHERE id = ?");
                 $success = $stmt->execute([$bookingId]);
                 respond(['success' => $success, 'message' => $success ? 'Reminder sent successfully' : 'Failed']);
                 break;
 
-            // ==================== RENEW BOOK (Updated) ====================
             case 'renew_book':
                 if (!$bookingId) respond(['success' => false, 'message' => 'Booking ID required'], 400);
                 $stmt = $pdo->prepare("
-                    UPDATE borrowings 
+                    UPDATE borrowed_books 
                     SET status = 'Borrowed', 
+                        has_penalty = 0, 
                         due_date = DATE_ADD(due_date, INTERVAL 7 DAY)
                     WHERE id = ?
                 ");
                 $success = $stmt->execute([$bookingId]);
                 respond(['success' => $success, 'message' => $success ? 'Book renewed successfully' : 'Failed to renew book']);
-                break;
-
-            // ==================== ROOM BOOKING ACTIONS (Keep as is) ====================
-            case 'create_room_booking':
-                $user_id   = $data['user_id'] ?? null;
-                $room_name = $data['room_name'] ?? $data['room_id'] ?? null;
-                $start     = $data['start_time'] ?? null;
-                $end       = $data['end_time'] ?? null;
-
-                if (!$user_id || !$room_name || !$start || !$end) {
-                    respond(['success' => false, 'message' => 'Missing required fields'], 400);
-                }
-
-                $stmt = $pdo->prepare("
-                    INSERT INTO room_bookings (user_id, room_name, start_time, end_time, status) 
-                    VALUES (?, ?, ?, ?, 'Active')
-                ");
-                $success = $stmt->execute([$user_id, $room_name, $start, $end]);
-
-                respond([
-                    'success' => $success, 
-                    'message' => $success ? 'Room booking created successfully' : 'Failed to create booking'
-                ]);
                 break;
 
             case 'approve_room_booking':
@@ -248,13 +227,31 @@ if ($method === 'POST') {
                 respond(['success' => $success]);
                 break;
 
-            case 'mark_room_available':
-                if (!$bookingId) respond(['success' => false, 'message' => 'Booking ID required'], 400);
-                $stmt = $pdo->prepare("UPDATE room_bookings SET status = 'Completed' WHERE id = ?");
-                $success = $stmt->execute([$bookingId]);
-                respond(['success' => $success, 'message' => $success ? 'Room marked as completed' : 'Failed']);
+            case 'create_room_booking':
+                // Keep your original create_room_booking logic here (with conflict check)
+                $user_id   = $data['user_id'] ?? null;
+                $room_name = $data['room_name'] ?? $data['room_id'] ?? null;
+                $start     = $data['start_time'] ?? null;
+                $end       = $data['end_time'] ?? null;
+
+                if (!$user_id || !$room_name || !$start || !$end) {
+                    respond(['success' => false, 'message' => 'Missing required fields'], 400);
+                }
+
+                // Optional: Add your conflict check here if you have it
+                $stmt = $pdo->prepare("
+                    INSERT INTO room_bookings (user_id, room_name, start_time, end_time, status) 
+                    VALUES (?, ?, ?, ?, 'Active')
+                ");
+                $success = $stmt->execute([$user_id, $room_name, $start, $end]);
+
+                respond([
+                    'success' => $success, 
+                    'message' => $success ? 'Room booking created successfully' : 'Failed to create booking'
+                ]);
                 break;
 
+            // ==================== NEW: CANCEL ROOM BOOKING ====================
             case 'cancel_room':
                 if (!$bookingId) respond(['success' => false, 'message' => 'Booking ID required'], 400);
                 $stmt = $pdo->prepare("UPDATE room_bookings SET status = 'cancelled' WHERE id = ?");
@@ -278,7 +275,7 @@ if ($method === 'DELETE') {
     parse_str($_SERVER['QUERY_STRING'], $query);
     $id = $query['id'] ?? null;
     if ($id) {
-        $stmt = $pdo->prepare("UPDATE room_bookings SET status = 'cancelled' WHERE id = ?");
+        $stmt = $pdo->prepare("UPDATE bookings SET status = 'cancelled' WHERE id = ?");
         $stmt->execute([$id]);
         respond(['success' => true, 'message' => 'Booking cancelled']);
     }
