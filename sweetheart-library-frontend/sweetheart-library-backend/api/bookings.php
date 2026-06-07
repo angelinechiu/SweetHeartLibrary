@@ -34,13 +34,7 @@ if ($method === 'GET') {
         $user_id = $_GET['user_id'] ?? null;
 
         if ($user_id) {
-            $stmt = $pdo->prepare("
-                SELECT bb.*, COALESCE(u.name, u.username, 'Unknown User') as user_name 
-                FROM borrowed_books bb 
-                LEFT JOIN users u ON bb.user_id = u.id 
-                WHERE bb.user_id = ? 
-                ORDER BY bb.borrow_date DESC
-            ");
+            $stmt = $pdo->prepare("SELECT * FROM borrowed_books WHERE user_id = ? ORDER BY borrow_date DESC");
             $stmt->execute([$user_id]);
             $response['borrowed_books'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -48,12 +42,7 @@ if ($method === 'GET') {
             $stmt->execute([$user_id]);
             $response['room_bookings'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
         } else {
-            $stmt = $pdo->prepare("
-                SELECT bb.*, COALESCE(u.name, u.username, 'Unknown User') as user_name 
-                FROM borrowed_books bb 
-                LEFT JOIN users u ON bb.user_id = u.id 
-                ORDER BY bb.due_date ASC
-            ");
+            $stmt = $pdo->prepare("SELECT * FROM borrowed_books ORDER BY due_date ASC");
             $stmt->execute();
             $response['borrowed_books'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -92,7 +81,7 @@ if ($method === 'GET') {
         }
     }
 
-    // Fallback
+    // Fallback (old bookings table)
     $user_id = $_GET['user_id'] ?? null;
     if ($user_id) {
         $stmt = $pdo->prepare("SELECT * FROM bookings WHERE user_id = ? ORDER BY booking_date DESC");
@@ -129,7 +118,23 @@ if ($method === 'POST') {
                 }
 
                 try {
-                    // Check if user already borrowed this book
+                    // === NEW: Check max 3 active borrows ===
+                    $countStmt = $pdo->prepare("
+                        SELECT COUNT(*) as total 
+                        FROM borrowed_books 
+                        WHERE user_id = ? AND status IN ('Borrowed', 'Overdue')
+                    ");
+                    $countStmt->execute([$user_id]);
+                    $count = $countStmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+
+                    if ($count >= 3) {
+                        respond([
+                            'success' => false, 
+                            'message' => 'You have reached the maximum limit of 3 active borrowed books.'
+                        ], 400);
+                    }
+
+                    // Check if already borrowed this book
                     $check = $pdo->prepare("
                         SELECT id FROM borrowed_books 
                         WHERE user_id = ? AND book_id = ? AND status IN ('Borrowed', 'Overdue')
@@ -139,7 +144,7 @@ if ($method === 'POST') {
                         respond(['success' => false, 'message' => 'You have already borrowed this book'], 400);
                     }
 
-                    // Get book details (title + author)
+                    // Get book details
                     $bookStmt = $pdo->prepare("SELECT title, author FROM books WHERE id = ?");
                     $bookStmt->execute([$book_id]);
                     $book = $bookStmt->fetch(PDO::FETCH_ASSOC);
@@ -148,7 +153,7 @@ if ($method === 'POST') {
                         respond(['success' => false, 'message' => 'Book not found'], 404);
                     }
 
-                    // Insert into borrowed_books with full info
+                    // Insert borrowing record
                     $stmt = $pdo->prepare("
                         INSERT INTO borrowed_books 
                         (user_id, book_id, book_title, author, borrow_date, due_date, status) 
@@ -180,6 +185,7 @@ if ($method === 'POST') {
                     respond(['success' => false, 'message' => $e->getMessage()], 500);
                 }
                 break;
+
             case 'mark_room_available':
                 if (!$bookingId) respond(['success' => false, 'message' => 'Booking ID required'], 400);
                 $stmt = $pdo->prepare("UPDATE room_bookings SET status = 'Completed' WHERE id = ?");
@@ -235,7 +241,7 @@ if ($method === 'POST') {
                 // Optional: Add your conflict check here if you have it
                 $stmt = $pdo->prepare("
                     INSERT INTO room_bookings (user_id, room_name, start_time, end_time, status) 
-                    VALUES (?, ?, ?, ?, 'pending')
+                    VALUES (?, ?, ?, ?, 'Active')
                 ");
                 $success = $stmt->execute([$user_id, $room_name, $start, $end]);
 

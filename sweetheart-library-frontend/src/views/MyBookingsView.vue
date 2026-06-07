@@ -33,7 +33,7 @@
                   <div class="d-flex justify-content-between align-items-start mb-2">
                     <span class="badge bg-info text-white px-3 py-1">Study Room</span>
                     <span class="badge px-3 py-1" :class="getStatusClass(room.status)">
-                      {{ room.status || 'Pending' }}
+                      {{ room.status || 'Active' }}
                     </span>
                   </div>
 
@@ -174,6 +174,7 @@ const getStatusClass = (status) => {
   if (s === 'overdue') return 'bg-danger text-white'
   if (s === 'returned') return 'bg-success text-white'
   if (s === 'pending') return 'bg-warning text-dark'
+  if (s === 'completed' || s === 'cancelled') return 'bg-secondary text-white'
   return 'bg-secondary text-white'
 }
 

@@ -607,21 +607,37 @@ const loadAllData = async () => {
       api.get('/bookings.php?action=get')
     ])
 
-    books.value = Array.isArray(b.data) ? b.data : (b.data?.data || [])
-    rooms.value = Array.isArray(r.data) ? r.data : (r.data?.data || [])
-    events.value = Array.isArray(e.data) ? e.data : (e.data?.data || [])
-    users.value = Array.isArray(u.data) ? u.data : (u.data?.data || [])
-    announcements.value = Array.isArray(a.data) ? a.data : (a.data?.data || [])
+      const usersList = u?.data || []
+      const userMap = {}
+      usersList.forEach(user => {
+          userMap[user.id] = user.name || user.username || 'Unknown User'
+      })
 
-    if (bookingsRes.data?.success) {
-      activeBorrowings.value = bookingsRes.data.borrowed_books || []
-      roomBookings.value = bookingsRes.data.room_bookings || []
-    }
-  } catch (error) {
-    console.error('Error loading data:', error)
-    toast.error('Failed to load data from database')
-  }
-}
+      let borrowedBooks = bookingsRes.data?.borrowed_books || []
+      activeBorrowings.value = borrowedBooks.map(book => ({
+          ...book,
+          user_name: userMap[book.user_id] || 'Unknown User'
+      }))
+
+      let roomList = bookingsRes.data?.room_bookings || []
+      roomBookings.value = roomList.map(room => ({
+          ...room,
+          user_name: userMap[room.user_id] || 'Unknown User'
+      }))
+
+
+          books.value = Array.isArray(b.data) ? b.data : (b.data?.data || [])
+          rooms.value = Array.isArray(r.data) ? r.data : (r.data?.data || [])
+          events.value = Array.isArray(e.data) ? e.data : (e.data?.data || [])
+          users.value = Array.isArray(u.data) ? u.data : (u.data?.data || [])
+          announcements.value = Array.isArray(a.data) ? a.data : (a.data?.data || [])
+
+
+        } catch (error) {
+          console.error('Error loading data:', error)
+          toast.error('Failed to load data from database')
+        }
+      }
 
 // ==================== BOOK ====================
 const openBookModal = (book = null) => {
@@ -873,23 +889,27 @@ const sendReminder = async (borrowing) => {
 }
 
 const markRoomAvailable = async (booking) => {
-  if (!confirm(`Mark room booking as completed?`)) return
+  if (!confirm(`Mark this room booking as Completed?`)) return
 
   try {
     await api.post('/bookings.php', {
-      action: 'mark_room_completed',
+      action: 'mark_room_available',   // ← Fixed action name
       booking_id: booking.id
     })
 
     toast.success('Room booking marked as completed!')
-    await loadAllData() // Refresh data
+    await loadAllData() // refresh the list
   } catch (error) {
     console.error(error)
-    toast.error('Failed to update room booking')
+    toast.error('Failed to mark as completed')
   }
 }
 
-const canMarkAvailable = (b) => ['Active', 'Pending'].includes(b.status)
+// Show "Mark Completed" button for Active rooms
+const canMarkAvailable = (b) => {
+  const status = (b.status || '').toLowerCase()
+  return status === 'active'   // Only show for Active rooms
+}
 
 // ==================== HELPERS ====================
 const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-MY') : '-'
