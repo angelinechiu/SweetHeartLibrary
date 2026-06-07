@@ -278,7 +278,6 @@
                 </td>
                 <td class="text-end">
                   <button class="btn btn-sm btn-outline-primary me-1" @click="viewUser(user)">View</button>
-                  <button class="btn btn-sm btn-outline-danger" @click="deleteUser(user.id)">Delete</button>
                 </td>
               </tr>
             </tbody>
@@ -399,7 +398,7 @@
           <div class="modal-body">
             <div class="mb-3"><label>Room Name</label><input v-model="currentRoom.name" class="form-control"></div>
             <div class="mb-3"><label>Capacity</label><input v-model.number="currentRoom.capacity" type="number" class="form-control"></div>
-            <div class="mb-3"><label>Facilities / Equipment</label><textarea v-model="currentRoom.facilities" class="form-control" rows="3"
+            <div class="mb-3"><label>Facilities</label><textarea v-model="currentRoom.facilities" class="form-control" rows="3"
                 placeholder="Projector, Whiteboard, Air Conditioner, etc."></textarea></div>
           </div>
           <div class="modal-footer">
@@ -429,6 +428,26 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
             <button type="button" class="btn btn-pink" @click="saveEvent">{{ editingEvent ? 'Save Changes' : 'Create Event' }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- User View Modal -->
+    <div class="modal fade" id="userModal" tabindex="-1" ref="userModalRef">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">User Details</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body" v-if="selectedUser">
+            <p><strong>Name:</strong> {{ selectedUser.name }}</p>
+            <p><strong>Email:</strong> {{ selectedUser.email }}</p>
+            <p><strong>Role:</strong> {{ selectedUser.role || 'User' }}</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </div>
         </div>
       </div>
@@ -514,6 +533,10 @@ const editingEvent = ref(false)
 const currentEvent = ref({})
 const eventModalRef = ref(null)
 let eventModalInstance = null
+
+const selectedUser = ref(null)
+const userModalRef = ref(null)
+let userModalInstance = null
 
 const editingAnnouncement = ref(false)
 const currentAnnouncement = ref({})
@@ -603,34 +626,57 @@ const loadAllData = async () => {
 // ==================== BOOK ====================
 const openBookModal = (book = null) => {
   if (book) {
-    currentBook.value = { ...book }
+    currentBook.value = {
+      id: book.id,
+      title: book.title || '',
+      author: book.author || '',
+      isbn: book.isbn || '',
+      category: book.category || '',
+      year: book.year || new Date().getFullYear(),
+      available_copies: book.available_copies || 0,
+      total_copies: book.total_copies || 0,
+      is_featured: book.is_featured || 0,
+      is_popular: book.is_popular || 0
+    }
     editingBook.value = true
   } else {
     currentBook.value = {
-    title: '', author: '', isbn: '', category: '',
-    year: new Date().getFullYear(),
-    available_copies: 3,
-    total_copies: 3,
-    is_featured: 0,
-    is_popular: 0
-  }
+      title: '',
+      author: '',
+      isbn: '',
+      category: '',
+      year: new Date().getFullYear(),
+      available_copies: 3,
+      total_copies: 3,
+      is_featured: 0,
+      is_popular: 0
+    }
     editingBook.value = false
   }
+
   nextTick(() => {
-    if (!bookModalInstance && bookModalRef.value) bookModalInstance = new bootstrap.Modal(bookModalRef.value)
+    if (!bookModalInstance && bookModalRef.value) {
+      bookModalInstance = new bootstrap.Modal(bookModalRef.value)
+    }
     bookModalInstance?.show()
   })
 }
 
 const saveBook = async () => {
   try {
-    await api.post('/books.php', currentBook.value)
-    toast.success(editingBook.value ? 'Book updated!' : 'Book added!')
-    bookModalInstance?.hide()
-    await loadAllData()
+    const response = await api.post('/books.php', currentBook.value)
+    console.log('Book save response:', response.data)
+
+    if (response.data?.success) {
+      toast.success(editingBook.value ? 'Book updated!' : 'Book added!')
+      bookModalInstance?.hide()
+      await loadAllData()
+    } else {
+      toast.error(response.data?.message || 'Failed to save book')
+    }
   } catch (error) {
-    console.error('Error saving book:', error)
-    toast.error('Failed to save book')
+    console.error('Book save error:', error)
+    toast.error('Failed to save book. Check console for details.')
   }
 }
 
@@ -649,26 +695,44 @@ const deleteBook = async (id) => {
 // ==================== ROOM ====================
 const openRoomModal = (room = null) => {
   if (room) {
-    currentRoom.value = { ...room }
+    currentRoom.value = {
+      id: room.id,
+      name: room.name || '',
+      capacity: room.capacity || 4,
+      facilities: room.facilities || room.equipment || ''
+    }
     editingRoom.value = true
   } else {
-    currentRoom.value = { name: '', capacity: 10, facilities: '' }
+    currentRoom.value = {
+      name: '',
+      capacity: 4,
+      facilities: ''
+    }
     editingRoom.value = false
   }
+
   nextTick(() => {
-    if (!roomModalInstance && roomModalRef.value) roomModalInstance = new bootstrap.Modal(roomModalRef.value)
+    if (!roomModalInstance && roomModalRef.value) {
+      roomModalInstance = new bootstrap.Modal(roomModalRef.value)
+    }
     roomModalInstance?.show()
   })
 }
 
 const saveRoom = async () => {
   try {
-    await api.post('/rooms.php', currentRoom.value)
-    toast.success(editingRoom.value ? 'Room updated!' : 'Room added!')
-    roomModalInstance?.hide()
-    await loadAllData()
+    const response = await api.post('/rooms.php', currentRoom.value)
+    console.log('Room save response:', response.data)
+
+    if (response.data?.success) {
+      toast.success(editingRoom.value ? 'Room updated!' : 'Room added!')
+      roomModalInstance?.hide()
+      await loadAllData()
+    } else {
+      toast.error(response.data?.message || 'Failed to save room')
+    }
   } catch (error) {
-    console.error('Error saving room:', error)
+    console.error('Room save error:', error)
     toast.error('Failed to save room')
   }
 }
@@ -722,6 +786,17 @@ const deleteEvent = async (id) => {
     console.error('Error deleting event:', error)
     toast.error('Delete failed')
   }
+}
+
+const viewUser = (user) => {
+  selectedUser.value = user
+
+  nextTick(() => {
+    if (!userModalInstance && userModalRef.value) {
+      userModalInstance = new bootstrap.Modal(userModalRef.value)
+    }
+    userModalInstance?.show()
+  })
 }
 
 // ==================== ANNOUNCEMENT ====================
@@ -820,6 +895,7 @@ const getStatusClass = (status) => {
 onMounted(() => {
   loadAllData()
 })
+
 </script>
 
 <style scoped>

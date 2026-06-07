@@ -272,3 +272,55 @@ INSERT INTO events (title, event_date, event_time, description) VALUES
 INSERT INTO feedback (user_id, name, email, type, message, rating) VALUES
 (1, 'Angeline Chiu', 'angeline@example.com', 'Praise', 'The new book collection is amazing!', 5.0),
 (2, 'Sarah Tan', 'sarah@example.com', 'Complaint', 'Had trouble booking a room.', 3.0);
+
+
+-- ==================== SWEETHEART LIBRARY - FULL TEST DATA ====================
+
+-- Admin User (password: 123)
+INSERT INTO users (name, email, password, role) VALUES 
+('Admin Test', 'admin@test.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
+
+-- Normal User (password: 123)
+INSERT INTO users (name, email, password, role) VALUES 
+('John Doe', 'user@test.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'user');
+
+-- Books
+INSERT INTO books (title, author, isbn, category, year, available_copies, total_copies, is_featured, is_popular) VALUES
+('The Great Gatsby', 'F. Scott Fitzgerald', '9780743273565', 'Classic', 1925, 4, 5, 1, 1),
+('To Kill a Mockingbird', 'Harper Lee', '9780061120084', 'Classic', 1960, 3, 3, 1, 0),
+('1984', 'George Orwell', '9780451524935', 'Dystopian', 1949, 5, 5, 0, 1),
+('Atomic Habits', 'James Clear', '9780735211292', 'Self-Help', 2018, 2, 2, 1, 1);
+
+-- Rooms
+INSERT INTO rooms (name, capacity, facilities) VALUES
+('Meeting Room A', 8, 'Projector, Whiteboard, Air Conditioner'),
+('Study Room 1', 4, 'Whiteboard, WiFi, Power Socket'),
+('Discussion Room', 10, 'Projector, Conference Table, AC');
+
+-- Events
+INSERT INTO events (title, event_date, event_time, description) VALUES
+('Library Orientation 2026', '2026-06-18', '10:00:00', 'Learn how to use the library effectively.'),
+('Monthly Book Club', '2026-06-25', '15:00:00', 'Discussion on "Atomic Habits" by James Clear.');
+
+-- Announcements
+INSERT INTO announcements (title, message, type) VALUES
+('System Maintenance', 'The system will be under maintenance on 15 June 2026 from 2AM - 4AM.', 'Maintenance'),
+('New Books Arrived', 'We have added 30 new books this month. Check them out!', 'Notice');
+
+-- ==================== OVERDUE + SEND REMINDER TEST DATA ====================
+
+-- Borrowed book that is OVERDUE (for Send Reminder test)
+INSERT INTO borrowed_books (user_id, book_id, borrow_date, due_date, status) VALUES
+(2, 1, '2026-05-20', '2026-06-03', 'Overdue');   -- Overdue book
+
+-- Normal borrowed book (not overdue)
+INSERT INTO borrowed_books (user_id, book_id, borrow_date, due_date, status) VALUES
+(2, 2, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 14 DAY), 'Borrowed');
+
+-- Room Booking (Active)
+INSERT INTO room_bookings (user_id, room_name, start_time, end_time, status) VALUES
+(2, 'Meeting Room A', '2026-06-12 10:00:00', '2026-06-12 12:00:00', 'Active');
+
+-- Feedback (for admin to view)
+INSERT INTO feedback (name, email, type, message, rating, user_id) VALUES
+('John Doe', 'user@test.com', 'Suggestion', 'Please add more self-help books.', 4, 2);
