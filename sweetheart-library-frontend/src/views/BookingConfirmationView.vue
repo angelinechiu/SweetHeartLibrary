@@ -111,22 +111,37 @@ const confirmBooking = async () => {
   try {
     if (isBookBorrow.value) {
       // === BOOK BORROWING ===
-      const response = await api.post('/bookings.php', {   // ← Changed to /bookings.php
+
+      // Debug logs (you can remove later)
+      console.log('bookId from query:', bookId)
+      console.log('Current user from store:', authStore.user)
+
+      if (!bookId) {
+        alert('Error: Book ID is missing. Please go back and try again.')
+        return
+      }
+
+      if (!authStore.user?.id) {
+        alert('Error: You are not logged in. Please login again.')
+        router.push('/login')
+        return
+      }
+
+      const response = await api.post('/bookings.php', {
         action: 'borrow_book',
         book_id: bookId,
-        user_id: authStore.user?.id
+        user_id: authStore.user.id
       })
 
       if (response.data.success) {
         alert('Book borrowed successfully!')
         router.push('/my-bookings')
       } else {
-        // Show the real error from backend
         alert(response.data.message || 'Failed to borrow book')
       }
 
     } else {
-      // === ROOM BOOKING (unchanged) ===
+      // Room booking stays the same...
       await api.post('/bookings.php', {
         action: 'create_room_booking',
         user_id: authStore.user?.id,
@@ -134,15 +149,12 @@ const confirmBooking = async () => {
         start_time: `${date} ${startTime}:00`,
         end_time: `${date} ${endTime}:00`
       })
-
       alert('Room booking confirmed successfully!')
       router.push('/my-bookings')
     }
 
   } catch (error) {
-    console.error('Borrow error:', error)
-
-    // Better error message
+    console.error('Borrow error full details:', error)
     const message = error.response?.data?.message || 'Failed to confirm booking. Please try again.'
     alert(message)
   } finally {

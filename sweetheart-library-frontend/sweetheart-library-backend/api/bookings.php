@@ -12,12 +12,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 require_once '../config/db.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
-$action = $_GET['action'] ?? $_POST['action'] ?? null;
 
 $data = json_decode(file_get_contents("php://input"), true);
 if (!is_array($data)) {
     $data = $_POST;
 }
+
+$action = $_GET['action'] ?? $data['action'] ?? $_POST['action'] ?? null;
 
 function respond($data, $status = 200) {
     http_response_code($status);
@@ -33,7 +34,13 @@ if ($method === 'GET') {
         $user_id = $_GET['user_id'] ?? null;
 
         if ($user_id) {
-            $stmt = $pdo->prepare("SELECT * FROM borrowed_books WHERE user_id = ? ORDER BY borrow_date DESC");
+            $stmt = $pdo->prepare("
+                SELECT bb.*, COALESCE(u.name, u.username, 'Unknown User') as user_name 
+                FROM borrowed_books bb 
+                LEFT JOIN users u ON bb.user_id = u.id 
+                WHERE bb.user_id = ? 
+                ORDER BY bb.borrow_date DESC
+            ");
             $stmt->execute([$user_id]);
             $response['borrowed_books'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -41,7 +48,12 @@ if ($method === 'GET') {
             $stmt->execute([$user_id]);
             $response['room_bookings'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
         } else {
-            $stmt = $pdo->prepare("SELECT * FROM borrowed_books ORDER BY due_date ASC");
+            $stmt = $pdo->prepare("
+                SELECT bb.*, COALESCE(u.name, u.username, 'Unknown User') as user_name 
+                FROM borrowed_books bb 
+                LEFT JOIN users u ON bb.user_id = u.id 
+                ORDER BY bb.due_date ASC
+            ");
             $stmt->execute();
             $response['borrowed_books'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -117,7 +129,7 @@ if ($method === 'POST') {
                 }
 
                 try {
-                    // Optional: Check if user already has this book borrowed
+                    // Check if user already borrowed this book
                     $check = $pdo->prepare("
                         SELECT id FROM borrowed_books 
                         WHERE user_id = ? AND book_id = ? AND status IN ('Borrowed', 'Overdue')
@@ -127,15 +139,29 @@ if ($method === 'POST') {
                         respond(['success' => false, 'message' => 'You have already borrowed this book'], 400);
                     }
 
-                    // 1. Insert into borrowed_books
+                    // Get book details (title + author)
+                    $bookStmt = $pdo->prepare("SELECT title, author FROM books WHERE id = ?");
+                    $bookStmt->execute([$book_id]);
+                    $book = $bookStmt->fetch(PDO::FETCH_ASSOC);
+
+                    if (!$book) {
+                        respond(['success' => false, 'message' => 'Book not found'], 404);
+                    }
+
+                    // Insert into borrowed_books with full info
                     $stmt = $pdo->prepare("
                         INSERT INTO borrowed_books 
-                        (user_id, book_id, borrow_date, due_date, status) 
-                        VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 14 DAY), 'Borrowed')
+                        (user_id, book_id, book_title, author, borrow_date, due_date, status) 
+                        VALUES (?, ?, ?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 14 DAY), 'Borrowed')
                     ");
-                    $success = $stmt->execute([$user_id, $book_id]);
+                    $success = $stmt->execute([
+                        $user_id, 
+                        $book_id, 
+                        $book['title'], 
+                        $book['author']
+                    ]);
 
-                    // 2. (Recommended) Decrease available copies
+                    // Decrease available copies
                     if ($success) {
                         $update = $pdo->prepare("
                             UPDATE books 
@@ -154,7 +180,6 @@ if ($method === 'POST') {
                     respond(['success' => false, 'message' => $e->getMessage()], 500);
                 }
                 break;
-                
             case 'mark_room_available':
                 if (!$bookingId) respond(['success' => false, 'message' => 'Booking ID required'], 400);
                 $stmt = $pdo->prepare("UPDATE room_bookings SET status = 'Completed' WHERE id = ?");
