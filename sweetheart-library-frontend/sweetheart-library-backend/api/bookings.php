@@ -156,6 +156,24 @@ if ($method === 'POST') {
             jsonResponse(['success' => $result, 'message' => $result ? 'Book renewed successfully' : 'Failed to renew book']);
         }
 
+        if ($action === 'approve_room_booking') {
+            $booking_id = $data['booking_id'] ?? null;
+            if (!$booking_id) { /* error */ }
+
+            $stmt = $pdo->prepare("UPDATE room_bookings SET status = 'Active' WHERE id = ?");
+            $success = $stmt->execute([$booking_id]);
+            echo json_encode(['success' => $success]);
+            exit;
+        }
+
+        if ($action === 'reject_room_booking') {
+            $booking_id = $data['booking_id'] ?? null;
+            $stmt = $pdo->prepare("UPDATE room_bookings SET status = 'Rejected' WHERE id = ?");
+            $success = $stmt->execute([$booking_id]);
+            echo json_encode(['success' => $success]);
+            exit;
+        }
+
         jsonResponse(['success' => false, 'message' => 'Unknown action']);
     }
 

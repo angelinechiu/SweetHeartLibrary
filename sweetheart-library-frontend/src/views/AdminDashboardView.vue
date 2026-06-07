@@ -1,275 +1,194 @@
 <template>
-  <div class="admin-dashboard">
+  <div class="admin-dashboard p-4">
     <!-- Header -->
-    <div class="admin-header mb-4">
-      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
-        <div class="flex-grow-1">
-          <h1 class="fw-bold mb-1" style="color: #2C2C2C; font-size: 2.4rem;">Admin Dashboard</h1>
-          <p class="text-muted mb-0 fs-5">Manage Books • Rooms • Events • Bookings • Users • Announcements</p>
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+      <div>
+        <h1 class="fw-bold mb-1" style="color: #2C2C2C; font-size: 2.5rem;">Admin Dashboard</h1>
+        <p class="text-muted mb-0 fs-5">Manage your SweetHeart Library</p>
+      </div>
+      <span class="badge px-4 py-2 fs-6" style="background-color: #E8B4B8; color: #2C2C2C; font-weight: 700; border-radius: 50px;">
+        <i class="bi bi-shield-check me-1"></i> ADMIN
+      </span>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card">
+          <div class="stat-icon bg-pink"><i class="bi bi-book-fill"></i></div>
+          <div class="stat-info"><div class="stat-value">{{ stats.totalBooks }}</div><div class="stat-label">Books</div></div>
         </div>
-
-        <div class="d-flex align-items-center gap-3">
-          <span class="badge px-4 py-2 fs-6" style="background-color: #E8B4B8; color: #2C2C2C; font-weight: 700; border-radius: 50px;">
-            ADMIN
-          </span>
-
-          <div class="dropdown d-md-none">
-            <button class="btn btn-dark dropdown-toggle px-3 py-2 d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
-              <i :class="currentTabIcon"></i>
-              <span>{{ currentTabLabel }}</span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow">
-              <li v-for="tab in tabs" :key="tab.key">
-                <button class="dropdown-item d-flex align-items-center gap-2" @click="activeTab = tab.key">
-                  <i :class="tab.icon"></i>
-                  <span>{{ tab.label }}</span>
-                </button>
-              </li>
-            </ul>
-          </div>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card">
+          <div class="stat-icon bg-info"><i class="bi bi-door-open-fill"></i></div>
+          <div class="stat-info"><div class="stat-value">{{ stats.totalRooms }}</div><div class="stat-label">Rooms</div></div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card">
+          <div class="stat-icon bg-success"><i class="bi bi-people-fill"></i></div>
+          <div class="stat-info"><div class="stat-value">{{ stats.totalUsers }}</div><div class="stat-label">Users</div></div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card">
+          <div class="stat-icon bg-warning"><i class="bi bi-calendar-check-fill"></i></div>
+          <div class="stat-info"><div class="stat-value">{{ stats.activeBookings }}</div><div class="stat-label">Active Bookings</div></div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card">
+          <div class="stat-icon bg-purple"><i class="bi bi-megaphone-fill"></i></div>
+          <div class="stat-info"><div class="stat-value">{{ stats.totalAnnouncements }}</div><div class="stat-label">Announcements</div></div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card">
+          <div class="stat-icon bg-danger"><i class="bi bi-exclamation-triangle-fill"></i></div>
+          <div class="stat-info"><div class="stat-value">{{ stats.overdueBooks }}</div><div class="stat-label">Overdue</div></div>
         </div>
       </div>
     </div>
 
-    <!-- Desktop Tabs -->
-    <div class="mb-4 d-none d-md-block">
-      <ul class="nav nav-pills elegant-admin-tabs">
+    <!-- Tabs -->
+    <div class="mb-4">
+      <ul class="nav nav-pills elegant-admin-tabs flex-wrap">
         <li class="nav-item" v-for="tab in tabs" :key="tab.key">
           <button class="nav-link d-flex align-items-center gap-2" :class="{ active: activeTab === tab.key }" @click="activeTab = tab.key">
             <i :class="tab.icon"></i>
-            <span>{{ tab.label }}</span>
+            <span class="d-none d-sm-inline">{{ tab.label }}</span>
           </button>
         </li>
       </ul>
     </div>
 
-    <!-- BOOKS TAB -->
-    <div v-if="activeTab === 'books'" class="tab-pane">
-      <div class="row g-4">
-        <div class="col-xl-5">
-          <div class="card elegant-card h-100">
-            <div class="card-header elegant-card-header">
-              <h5 class="mb-0"><i class="bi bi-plus-circle-fill me-2"></i>{{ editingBook ? 'Edit Book' : 'Add New Book' }}</h5>
-            </div>
-            <div class="card-body">
-              <div class="row g-3">
-                <div class="col-12"><input v-model="newBook.title" class="form-control" placeholder="Book Title"></div>
-                <div class="col-12"><input v-model="newBook.author" class="form-control" placeholder="Author"></div>
-                <div class="col-md-6"><input v-model="newBook.isbn" class="form-control" placeholder="ISBN"></div>
-                <div class="col-md-6"><input v-model="newBook.category" class="form-control" placeholder="Category"></div>
-                <div class="col-md-6"><input v-model.number="newBook.publication_year" type="number" class="form-control" placeholder="Year"></div>
-                <div class="col-md-6"><input v-model.number="newBook.copies" type="number" class="form-control" placeholder="Copies"></div>
-                <div class="col-12">
-                  <select v-model="newBook.availability_status" class="form-select">
-                    <option value="Available">Available</option>
-                    <option value="Borrowed">Borrowed</option>
-                    <option value="Reserved">Reserved</option>
-                  </select>
-                </div>
-                <div class="col-12 d-flex gap-2 mt-3">
-                  <button v-if="!editingBook" class="btn btn-pink flex-fill" @click="addBook">Add Book</button>
-                  <button v-else class="btn btn-success flex-fill" @click="saveBookEdit">Save Changes</button>
-                  <button v-if="editingBook" class="btn btn-secondary flex-fill" @click="cancelEdit">Cancel</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-xl-7">
-          <div class="card elegant-card">
-            <div class="card-header elegant-card-header d-flex justify-content-between">
-              <h5><i class="bi bi-book-fill me-2"></i>Manage Books</h5>
-              <span class="badge bg-white text-dark">{{ books.length }} books</span>
-            </div>
-            <div class="card-body p-0">
-              <table class="table table-hover mb-0">
-                <thead>
-                  <tr>
-                    <th>Title</th><th>Author</th><th>ISBN</th><th>Category</th><th>Year</th><th>Copies</th><th>Status</th><th class="text-end">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="book in books" :key="book.id">
-                    <td>{{ book.title }}</td>
-                    <td>{{ book.author }}</td>
-                    <td>{{ book.isbn }}</td>
-                    <td>{{ book.category }}</td>
-                    <td>{{ book.publication_year }}</td>
-                    <td>{{ book.copies }}</td>
-                    <td>{{ book.availability_status }}</td>
-                    <td class="text-end">
-                      <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditBook(book)">Edit</button>
-                      <button class="btn btn-sm action-btn delete-btn" @click="deleteBook(book.id)">Delete</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+    <!-- ==================== BOOKS TAB ==================== -->
+    <div v-if="activeTab === 'books'" class="tab-content">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0"><i class="bi bi-book me-2"></i>Books Management</h4>
+        <button class="btn btn-pink" @click="openBookModal()"><i class="bi bi-plus-lg me-1"></i> Add New Book</button>
+      </div>
+      <div class="mb-3">
+        <input v-model="bookSearch" type="text" class="form-control" placeholder="Search books by title, author, ISBN...">
+      </div>
+      <div class="card elegant-card">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Title</th><th>Author</th><th>ISBN</th><th>Category</th><th>Year</th><th>Copies</th><th>Status</th><th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="book in filteredBooks" :key="book.id">
+                  <td class="fw-semibold">{{ book.title }}</td>
+                  <td>{{ book.author }}</td>
+                  <td><code>{{ book.isbn }}</code></td>
+                  <td><span class="badge bg-light text-dark">{{ book.category }}</span></td>
+                  <td>{{ book.publication_year }}</td>
+                  <td>{{ book.copies }}</td>
+                  <td><span class="badge" :class="getStatusBadge(book.availability_status)">{{ book.availability_status }}</span></td>
+                  <td class="text-end">
+                    <button class="btn btn-sm btn-outline-warning me-1" @click="openBookModal(book)"><i class="bi bi-pencil"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" @click="deleteBook(book.id)"><i class="bi bi-trash"></i></button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ROOMS TAB -->
-    <div v-if="activeTab === 'rooms'" class="tab-pane">
-      <div class="row g-4">
-        <div class="col-lg-5">
-          <div class="card elegant-card h-100">
-            <div class="card-header elegant-card-header">
-              <h5><i class="bi bi-plus-circle-fill me-2"></i>{{ editingRoom ? 'Edit Room' : 'Add New Room' }}</h5>
-            </div>
-            <div class="card-body">
-              <div class="row g-3">
-                <div class="col-12"><input v-model="newRoom.name" class="form-control" placeholder="Room Name"></div>
-                <div class="col-12"><input v-model.number="newRoom.capacity" type="number" class="form-control" placeholder="Capacity"></div>
-                <div class="col-12"><input v-model="newRoom.equipment" class="form-control" placeholder="Equipment"></div>
-                <div class="col-12 d-flex gap-2 mt-3">
-                  <button v-if="!editingRoom" class="btn btn-pink w-100" @click="addRoom">Add Room</button>
-                  <button v-else class="btn btn-success w-100" @click="saveRoomEdit">Save</button>
-                  <button v-if="editingRoom" class="btn btn-secondary w-100" @click="cancelEdit">Cancel</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-7">
-          <div class="card elegant-card">
-            <div class="card-header elegant-card-header d-flex justify-content-between">
-              <h5><i class="bi bi-door-open-fill me-2"></i>Manage Rooms</h5>
-              <span class="badge bg-white text-dark">{{ rooms.length }} rooms</span>
-            </div>
-            <div class="card-body p-0">
-              <table class="table table-hover mb-0">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Capacity</th>
-                    <th>Equipment</th>
-                    <th class="text-end">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="room in rooms" :key="room.id">
-                    <td class="fw-semibold">{{ room.name }}</td>
-                    <td><span class="badge bg-pink text-dark">{{ room.capacity }} seats</span></td>
-                    <td>{{ room.equipment }}</td>
-                    <td class="text-end">
-                      <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditRoom(room)">Edit</button>
-                      <button class="btn btn-sm action-btn delete-btn" @click="deleteRoom(room.id)">Delete</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+    <!-- ==================== ROOMS TAB ==================== -->
+    <div v-if="activeTab === 'rooms'" class="tab-content">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0"><i class="bi bi-door-open me-2"></i>Rooms Management</h4>
+        <button class="btn btn-pink" @click="openRoomModal()"><i class="bi bi-plus-lg me-1"></i> Add New Room</button>
+      </div>
+      <div class="mb-3">
+        <input v-model="roomSearch" type="text" class="form-control" placeholder="Search rooms...">
+      </div>
+      <div class="card elegant-card">
+        <div class="card-body p-0">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr><th>Room Name</th><th>Capacity</th><th>Equipment</th><th class="text-end">Actions</th></tr>
+            </thead>
+            <tbody>
+              <tr v-for="room in filteredRooms" :key="room.id">
+                <td class="fw-semibold">{{ room.name }}</td>
+                <td><span class="badge bg-pink text-dark">{{ room.capacity }} seats</span></td>
+                <td>{{ room.equipment || '-' }}</td>
+                <td class="text-end">
+                  <button class="btn btn-sm btn-outline-warning me-1" @click="openRoomModal(room)"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-outline-danger" @click="deleteRoom(room.id)"><i class="bi bi-trash"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
 
-    <!-- EVENTS TAB -->
-    <div v-if="activeTab === 'events'" class="tab-pane">
-      <div class="row g-3">
-        <div class="col-lg-5">
-          <div class="card elegant-card h-100">
-            <div class="card-header elegant-card-header">
-              <h5><i class="bi bi-plus-circle-fill me-2"></i>{{ editingEvent ? 'Edit Event' : 'Add New Event' }}</h5>
-            </div>
-            <div class="card-body">
-              <div class="row g-3">
-                <div class="col-12"><input v-model="newEvent.title" class="form-control" placeholder="Event Title"></div>
-                <div class="col-md-6"><input v-model="newEvent.event_date" type="date" class="form-control"></div>
-                <div class="col-md-6"><input v-model="newEvent.event_time" type="time" class="form-control"></div>
-                <div class="col-12"><textarea v-model="newEvent.description" class="form-control" rows="2" placeholder="Description"></textarea></div>
-                <div class="col-12 d-flex gap-2 mt-3">
-                  <button v-if="!editingEvent" class="btn btn-pink w-100" @click="addEvent">Create Event</button>
-                  <button v-else class="btn btn-success w-100" @click="saveEventEdit">Save</button>
-                  <button v-if="editingEvent" class="btn btn-secondary w-100" @click="cancelEdit">Cancel</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-7">
-          <div class="card elegant-card">
-            <div class="card-header elegant-card-header">
-              <h5><i class="bi bi-calendar-event-fill me-2"></i>Manage Events</h5>
-            </div>
-            <div class="card-body p-0">
-              <table class="table table-hover mb-0">
-                <thead>
-                  <tr>
-                    <th>Event Title</th>
-                    <th>Description</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th class="text-end">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="event in events" :key="event.id">
-                    <td class="fw-semibold">{{ event.title }}</td>
-                    <td class="text-muted">{{ event.description || '-' }}</td>
-                    <td>{{ event.event_date }}</td>
-                    <td>{{ event.event_time }}</td>
-                    <td class="text-end">
-                      <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditEvent(event)">Edit</button>
-                      <button class="btn btn-sm action-btn delete-btn" @click="deleteEvent(event.id)">Delete</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+    <!-- ==================== EVENTS TAB ==================== -->
+    <div v-if="activeTab === 'events'" class="tab-content">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0"><i class="bi bi-calendar-event me-2"></i>Events Management</h4>
+        <button class="btn btn-pink" @click="openEventModal()"><i class="bi bi-plus-lg me-1"></i> Create Event</button>
+      </div>
+      <div class="mb-3">
+        <input v-model="eventSearch" type="text" class="form-control" placeholder="Search events...">
+      </div>
+      <div class="card elegant-card">
+        <div class="card-body p-0">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr><th>Title</th><th>Date</th><th>Time</th><th>Description</th><th class="text-end">Actions</th></tr>
+            </thead>
+            <tbody>
+              <tr v-for="event in filteredEvents" :key="event.id">
+                <td class="fw-semibold">{{ event.title }}</td>
+                <td>{{ event.event_date }}</td>
+                <td>{{ event.event_time }}</td>
+                <td class="text-muted small">{{ event.description || '-' }}</td>
+                <td class="text-end">
+                  <button class="btn btn-sm btn-outline-warning me-1" @click="openEventModal(event)"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-outline-danger" @click="deleteEvent(event.id)"><i class="bi bi-trash"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
 
-    <!-- BOOKINGS TAB -->
-    <div v-if="activeTab === 'bookings'" class="tab-pane">
-      <h4 class="mb-4 fw-bold">Booking Management</h4>
-
+    <!-- ==================== BOOKINGS TAB ==================== -->
+    <div v-if="activeTab === 'bookings'" class="tab-content">
+      <h4 class="mb-3"><i class="bi bi-calendar-check me-2"></i>Bookings Management</h4>
       <ul class="nav nav-tabs mb-3">
-        <li class="nav-item"><button class="nav-link" :class="{active: bookingSubTab === 'books'}" @click="bookingSubTab = 'books'">Borrowed Books</button></li>
-        <li class="nav-item"><button class="nav-link" :class="{active: bookingSubTab === 'rooms'}" @click="bookingSubTab = 'rooms'">Room Bookings</button></li>
+        <li class="nav-item"><button class="nav-link" :class="{ active: bookingSubTab === 'books' }" @click="bookingSubTab = 'books'">Borrowed Books</button></li>
+        <li class="nav-item"><button class="nav-link" :class="{ active: bookingSubTab === 'rooms' }" @click="bookingSubTab = 'rooms'">Room Bookings</button></li>
       </ul>
 
       <!-- Borrowed Books -->
       <div v-if="bookingSubTab === 'books'">
+        <div class="mb-3"><input v-model="borrowedSearch" type="text" class="form-control" placeholder="Search by user or book..."></div>
         <div class="card elegant-card">
-          <div class="card-header elegant-card-header"><h5><i class="bi bi-book me-2"></i>Borrowed Books</h5></div>
           <div class="card-body p-0">
-            <table class="table table-hover mb-0">
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Book</th>
-                  <th>Due Date</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
+            <table class="table table-hover align-middle mb-0">
+              <thead><tr><th>User</th><th>Book</th><th>Due Date</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
               <tbody>
-                <tr v-for="booking in activeBorrowings" :key="booking.id">
-                  <td>{{ booking.user_name }}</td>
-                  <td>{{ booking.book_title }}</td>
-                  <td>{{ formatDate(booking.due_date) }}</td>
-                  <td><span :class="getBookingStatusClass(booking.status)">{{ booking.status }}</span></td>
-                  <td class="d-flex gap-1 flex-wrap">
-                    <!-- Send Reminder (original) -->
-                    <button class="btn btn-sm btn-warning" 
-                            :disabled="booking.status !== 'Overdue'" 
-                            @click="sendReminder(booking)">
-                      Send Reminder
-                    </button>
-                    
-                    <!-- Mark as Returned -->
-                    <button class="btn btn-sm btn-success" 
-                            @click="markBookReturned(booking)">
-                      Mark as Returned
-                    </button>
+                <tr v-for="b in filteredBorrowedBooks" :key="b.id">
+                  <td>{{ b.user_name }}</td>
+                  <td class="fw-semibold">{{ b.book_title }}</td>
+                  <td class="text-muted small">{{ formatDate(b.due_date) }}</td>
+                  <td><span class="badge" :class="getBookingStatusClass(b.status)">{{ b.status }}</span></td>
+                  <td class="text-end">
+                    <button v-if="b.status !== 'Returned'" class="btn btn-sm btn-success me-1" @click="markBookReturned(b)">Mark Returned</button>
+                    <button v-if="b.status === 'Overdue'" class="btn btn-sm btn-warning" @click="sendReminder(b)">Send Reminder</button>
                   </td>
                 </tr>
               </tbody>
@@ -280,27 +199,19 @@
 
       <!-- Room Bookings -->
       <div v-if="bookingSubTab === 'rooms'">
+        <div class="mb-3"><input v-model="roomBookingSearch" type="text" class="form-control" placeholder="Search room bookings..."></div>
         <div class="card elegant-card">
-          <div class="card-header elegant-card-header"><h5><i class="bi bi-door-open me-2"></i>Active Room Bookings</h5></div>
           <div class="card-body p-0">
-            <table class="table table-hover mb-0">
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Room</th>
-                  <th>Time</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
+            <table class="table table-hover align-middle mb-0">
+              <thead><tr><th>User</th><th>Room</th><th>Start Time</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
               <tbody>
-                <tr v-for="booking in roomBookings" :key="booking.id">
-                  <td>{{ booking.user_name }}</td>
-                  <td>{{ booking.room_name }}</td>
-                  <td>{{ formatDateTime(booking.start_time) }}</td>
-                  <td><span :class="getBookingStatusClass(booking.status)">{{ booking.status }}</span></td>
-                  <td>
-                    <button v-if="canMarkRoomAvailable(booking)" class="btn btn-sm btn-success" @click="markRoomAvailable(booking)">Mark Available</button>
+                <tr v-for="rb in filteredRoomBookings" :key="rb.id">
+                  <td>{{ rb.user_name }}</td>
+                  <td class="fw-semibold">{{ rb.room_name }}</td>
+                  <td class="text-muted small">{{ formatDateTime(rb.start_time) }}</td>
+                  <td><span class="badge" :class="getBookingStatusClass(rb.status)">{{ rb.status }}</span></td>
+                  <td class="text-end">
+                    <button v-if="canMarkRoomAvailable(rb)" class="btn btn-sm btn-success" @click="markRoomAvailable(rb)">Mark Available</button>
                   </td>
                 </tr>
               </tbody>
@@ -310,26 +221,24 @@
       </div>
     </div>
 
-    <!-- USERS TAB -->
-    <div v-if="activeTab === 'users'" class="tab-pane mt-4">
+    <!-- ==================== USERS TAB ==================== -->
+    <div v-if="activeTab === 'users'" class="tab-content">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0"><i class="bi bi-people me-2"></i>Users Management</h4>
+      </div>
+      <div class="mb-3"><input v-model="userSearch" type="text" class="form-control" placeholder="Search users..."></div>
       <div class="card elegant-card">
-        <div class="card-header elegant-card-header d-flex justify-content-between">
-          <h5><i class="bi bi-people-fill me-2"></i>Manage Users</h5>
-          <span class="badge bg-white text-dark">{{ users.length }} users</span>
-        </div>
         <div class="card-body p-0">
-          <table class="table table-hover mb-0">
-            <thead>
-              <tr><th>Name</th><th>Email</th><th>Role</th><th class="text-end">Actions</th></tr>
-            </thead>
+          <table class="table table-hover align-middle mb-0">
+            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
-              <tr v-for="user in users" :key="user.id">
+              <tr v-for="user in filteredUsers" :key="user.id">
                 <td class="fw-semibold">{{ user.name }}</td>
                 <td>{{ user.email }}</td>
                 <td><span class="badge bg-pink text-dark">{{ user.role || 'User' }}</span></td>
                 <td class="text-end">
-                  <button class="btn btn-sm action-btn edit-btn me-2" @click="viewUser(user)">View</button>
-                  <button class="btn btn-sm action-btn delete-btn" @click="deleteUser(user.id)">Delete</button>
+                  <button class="btn btn-sm btn-outline-primary me-1" @click="viewUser(user)">View</button>
+                  <button class="btn btn-sm btn-outline-danger" @click="deleteUser(user.id)"><i class="bi bi-trash"></i></button>
                 </td>
               </tr>
             </tbody>
@@ -338,83 +247,164 @@
       </div>
     </div>
 
-    <!-- ANNOUNCEMENTS TAB -->
-    <div v-if="activeTab === 'announcements'" class="tab-pane">
-      <div class="row g-4">
-        <div class="col-lg-5">
-          <div class="card elegant-card h-100">
-            <div class="card-header elegant-card-header">
-              <h5><i class="bi bi-plus-circle-fill me-2"></i>{{ editingAnnouncement ? 'Edit' : 'Create' }} Announcement</h5>
-            </div>
-            <div class="card-body">
-              <div class="row g-3">
-                <div class="col-12"><input v-model="newAnnouncement.title" class="form-control" placeholder="Title"></div>
-                <div class="col-12">
-                  <select v-model="newAnnouncement.type" class="form-select">
-                    <option value="Notice">Notice</option>
-                    <option value="Event">Event</option>
-                    <option value="Maintenance">Maintenance</option>
-                  </select>
-                </div>
-                <div class="col-12"><textarea v-model="newAnnouncement.message" class="form-control" rows="3" placeholder="Message"></textarea></div>
-                <div class="col-12 d-flex gap-2 mt-2">
-                  <button v-if="!editingAnnouncement" class="btn btn-pink flex-fill" @click="addAnnouncement">Publish</button>
-                  <button v-else class="btn btn-success flex-fill" @click="saveAnnouncementEdit">Save</button>
-                  <button v-if="editingAnnouncement" class="btn btn-secondary flex-fill" @click="cancelEdit">Cancel</button>
-                </div>
+    <!-- ==================== ANNOUNCEMENTS TAB ==================== -->
+    <div v-if="activeTab === 'announcements'" class="tab-content">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0"><i class="bi bi-megaphone me-2"></i>Announcements</h4>
+        <button class="btn btn-pink" @click="openAnnouncementModal()"><i class="bi bi-plus-lg me-1"></i> New Announcement</button>
+      </div>
+      <div class="mb-3"><input v-model="announcementSearch" type="text" class="form-control" placeholder="Search announcements..."></div>
+      <div class="card elegant-card">
+        <div class="card-body p-0">
+          <table class="table table-hover align-middle mb-0">
+            <thead><tr><th>Title</th><th>Type</th><th>Date</th><th class="text-end">Actions</th></tr></thead>
+            <tbody>
+              <tr v-for="ann in filteredAnnouncements" :key="ann.id">
+                <td class="fw-semibold">{{ ann.title }}</td>
+                <td><span class="badge bg-pink text-dark">{{ ann.type }}</span></td>
+                <td class="text-muted small">{{ formatDate(ann.created_at) }}</td>
+                <td class="text-end">
+                  <button class="btn btn-sm btn-outline-warning me-1" @click="openAnnouncementModal(ann)"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-outline-danger" @click="deleteAnnouncement(ann.id)"><i class="bi bi-trash"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- Book Modal -->
+    <div class="modal fade" id="bookModal" tabindex="-1" ref="bookModalRef">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{ editingBook ? 'Edit Book' : 'Add New Book' }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-6"><label class="form-label">Title</label><input v-model="currentBook.title" class="form-control"></div>
+              <div class="col-md-6"><label class="form-label">Author</label><input v-model="currentBook.author" class="form-control"></div>
+              <div class="col-md-6"><label class="form-label">ISBN</label><input v-model="currentBook.isbn" class="form-control"></div>
+              <div class="col-md-6"><label class="form-label">Category</label><input v-model="currentBook.category" class="form-control"></div>
+              <div class="col-md-4"><label class="form-label">Year</label><input v-model.number="currentBook.publication_year" type="number" class="form-control"></div>
+              <div class="col-md-4"><label class="form-label">Copies</label><input v-model.number="currentBook.copies" type="number" class="form-control"></div>
+              <div class="col-md-4"><label class="form-label">Status</label>
+                <select v-model="currentBook.availability_status" class="form-select">
+                  <option value="Available">Available</option><option value="Borrowed">Borrowed</option><option value="Reserved">Reserved</option>
+                </select>
               </div>
             </div>
           </div>
-        </div>
-
-        <div class="col-lg-7">
-          <div class="card elegant-card">
-            <div class="card-header elegant-card-header d-flex justify-content-between">
-              <h5><i class="bi bi-megaphone-fill me-2"></i>Manage Announcements</h5>
-              <span class="badge bg-white text-dark">{{ announcements.length }} announcements</span>
-            </div>
-            <div class="card-body p-0">
-              <table class="table table-hover mb-0">
-                <thead>
-                  <tr><th>Title</th><th>Type</th><th>Date</th><th class="text-end">Actions</th></tr>
-                </thead>
-                <tbody>
-                  <tr v-for="ann in announcements" :key="ann.id">
-                    <td class="fw-semibold">{{ ann.title }}</td>
-                    <td><span class="badge bg-pink text-dark">{{ ann.type }}</span></td>
-                    <td>{{ ann.created_at || ann.published_at }}</td>
-                    <td class="text-end">
-                      <button class="btn btn-sm action-btn edit-btn me-2" @click="startEditAnnouncement(ann)">Edit</button>
-                      <button class="btn btn-sm action-btn delete-btn" @click="deleteAnnouncement(ann.id)">Delete</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-pink" @click="saveBook">{{ editingBook ? 'Save Changes' : 'Add Book' }}</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- User Modal -->
-    <div v-if="showUserModal" class="admin-modal-backdrop">
-      <div class="admin-modal">
-        <h5>User Details</h5>
-        <p><strong>Name:</strong> {{ selectedUser?.name }}</p>
-        <p><strong>Email:</strong> {{ selectedUser?.email }}</p>
-        <button class="btn btn-secondary mt-3" @click="closeUserModal">Close</button>
+    <!-- Room Modal -->
+    <div class="modal fade" id="roomModal" tabindex="-1" ref="roomModalRef">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{ editingRoom ? 'Edit Room' : 'Add New Room' }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3"><label class="form-label">Room Name</label><input v-model="currentRoom.name" class="form-control" placeholder="Meeting Room A"></div>
+            <div class="mb-3"><label class="form-label">Capacity</label><input v-model.number="currentRoom.capacity" type="number" class="form-control" placeholder="10"></div>
+            <div class="mb-3"><label class="form-label">Equipment</label><input v-model="currentRoom.equipment" class="form-control" placeholder="Projector, Whiteboard"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-pink" @click="saveRoom">{{ editingRoom ? 'Save Changes' : 'Add Room' }}</button>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- Event Modal -->
+    <div class="modal fade" id="eventModal" tabindex="-1" ref="eventModalRef">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{ editingEvent ? 'Edit Event' : 'Create New Event' }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3"><label class="form-label">Event Title</label><input v-model="currentEvent.title" class="form-control"></div>
+            <div class="row g-3">
+              <div class="col-md-6"><label class="form-label">Date</label><input v-model="currentEvent.event_date" type="date" class="form-control"></div>
+              <div class="col-md-6"><label class="form-label">Time</label><input v-model="currentEvent.event_time" type="time" class="form-control"></div>
+            </div>
+            <div class="mt-3"><label class="form-label">Description</label><textarea v-model="currentEvent.description" class="form-control" rows="3"></textarea></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-pink" @click="saveEvent">{{ editingEvent ? 'Save Changes' : 'Create Event' }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Announcement Modal -->
+    <div class="modal fade" id="announcementModal" tabindex="-1" ref="announcementModalRef">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{ editingAnnouncement ? 'Edit Announcement' : 'Create New Announcement' }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3"><label class="form-label">Title</label><input v-model="currentAnnouncement.title" class="form-control"></div>
+            <div class="mb-3"><label class="form-label">Type</label>
+              <select v-model="currentAnnouncement.type" class="form-select">
+                <option value="Notice">Notice</option>
+                <option value="Event">Event</option>
+                <option value="Maintenance">Maintenance</option>
+              </select>
+            </div>
+            <div class="mb-3"><label class="form-label">Message</label><textarea v-model="currentAnnouncement.message" class="form-control" rows="4"></textarea></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-pink" @click="saveAnnouncement">{{ editingAnnouncement ? 'Save Changes' : 'Publish' }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- User View Modal -->
+    <div class="modal fade" id="userModal" tabindex="-1" ref="userModalRef">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header"><h5 class="modal-title">User Details</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+          <div class="modal-body" v-if="selectedUser">
+            <p><strong>Name:</strong> {{ selectedUser.name }}</p>
+            <p><strong>Email:</strong> {{ selectedUser.email }}</p>
+            <p><strong>Role:</strong> {{ selectedUser.role || 'User' }}</p>
+          </div>
+          <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import api from '../services/api.js'
-import axios from 'axios'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
+import * as bootstrap from 'bootstrap'
 
 const activeTab = ref('books')
-
 const tabs = [
   { key: 'books', label: 'Books', icon: 'bi bi-book-fill' },
   { key: 'rooms', label: 'Rooms', icon: 'bi bi-door-open-fill' },
@@ -428,277 +418,316 @@ const books = ref([])
 const rooms = ref([])
 const events = ref([])
 const users = ref([])
-const selectedUser = ref(null)
-const showUserModal = ref(false)
-
 const announcements = ref([])
-const newAnnouncement = ref({ title: '', type: 'Notice', message: '' })
-const editingAnnouncement = ref(false)
-
-const newBook = ref({ title: '', author: '', isbn: '', category: '', publication_year: new Date().getFullYear(), copies: 1, availability_status: 'Available' })
-const newRoom = ref({ name: '', capacity: '', equipment: '' })
-const newEvent = ref({ title: '', event_date: '', event_time: '', description: '' })
-
-const editingBook = ref(false)
-const editingRoom = ref(false)
-const editingEvent = ref(false)
-
-const bookingSubTab = ref('books')
 const activeBorrowings = ref([])
 const roomBookings = ref([])
 
-const API_BASE = 'http://localhost/sweetheart-library-backend/api/'
+const bookSearch = ref('')
+const roomSearch = ref('')
+const eventSearch = ref('')
+const userSearch = ref('')
+const announcementSearch = ref('')
+const borrowedSearch = ref('')
+const roomBookingSearch = ref('')
+
+const bookingSubTab = ref('books')
+
+// Modal states
+const editingBook = ref(false)
+const currentBook = ref({})
+const bookModalRef = ref(null)
+let bookModalInstance = null
+
+const editingRoom = ref(false)
+const currentRoom = ref({})
+const roomModalRef = ref(null)
+let roomModalInstance = null
+
+const editingEvent = ref(false)
+const currentEvent = ref({})
+const eventModalRef = ref(null)
+let eventModalInstance = null
+
+const editingAnnouncement = ref(false)
+const currentAnnouncement = ref({})
+const announcementModalRef = ref(null)
+let announcementModalInstance = null
+
+const selectedUser = ref(null)
+const userModalRef = ref(null)
+let userModalInstance = null
+
+const stats = ref({
+  totalBooks: 0, totalRooms: 0, totalUsers: 0,
+  activeBookings: 0, totalAnnouncements: 0, overdueBooks: 0
+})
+
+// ==================== COMPUTED ====================
+const filteredBooks = computed(() => {
+  if (!bookSearch.value) return books.value
+  const q = bookSearch.value.toLowerCase()
+  return books.value.filter(b =>
+    (b.title || '').toLowerCase().includes(q) ||
+    (b.author || '').toLowerCase().includes(q) ||
+    (b.isbn || '').toLowerCase().includes(q)
+  )
+})
+
+const filteredRooms = computed(() => roomSearch.value ? rooms.value.filter(r => (r.name || '').toLowerCase().includes(roomSearch.value.toLowerCase())) : rooms.value)
+const filteredEvents = computed(() => eventSearch.value ? events.value.filter(e => (e.title || '').toLowerCase().includes(eventSearch.value.toLowerCase())) : events.value)
+const filteredUsers = computed(() => userSearch.value ? users.value.filter(u => (u.name || '').toLowerCase().includes(userSearch.value.toLowerCase()) || (u.email || '').toLowerCase().includes(userSearch.value.toLowerCase())) : users.value)
+const filteredAnnouncements = computed(() => announcementSearch.value ? announcements.value.filter(a => (a.title || '').toLowerCase().includes(announcementSearch.value.toLowerCase())) : announcements.value)
+const filteredBorrowedBooks = computed(() => borrowedSearch.value ? activeBorrowings.value.filter(b => (b.user_name || '').toLowerCase().includes(borrowedSearch.value.toLowerCase()) || (b.book_title || '').toLowerCase().includes(borrowedSearch.value.toLowerCase())) : activeBorrowings.value)
+const filteredRoomBookings = computed(() => roomBookingSearch.value ? roomBookings.value.filter(rb => (rb.user_name || '').toLowerCase().includes(roomBookingSearch.value.toLowerCase()) || (rb.room_name || '').toLowerCase().includes(roomBookingSearch.value.toLowerCase())) : roomBookings.value)
+
+// ==================== HELPERS ====================
+const getStatusBadge = (status) => status === 'Available' ? 'bg-success text-white' : status === 'Borrowed' ? 'bg-warning text-dark' : 'bg-secondary text-white'
+const getBookingStatusClass = (status) => status === 'Overdue' ? 'bg-danger text-white' : (status === 'Active' || status === 'Borrowed') ? 'bg-success text-white' : 'bg-secondary text-white'
+const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-MY') : '-'
+const formatDateTime = (d) => d ? new Date(d).toLocaleString('en-MY') : '-'
+const canMarkRoomAvailable = (b) => ['Active', 'Pending', null, undefined].includes(b.status)
 
 // ==================== LOAD DATA ====================
 const loadAllData = async () => {
   try {
-    const [b, r, e] = await Promise.all([api.get('/books.php'), api.get('/rooms.php'), api.get('/events.php')])
+    const [b, r, e, u, a] = await Promise.all([
+      api.get('/books.php'),
+      api.get('/rooms.php'),
+      api.get('/events.php'),
+      api.get('/users.php'),
+      api.get('/announcements.php?action=get_all')
+    ])
     books.value = b.data || []
     rooms.value = r.data || []
     events.value = e.data || []
-  } catch (err) { console.error(err) }
-}
+    users.value = u.data || []
+    announcements.value = a.data || []
 
-const loadAnnouncements = async () => {
-  try {
-    const res = await api.get('/announcements.php?action=get_all')
-    announcements.value = res.data || []
-  } catch (err) { console.error(err) }
+    stats.value.totalBooks = books.value.length
+    stats.value.totalRooms = rooms.value.length
+    stats.value.totalUsers = users.value.length
+    stats.value.totalAnnouncements = announcements.value.length
+  } catch (err) {
+    console.error('Error loading data:', err)
+    toast.error('Failed to load data')
+  }
 }
 
 const fetchBookings = async () => {
   try {
-    const res = await axios.get(API_BASE + 'bookings.php?action=get')
+    const res = await api.get('/bookings.php?action=get')
     if (res.data?.success) {
       activeBorrowings.value = res.data.borrowed_books || []
       roomBookings.value = res.data.room_bookings || []
+      stats.value.overdueBooks = activeBorrowings.value.filter(b => b.status === 'Overdue').length
+      stats.value.activeBookings = activeBorrowings.value.length + roomBookings.value.length
     }
-  } catch (err) { console.error(err) }
-}
-
-// ==================== ANNOUNCEMENTS ====================
-const addAnnouncement = async () => {
-  if (!newAnnouncement.value.title || !newAnnouncement.value.message) return alert('Title and message required')
-  try {
-    await api.post('/announcements.php', newAnnouncement.value)
-    newAnnouncement.value = { title: '', type: 'Notice', message: '' }
-    loadAnnouncements()
-  } catch (error) {
-    console.error(error)
-    alert('Failed to create announcement')
+  } catch (err) {
+    console.error('Error fetching bookings:', err)
+    toast.error('Failed to load bookings')
   }
 }
 
-const startEditAnnouncement = (ann) => {
-  newAnnouncement.value = { ...ann }
-  editingAnnouncement.value = true
+// ==================== BOOK MODAL ====================
+const openBookModal = (book = null) => {
+  if (book) {
+    currentBook.value = { ...book }
+    editingBook.value = true
+  } else {
+    currentBook.value = { title: '', author: '', isbn: '', category: '', publication_year: new Date().getFullYear(), copies: 1, availability_status: 'Available' }
+    editingBook.value = false
+  }
+  nextTick(() => {
+    if (!bookModalInstance && bookModalRef.value) bookModalInstance = new bootstrap.Modal(bookModalRef.value)
+    bookModalInstance?.show()
+  })
+}
+const saveBook = async () => {
+  try {
+    await api.post('/books.php', currentBook.value)
+    toast.success(editingBook.value ? 'Book updated!' : 'Book added!')
+    bookModalInstance?.hide()
+    await loadAllData()
+  } catch (e) {
+    console.error('Error saving book:', e)
+    toast.error('Failed to save book')
+  }
+}
+const deleteBook = async (id) => {
+  if (!confirm('Delete this book?')) return
+  try { await api.delete(`/books.php?id=${id}`); toast.success('Book deleted'); await loadAllData() } catch (e) {
+    console.error('Error deleting book:', e)
+    toast.error('Delete failed')
+  }
 }
 
-const saveAnnouncementEdit = async () => {
+// ==================== ROOM MODAL ====================
+const openRoomModal = (room = null) => {
+  if (room) {
+    currentRoom.value = { ...room }
+    editingRoom.value = true
+  } else {
+    currentRoom.value = { name: '', capacity: 10, equipment: '' }
+    editingRoom.value = false
+  }
+  nextTick(() => {
+    if (!roomModalInstance && roomModalRef.value) roomModalInstance = new bootstrap.Modal(roomModalRef.value)
+    roomModalInstance?.show()
+  })
+}
+const saveRoom = async () => {
   try {
-    await api.post('/announcements.php?action=update', newAnnouncement.value)
+    await api.post('/rooms.php', currentRoom.value)
+    toast.success(editingRoom.value ? 'Room updated!' : 'Room added!')
+    roomModalInstance?.hide()
+    await loadAllData()
+  } catch (e) {
+    console.error('Error saving room:', e)
+
+    toast.error('Failed to save room')
+  }
+}
+const deleteRoom = async (id) => {
+  if (!confirm('Delete this room?')) return
+  try { await api.delete(`/rooms.php?id=${id}`); toast.success('Room deleted'); await loadAllData() } catch (e) {
+    console.error('Error deleting room:', e)
+    toast.error('Delete failed')
+  }
+}
+
+// ==================== EVENT MODAL ====================
+const openEventModal = (eventItem = null) => {
+  if (eventItem) {
+    currentEvent.value = { ...eventItem }
+    editingEvent.value = true
+  } else {
+    currentEvent.value = { title: '', event_date: '', event_time: '', description: '' }
+    editingEvent.value = false
+  }
+  nextTick(() => {
+    if (!eventModalInstance && eventModalRef.value) eventModalInstance = new bootstrap.Modal(eventModalRef.value)
+    eventModalInstance?.show()
+  })
+}
+const saveEvent = async () => {
+  try {
+    await api.post('/events.php', currentEvent.value)
+    toast.success(editingEvent.value ? 'Event updated!' : 'Event created!')
+    eventModalInstance?.hide()
+    await loadAllData()
+  } catch (e) {
+    console.error('Error saving event:', e)
+    toast.error('Failed to save event')
+  }
+}
+const deleteEvent = async (id) => {
+  if (!confirm('Delete this event?')) return
+  try { await api.delete(`/events.php?id=${id}`); toast.success('Event deleted'); await loadAllData() } catch (e) {
+    console.error('Error deleting event:', e)
+    toast.error('Delete failed')
+  }
+}
+
+// ==================== ANNOUNCEMENT MODAL ====================
+const openAnnouncementModal = (ann = null) => {
+  if (ann) {
+    currentAnnouncement.value = { ...ann }
+    editingAnnouncement.value = true
+  } else {
+    currentAnnouncement.value = { title: '', type: 'Notice', message: '' }
     editingAnnouncement.value = false
-    newAnnouncement.value = { title: '', type: 'Notice', message: '' }
-    loadAnnouncements()
-  } catch (error) {
-    console.error(error)
-    alert('Failed to update announcement')
+  }
+  nextTick(() => {
+    if (!announcementModalInstance && announcementModalRef.value) announcementModalInstance = new bootstrap.Modal(announcementModalRef.value)
+    announcementModalInstance?.show()
+  })
+}
+const saveAnnouncement = async () => {
+  try {
+    const payload = { ...currentAnnouncement.value }
+    if (editingAnnouncement.value) payload.action = 'update'
+    await api.post('/announcements.php', payload)
+    toast.success(editingAnnouncement.value ? 'Announcement updated!' : 'Announcement published!')
+    announcementModalInstance?.hide()
+    await loadAllData()
+  } catch (e) {
+    console.error('Error saving announcement:', e)
+    toast.error('Failed to save announcement')
   }
 }
-
 const deleteAnnouncement = async (id) => {
-  if (confirm('Delete this announcement?')) {
-    try {
-      await api.delete(`/announcements.php?id=${id}`)
-      loadAnnouncements()
-    } catch (error) {
-      console.error(error)
-      alert('Failed to delete announcement')
-    }
+  if (!confirm('Delete this announcement?')) return
+  try { await api.delete(`/announcements.php?id=${id}`); toast.success('Announcement deleted'); await loadAllData() } catch (e) {
+    console.error('Error deleting announcement:', e)
+    toast.error('Delete failed')
   }
 }
 
-// ==================== SEND REMINDER ====================
+// ==================== BOOKINGS ACTIONS ====================
+const markBookReturned = async (booking) => {
+  if (!confirm(`Mark "${booking.book_title}" as returned?`)) return
+  try { await api.post('/bookings.php?action=mark_returned', { booking_id: booking.id }); toast.success('Book returned!'); await fetchBookings() } catch (e) {
+    console.error('Error marking book as returned:', e)
+    toast.error('Failed')
+  }
+}
 const sendReminder = async (booking) => {
-  if (!booking?.id) return
-  if (!confirm(`Send reminder for ${booking.book_title}?`)) return
-
+  if (!confirm(`Send reminder for "${booking.book_title}"?`)) return
   try {
     await api.post('/announcements.php', {
       title: 'Overdue Book Reminder',
       message: `You have an overdue book: "${booking.book_title}". Please return it soon.`,
-      type: 'Overdue Reminder',
-      due_date: booking.due_date,
-      is_published: 1
+      type: 'Reminder'
     })
-    alert('Reminder sent successfully!')
-    fetchBookings()
-  } catch (error) {
-    console.error(error)
-    alert('Failed to send reminder')
+    toast.success('Reminder sent!')
+    await fetchBookings()
+  } catch (e) {
+    console.error('Error sending reminder:', e)
+    toast.error('Failed to send reminder')
   }
 }
-
 const markRoomAvailable = async (booking) => {
-  if (!booking?.id) return
-  if (!confirm(`Mark room as available?`)) return
-  try {
-    await axios.post(API_BASE + 'bookings.php?action=mark_room_available', { booking_id: booking.id })
-    alert('Room marked as available!')
-    fetchBookings()
-  } catch (error) {
-    console.error(error)
-    alert('Failed to update room')
+  if (!confirm('Mark room booking as completed?')) return
+  try { await api.post('/bookings.php?action=mark_room_available', { booking_id: booking.id }); toast.success('Room marked available!'); await fetchBookings() } catch (e) {
+    console.error('Error marking room as available:', e)
+    toast.error('Failed')
   }
 }
 
-// ==================== BORROWED BOOKS ACTIONS ====================
-// Mark book as returned
-const markBookReturned = async (booking) => {
-  if (!booking?.id) return
-  if (!confirm(`Mark "${booking.book_title}" as returned by ${booking.user_name}?`)) return
-
-  try {
-    await axios.post(API_BASE + 'bookings.php?action=mark_returned', { 
-      booking_id: booking.id 
-    })
-    alert('Book marked as returned!')
-    fetchBookings()
-  } catch (error) {
-    console.error(error)
-    alert('Failed to mark book as returned')
+// ==================== USERS ====================
+const viewUser = (user) => {
+  selectedUser.value = user
+  nextTick(() => {
+    if (!userModalInstance && userModalRef.value) userModalInstance = new bootstrap.Modal(userModalRef.value)
+    userModalInstance?.show()
+  })
+}
+const deleteUser = async (id) => {
+  if (!confirm('Delete this user?')) return
+  try { await api.delete(`/users.php?id=${id}`); toast.success('User deleted'); await loadAllData() } catch (e) {
+    console.error('Error deleting user:', e)
+    toast.error('Delete failed')
   }
 }
 
-// ==================== CRUD ====================
-const addBook = async () => { await api.post('/books.php', newBook.value); loadAllData() }
-const startEditBook = (book) => { newBook.value = { ...book }; editingBook.value = true }
-const saveBookEdit = async () => { await api.post('/books.php', newBook.value); editingBook.value = false; loadAllData() }
-const deleteBook = async (id) => { if (confirm('Delete book?')) { await api.delete(`/books.php?id=${id}`); loadAllData() } }
-
-const addRoom = async () => { await api.post('/rooms.php', newRoom.value); loadAllData() }
-const startEditRoom = (room) => { newRoom.value = { ...room }; editingRoom.value = true }
-const saveRoomEdit = async () => { await api.post('/rooms.php', newRoom.value); editingRoom.value = false; loadAllData() }
-const deleteRoom = async (id) => { if (confirm('Delete room?')) { await api.delete(`/rooms.php?id=${id}`); loadAllData() } }
-
-const addEvent = async () => { await api.post('/events.php', newEvent.value); loadAllData() }
-const startEditEvent = (event) => { newEvent.value = { ...event }; editingEvent.value = true }
-const saveEventEdit = async () => { await api.post('/events.php', newEvent.value); editingEvent.value = false; loadAllData() }
-const deleteEvent = async (id) => { if (confirm('Delete event?')) { await api.delete(`/events.php?id=${id}`); loadAllData() } }
-
-const loadUsers = async () => { try { const res = await api.get('/users.php'); users.value = res.data || [] } catch(error) { console.error(error) } }
-const viewUser = (u) => { selectedUser.value = u; showUserModal.value = true }
-const closeUserModal = () => { showUserModal.value = false }
-const deleteUser = async (id) => { if (confirm('Delete user?')) { await api.delete(`/users.php?id=${id}`); loadUsers() } }
-
-// Helpers
-const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-MY') : '-'
-const formatDateTime = (d) => d ? new Date(d).toLocaleString('en-MY') : '-'
-const getBookingStatusClass = (s) => s === 'Overdue' ? 'badge bg-danger' : 'badge bg-success'
-
-const canMarkRoomAvailable = (b) => {
-  return b.status === 'Active' || !b.status || b.status === 'Pending'
-}
-
-onMounted(() => {
-  loadAllData()
-  loadUsers()
-  loadAnnouncements()
-  fetchBookings()
+// ==================== INIT ====================
+onMounted(async () => {
+  await loadAllData()
+  await fetchBookings()
 })
 </script>
 
 <style scoped>
-/* ==================== TAB STYLING ==================== */
-.elegant-admin-tabs .nav-link {
-  color: #2C2C2C;
-  font-weight: 600;
-  padding: 10px 24px;
-  border-radius: 50px;
-  margin-right: 8px;
-  border: 2px solid #E8B4B8;
-  background: white;
-  transition: all 0.3s ease;
-}
-
-.elegant-admin-tabs .nav-link.active {
-  background-color: #E8B4B8 !important;
-  color: #2C2C2C !important;
-  border-color: #E8B4B8 !important;
-  box-shadow: 0 4px 15px rgba(232, 180, 184, 0.4);
-  font-weight: 700;
-}
-
-/* ==================== CARDS ==================== */
-.elegant-card {
-  border: none;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-}
-
-.elegant-card-header {
-  background: linear-gradient(#2C2C2C, #1F1F1F);
-  color: #F8F4F0;
-  padding: 16px 20px;
-  font-weight: 600;
-}
-
-/* ==================== ACTION BUTTONS ==================== */
-.action-btn {
-  border-radius: 8px;
-  padding: 6px 14px;
-  font-weight: 600;
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
-  border: none;
-}
-
-.edit-btn {
-  background-color: #FFF3CD;
-  color: #856404;
-}
-.edit-btn:hover {
-  background-color: #ffe69c;
-  color: #664d03;
-}
-
-.delete-btn {
-  background-color: #F8D7DA;
-  color: #842029;
-}
-.delete-btn:hover {
-  background-color: #f5c2c7;
-  color: #58151c;
-}
-
-/* ==================== CONSISTENT BADGE STYLING ==================== */
-.badge {
-  font-weight: 600;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-}
-
-/* Status badges in Bookings */
-.badge.bg-success {
-  background-color: #D1E7DD !important;
-  color: #0f5132 !important;
-}
-
-.badge.bg-danger {
-  background-color: #F8D7DA !important;
-  color: #842029 !important;
-}
-
-/* Type / Role / Capacity badges - consistent soft pink */
-.badge.bg-pink {
-  background-color: #E8B4B8 !important;
-  color: #2C2C2C !important;
-}
-
-/* Capacity in Rooms */
-.badge.bg-secondary {
-  background-color: #E8B4B8 !important;
-  color: #2C2C2C !important;
-}
+/* Same elegant styles as before */
+.elegant-admin-tabs .nav-link { color: #2C2C2C; font-weight: 600; padding: 10px 20px; border-radius: 50px; margin-right: 8px; border: 2px solid #E8B4B8; background: white; transition: all 0.3s ease; }
+.elegant-admin-tabs .nav-link.active { background-color: #E8B4B8 !important; color: #2C2C2C !important; border-color: #E8B4B8 !important; box-shadow: 0 4px 15px rgba(232, 180, 184, 0.4); }
+.elegant-card { border: none; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
+.stat-card { background: white; border-radius: 16px; padding: 16px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 16px; }
+.stat-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: white; }
+.bg-pink { background-color: #E8B4B8; } .bg-purple { background-color: #9B7EBD; }
+.stat-value { font-size: 1.8rem; font-weight: 700; color: #2C2C2C; line-height: 1; }
+.stat-label { font-size: 0.875rem; color: #666; margin-top: 4px; }
+.btn-pink { background-color: #E8B4B8; border-color: #E8B4B8; color: #2C2C2C; font-weight: 600; }
+.btn-pink:hover { background-color: #d89ca0; border-color: #d89ca0; color: #2C2C2C; }
+.table th { background-color: #fafafa; font-weight: 600; color: #555; }
 </style>
