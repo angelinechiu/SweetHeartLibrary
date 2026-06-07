@@ -841,43 +841,51 @@ const deleteAnnouncement = async (id) => {
 }
 
 // ==================== BOOKINGS ACTIONS ====================
-const markBookReturned = async (booking) => {
-  if (!confirm(`Mark "${booking.book_title}" as returned?`)) return
+const markBookReturned = async (borrowing) => {
+  if (!confirm(`Mark "${borrowing.book_title}" as returned?`)) return
+
   try {
-    await api.post('/bookings.php?action=mark_returned', { booking_id: booking.id })
-    toast.success('Book marked as returned!')
-    await loadAllData()
+    await api.post('/bookings.php', {
+      action: 'mark_returned',
+      borrowing_id: borrowing.id
+    })
+
+    toast.success('Book marked as returned successfully!')
+    await loadAllData() // Refresh data
   } catch (error) {
-    console.error('Error marking book as returned:', error)
-    toast.error('Failed')
+    console.error(error)
+    toast.error('Failed to mark book as returned')
   }
 }
 
-const sendReminder = async (booking) => {
-  if (!confirm(`Send reminder for "${booking.book_title}"?`)) return
+const sendReminder = async (borrowing) => {
   try {
-    await api.post('/announcements.php', {
-      title: 'Overdue Book Reminder',
-      message: `You have an overdue book: "${booking.book_title}". Please return it soon.`,
-      type: 'Reminder'
+    await api.post('/bookings.php', {
+      action: 'send_reminder',
+      borrowing_id: borrowing.id
     })
-    toast.success('Reminder sent!')
-    await loadAllData()
+
+    toast.success('Reminder sent successfully!')
   } catch (error) {
-    console.error('Error sending reminder:', error)
+    console.error(error)
     toast.error('Failed to send reminder')
   }
 }
 
 const markRoomAvailable = async (booking) => {
-  if (!confirm('Mark this room booking as completed?')) return
+  if (!confirm(`Mark room booking as completed?`)) return
+
   try {
-    await api.post('/bookings.php?action=mark_room_available', { booking_id: booking.id })
-    toast.success('Room marked as completed!')
-    await loadAllData()
+    await api.post('/bookings.php', {
+      action: 'mark_room_completed',
+      booking_id: booking.id
+    })
+
+    toast.success('Room booking marked as completed!')
+    await loadAllData() // Refresh data
   } catch (error) {
-    console.error('Error marking room as available:', error)
-    toast.error('Failed')
+    console.error(error)
+    toast.error('Failed to update room booking')
   }
 }
 

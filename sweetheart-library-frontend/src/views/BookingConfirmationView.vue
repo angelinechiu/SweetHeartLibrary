@@ -78,11 +78,12 @@
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../services/api.js'
-import { useAuthStore } from '../stores/auth'   // ← Added
+import { useAuthStore } from '../stores/auth'
+import { toast } from 'vue3-toastify'
 
 const route = useRoute()
 const router = useRouter()
-const authStore = useAuthStore()                 // ← Added
+const authStore = useAuthStore()
 const isSubmitting = ref(false)
 
 // Detect booking type
@@ -114,10 +115,10 @@ const confirmBooking = async () => {
       await api.post('/books.php', {
         action: 'borrow_book',
         book_id: bookId,
-        user_id: authStore.user?.id          // ← Now using authStore
+        user_id: authStore.user?.id
       })
 
-      alert('Book borrowed successfully!')
+      toast.success('Book borrowed successfully!', { autoClose: 2500 })
       router.push('/my-bookings')
 
     } else {
@@ -130,13 +131,13 @@ const confirmBooking = async () => {
         end_time: `${date} ${endTime}:00`
       })
 
-      alert('Room booking confirmed successfully!')
+      toast.success('Room booking confirmed successfully!', { autoClose: 2500 })
       router.push('/my-bookings')
     }
 
   } catch (error) {
     console.error(error)
-    alert('Failed to confirm booking. Please try again.')
+    toast.error('Failed to confirm booking. Please try again.', { autoClose: 3000 })
   } finally {
     isSubmitting.value = false
   }

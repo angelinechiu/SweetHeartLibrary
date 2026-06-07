@@ -156,9 +156,10 @@ import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import api from '../services/api.js'
-
+import {toast} from 'vue3-toastify'
+import { useRoute } from 'vue-router'
 const authStore = useAuthStore()
-
+const route = useRoute()
 const loading = ref(true)
 const userName = computed(() => authStore.user?.name || 'Reader')
 
@@ -264,8 +265,15 @@ const loadDashboardData = async () => {
   }
 }
 
-onMounted(() => {
-  loadDashboardData()
+onMounted(async () => {
+  await loadDashboardData()
+
+  // Show success message if user just completed a booking
+  if (route.query.success === 'true') {
+    toast.success('Your booking has been confirmed!', { autoClose: 3000 })
+    // Clean URL
+    window.history.replaceState({}, document.title, window.location.pathname)
+  }
 })
 </script>
 

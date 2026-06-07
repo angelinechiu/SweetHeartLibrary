@@ -143,6 +143,7 @@
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import api from '../services/api'
+import { toast } from 'vue3-toastify'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 
 const authStore = useAuthStore()
@@ -198,25 +199,32 @@ const loadProfileData = async () => {
 
 const updateProfile = async () => {
   loadingUpdate.value = true
+
   try {
-    const response = await api.post('/users.php?action=update_profile', {
-      user_id: authStore.user.id,
+    const userId = getUserId()
+
+    await api.post('/users.php', {
+      action: 'update_profile',
+      user_id: userId,
       name: form.value.name,
       email: form.value.email
     })
 
-    if (response.data.success) {
+    // Update local user data
+    user.value.name = form.value.name
+    user.value.email = form.value.email
+
+    // Update Pinia store if needed
+    if (authStore.user) {
       authStore.user.name = form.value.name
       authStore.user.email = form.value.email
-      localStorage.setItem('user', JSON.stringify(authStore.user))
-      user.value = { ...authStore.user }
-      alert('Profile updated successfully!')
-    } else {
-      alert(response.data.message || 'Failed to update profile')
     }
+
+    toast.success('Profile updated successfully!')
+
   } catch (error) {
     console.error('Profile update failed:', error)
-    alert('Something went wrong while updating profile')
+    toast.error('Failed to update profile. Please try again.')
   } finally {
     loadingUpdate.value = false
   }

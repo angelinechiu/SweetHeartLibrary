@@ -128,13 +128,18 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '../stores/auth'
+import { useRoute } from 'vue-router'
 import api from '../services/api.js'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
+import { toast } from 'vue3-toastify'
 
 const authStore = useAuthStore()
+const route = useRoute()
+
 const allData = ref({ borrowed_books: [], room_bookings: [] })
 const loading = ref(true)
 
+// ==================== EXISTING COMPUTED PROPERTIES ====================
 const activeRoomBookings = computed(() => {
   if (!allData.value.room_bookings) return []
   return allData.value.room_bookings.filter(room => {
@@ -151,6 +156,7 @@ const activeBorrowedBooks = computed(() => {
   })
 })
 
+// ==================== EXISTING HELPER FUNCTIONS ====================
 const formatDate = (dateStr) => {
   if (!dateStr) return 'N/A'
   return new Date(dateStr).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -158,7 +164,7 @@ const formatDate = (dateStr) => {
 
 const formatTime = (room) => {
   if (!room.start_time || !room.end_time) return ''
-  return `${new Date(room.start_time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} - ${new Date(room.end_time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`
+  return `${new Date(room.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(room.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
 }
 
 const getStatusClass = (status) => {
@@ -190,6 +196,44 @@ const canRenew = (book) => {
   return isOverdue(book) || book.status === 'Overdue'
 }
 
+// ==================== IMPROVED DATA LOADING ====================
+const loadMyBookings = async () => {
+  try {
+    loading.value = true
+
+    // 1. Try main endpoint first
+    const mainRes = await api.get(`/bookings.php?action=get&user_id=${authStore.user.id}`)
+    let borrowed = mainRes.data?.borrowed_books || []
+    let rooms = mainRes.data?.room_bookings || []
+
+    // 2. If no borrowed books found, fallback to books.php
+    if (borrowed.length === 0) {
+      try {
+        const bookRes = await api.get(`/books.php?action=my_borrowed_books&user_id=${authStore.user.id}`)
+        borrowed = bookRes.data || []
+      } catch (e) {
+        console.error('Fallback borrowed books endpoint not available', e)
+        console.log('Fallback books endpoint not available')
+      }
+    }
+
+    allData.value = {
+      borrowed_books: borrowed,
+      room_bookings: rooms
+    }
+
+    console.log('Loaded borrowed books:', borrowed) // For debugging
+
+  } catch (error) {
+    console.error('Failed to load bookings:', error)
+    toast.error('Failed to load your bookings')
+  } finally {
+    loading.value = false
+  }
+}
+// ==================== EXISTING ACTIONS (Keep these) ====================
+
+
 const cancelRoom = async (room) => {
   if (!confirm(`Cancel "${room.room_name || room.purpose}"?`)) return
   try {
@@ -213,20 +257,15 @@ const renewBook = async (book) => {
     alert('Failed to renew')
   }
 }
+// ==================== NEW IMPROVEMENTS ====================
+onMounted(async () => {
+  await loadMyBookings()
 
-const loadMyBookings = async () => {
-  if (!authStore.user?.id) return
-  loading.value = true
-  try {
-    const res = await api.get(`/bookings.php?action=get&user_id=${authStore.user.id}`)
-    allData.value = res.data || { borrowed_books: [], room_bookings: [] }
-  } catch (error) {
-    console.error(error)
-    allData.value = { borrowed_books: [], room_bookings: [] }
-  } finally {
-    loading.value = false
+  // Show success toast if user just made a booking
+  if (route.query.success === 'true') {
+    toast.success('Booking confirmed successfully!', { autoClose: 3000 })
+    // Clean the URL
+    window.history.replaceState({}, document.title, window.location.pathname)
   }
-}
-
-onMounted(loadMyBookings)
+})
 </script>

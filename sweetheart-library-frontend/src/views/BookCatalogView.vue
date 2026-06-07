@@ -124,12 +124,15 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 import api from '../services/api.js'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 
 const router = useRouter()
+const authStore = useAuthStore()
 
 const books = ref([])
+const borrowedBookIds = ref(new Set())   // ← NEW: track books user already borrowed
 const loading = ref(true)
 const searchQuery = ref('')
 const selectedCategory = ref('')
@@ -151,19 +154,39 @@ const fetchBooks = async () => {
   } catch (error) {
     console.error('Failed to fetch books:', error)
     books.value = []
-  } finally {
-    loading.value = false
+  }
+}
+
+// NEW: Fetch user's active borrowed books
+const fetchUserBorrowedBooks = async () => {
+  if (!authStore.user?.id) return
+  try {
+    const res = await api.get(`/bookings.php?action=get&user_id=${authStore.user.id}`)
+    const borrowed = res.data?.borrowed_books || []
+    // Store IDs of books that are currently borrowed (not returned)
+    borrowedBookIds.value = new Set(
+      borrowed
+        .filter(b => ['borrowed', 'overdue'].includes((b.status || '').toLowerCase()))
+        .map(b => b.book_id || b.id)   // adjust if your backend uses different field
+    )
+  } catch (error) {
+    console.error('Failed to fetch user borrows:', error)
   }
 }
 
 const filteredBooks = computed(() => {
-  return books.value.filter(book => {
-    const matchesSearch =
-      book.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchQuery.value.toLowerCase())
-    const matchesCategory = !selectedCategory.value || book.category === selectedCategory.value
-    return matchesSearch && matchesCategory
-  })
+  return books.value
+    .filter(book => {
+      // NEW: Hide books the user has already borrowed
+      if (borrowedBookIds.value.has(book.id)) {
+        return false
+      }
+      const matchesSearch =
+        book.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+        book.author.toLowerCase().includes(searchQuery.value.toLowerCase())
+      const matchesCategory = !selectedCategory.value || book.category === selectedCategory.value
+      return matchesSearch && matchesCategory
+    })
 })
 
 const paginatedBooks = computed(() => {
@@ -192,15 +215,11 @@ const closeModal = () => {
 
 // Go to Confirmation Page
 const proceedToConfirmation = () => {
-  if (!agreedToTerms.value || !selectedBook.value) {
-    return
-  }
+  if (!agreedToTerms.value || !selectedBook.value) return
 
-  // Close modal
   showTermsModal.value = false
   agreedToTerms.value = false
 
-  // Navigate to Confirmation Page
   router.push({
     name: 'BookingConfirmation',
     query: {
@@ -211,8 +230,9 @@ const proceedToConfirmation = () => {
   })
 }
 
-onMounted(() => {
-  fetchBooks()
+onMounted(async () => {
+  await Promise.all([fetchBooks(), fetchUserBorrowedBooks()])
+  loading.value = false
 })
 </script>
 
