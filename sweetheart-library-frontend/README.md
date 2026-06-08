@@ -235,7 +235,7 @@ You need to import in this order:
 |--------|---------------------------|---------------|-----------------------------------|
 | Admin  | `admin@example.com`       | `password`    | Register normally                 |
 | User   | `angeline@example.com`    | `password`    | Register normally                 |
-| Sample | `angeline@example.com`    | `password`  ' | Register normally                 |
+| Sample | `angeline@example.com`    | `password`    | Register normally                 |
 
 > **Security Note:** All passwords are hashed using PHP's `password_hash()`. Never store plain text passwords.
 
