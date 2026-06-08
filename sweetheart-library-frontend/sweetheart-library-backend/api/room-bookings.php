@@ -40,7 +40,7 @@ if ($method === 'GET') {
             $stmt->execute([$user_id]);
             $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Format for frontend (no location)
+            
             foreach ($bookings as &$b) {
                 if (!empty($b['start_time']) && !empty($b['end_time'])) {
                     $b['date'] = date('M j, Y', strtotime($b['start_time']));

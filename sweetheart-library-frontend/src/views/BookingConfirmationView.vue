@@ -6,7 +6,7 @@
       <h2 class="fw-bold mt-4" style="color: #2C2C2C;">Booking Confirmation</h2>
       <p class="text-muted">Please review your booking details before confirming.</p>
 
-      <!-- Book Borrowing Summary -->
+      
       <div v-if="isBookBorrow" class="card border-0 shadow-sm mx-auto mt-4" style="max-width: 520px;">
         <div class="card-body text-start p-4">
           <h6 class="fw-bold mb-3">Book Borrowing Summary</h6>
@@ -32,7 +32,7 @@
         </div>
       </div>
 
-      <!-- Room Booking Summary -->
+      
       <div v-else class="card border-0 shadow-sm mx-auto mt-4" style="max-width: 520px;">
         <div class="card-body text-start p-4">
           <h6 class="fw-bold mb-3">Room Booking Summary</h6>
@@ -58,7 +58,7 @@
         </div>
       </div>
 
-      <!-- Confirm Button -->
+      
       <div class="mt-4">
         <button
           class="btn btn-pink px-5 py-2"
@@ -85,21 +85,21 @@ const router = useRouter()
 const authStore = useAuthStore()
 const isSubmitting = ref(false)
 
-// Detect booking type
+
 const isBookBorrow = computed(() => route.query.type === 'book')
 
-// Book data
+
 const bookId = route.query.bookId
 const bookTitle = route.query.bookTitle || ''
 
-// Calculate due date (14 days)
+
 const dueDate = computed(() => {
   const date = new Date()
   date.setDate(date.getDate() + 14)
   return date.toISOString().split('T')[0]
 })
 
-// Room data
+
 const roomName = route.query.roomName || 'Study Room'
 const date = route.query.date || ''
 const startTime = route.query.startTime || ''
@@ -110,9 +110,9 @@ const confirmBooking = async () => {
 
   try {
     if (isBookBorrow.value) {
-      // === BOOK BORROWING ===
+      
 
-      // Debug logs (you can remove later)
+      
       console.log('bookId from query:', bookId)
       console.log('Current user from store:', authStore.user)
 
@@ -141,7 +141,7 @@ const confirmBooking = async () => {
       }
 
     } else {
-      // Room booking stays the same...
+      
       await api.post('/bookings.php', {
         action: 'create_room_booking',
         user_id: authStore.user?.id,

@@ -4,7 +4,7 @@
       <div class="row justify-content-center">
         <div class="col-lg-10 col-xl-9">
 
-          <!-- Header -->
+          
           <div class="text-center mb-5">
             <h1 class="fw-bold mb-2" style="color: #2C2C2C;">My Profile</h1>
             <p class="text-muted">Manage your account and view your library activity</p>
@@ -14,11 +14,11 @@
 
           <div v-if="!loading">
 
-            <!-- Profile Overview -->
+            
             <div class="card border-0 shadow-sm mb-4" style="background-color: #D9CFC2; border-radius: 20px;">
               <div class="card-body p-4">
                 <div class="row align-items-center">
-                  <!-- Avatar -->
+                  
                   <div class="col-md-3 text-center mb-3 mb-md-0">
                     <div class="mx-auto" style="width: 120px; height: 120px;">
                       <div class="rounded-circle overflow-hidden border border-4 border-white shadow"
@@ -31,7 +31,7 @@
                     </div>
                   </div>
 
-                  <!-- User Info -->
+                  
                   <div class="col-md-9">
                     <h3 class="fw-bold mb-1" style="color: #2C2C2C;">{{ user.name }}</h3>
                     <p class="text-muted mb-2">{{ user.email }}</p>
@@ -43,10 +43,10 @@
               </div>
             </div>
 
-            <!-- Statistics Section (Only show for normal users) -->
+            
             <div v-if="user.role !== 'admin'" class="row g-4 mb-4">
 
-              <!-- Borrowing Statistics -->
+              
               <div class="col-md-6">
                 <div class="card border-0 shadow-sm h-100" style="background-color: #fff; border-radius: 20px;">
                   <div class="card-body p-4">
@@ -77,7 +77,7 @@
                 </div>
               </div>
 
-              <!-- Room Booking Statistics -->
+              
               <div class="col-md-6">
                 <div class="card border-0 shadow-sm h-100" style="background-color: #fff; border-radius: 20px;">
                   <div class="card-body p-4">
@@ -110,7 +110,7 @@
 
             </div>
 
-            <!-- Personal Information -->
+            
             <div class="card border-0 shadow-sm" style="background-color: #fff; border-radius: 20px;">
               <div class="card-body p-4">
                 <h5 class="fw-semibold mb-4" style="color: #2C2C2C;">Personal Information</h5>
@@ -210,11 +210,11 @@ const updateProfile = async () => {
       email: form.value.email
     })
 
-    // Update local user data
+    
     user.value.name = form.value.name
     user.value.email = form.value.email
 
-    // Update Pinia store if needed
+    
     if (authStore.user) {
       authStore.user.name = form.value.name
       authStore.user.email = form.value.email

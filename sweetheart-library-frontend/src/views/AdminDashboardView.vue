@@ -1,6 +1,6 @@
 <template>
   <div class="admin-dashboard p-4">
-    <!-- Header -->
+    
     <div class="d-flex justify-content-between align-items-center mb-4">
       <div>
         <h1 class="fw-bold">Admin Dashboard</h1>
@@ -9,7 +9,7 @@
       <span class="badge px-4 py-2" style="background-color: #E8B4B8; color: #2C2C2C;">ADMIN</span>
     </div>
 
-    <!-- Tabs -->
+    
     <ul class="nav nav-pills elegant-tabs mb-4">
       <li class="nav-item" v-for="tab in tabs" :key="tab.key">
         <button class="nav-link" :class="{ active: activeTab === tab.key }" @click="activeTab = tab.key">
@@ -18,14 +18,14 @@
       </li>
     </ul>
 
-    <!-- ==================== BOOKS TAB ==================== -->
+    
     <div v-if="activeTab === 'books'">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h4>Books Management</h4>
         <button class="btn btn-pink" @click="openBookModal()">+ Add New Book</button>
       </div>
 
-      <!-- Search -->
+      
       <div class="mb-3">
         <input v-model="bookSearch" type="text" class="form-control" placeholder="Search books by title, author, or ISBN...">
       </div>
@@ -52,8 +52,8 @@
                 <td>{{ book.author }}</td>
                 <td><code>{{ book.isbn }}</code></td>
                 <td>{{ book.category }}</td>
-                <td>{{ book.year }}</td>                    <!-- Fixed -->
-                <td>{{ book.available_copies }} / {{ book.total_copies }}</td> <!-- Fixed -->
+                <td>{{ book.year }}</td>                    
+                <td>{{ book.available_copies }} / {{ book.total_copies }}</td> 
                 <td>
                   <span class="badge" :class="book.is_featured ? 'bg-success' : 'bg-secondary'">
                     {{ book.is_featured ? 'Yes' : 'No' }}
@@ -75,7 +75,7 @@
       </div>
     </div>
 
-    <!-- ==================== ROOMS TAB ==================== -->
+    
     <div v-if="activeTab === 'rooms'">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h4>Rooms Management</h4>
@@ -117,7 +117,7 @@
       </div>
     </div>
 
-    <!-- ==================== EVENTS TAB ==================== -->
+    
     <div v-if="activeTab === 'events'">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h4>Events Management</h4>
@@ -157,7 +157,7 @@
       </div>
     </div>
 
-    <!-- ==================== BOOKINGS TAB ==================== -->
+    
     <div v-if="activeTab === 'bookings'">
       <h4 class="mb-3">Bookings Management</h4>
 
@@ -174,7 +174,7 @@
         </li>
       </ul>
 
-      <!-- Borrowed Books -->
+      
       <div v-if="bookingSubTab === 'books'">
         <div class="mb-3">
           <input v-model="borrowedSearch" type="text" class="form-control" placeholder="Search borrowed books...">
@@ -214,7 +214,7 @@
         </div>
       </div>
 
-      <!-- Room Bookings -->
+      
       <div v-if="bookingSubTab === 'rooms'">
         <div class="mb-3">
           <input v-model="roomBookingSearch" type="text" class="form-control" placeholder="Search room bookings...">
@@ -250,7 +250,7 @@
       </div>
     </div>
 
-    <!-- ==================== USERS TAB ==================== -->
+    
     <div v-if="activeTab === 'users'">
       <h4 class="mb-3">Users Management</h4>
       <div class="mb-3">
@@ -286,7 +286,7 @@
       </div>
     </div>
 
-    <!-- ==================== ANNOUNCEMENTS TAB ==================== -->
+    
     <div v-if="activeTab === 'announcements'">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h4>Announcements</h4>
@@ -328,9 +328,9 @@
       </div>
     </div>
 
-    <!-- ==================== MODALS ==================== -->
+    
 
-    <!-- Book Modal -->
+    
     <div class="modal fade" id="bookModal" tabindex="-1" ref="bookModalRef">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -345,19 +345,19 @@
               <div class="col-md-6"><label>ISBN</label><input v-model="currentBook.isbn" class="form-control"></div>
               <div class="col-md-6"><label>Category</label><input v-model="currentBook.category" class="form-control"></div>
 
-              <!-- Fixed: year -->
+              
               <div class="col-md-4">
                 <label>Year</label>
                 <input v-model.number="currentBook.year" type="number" class="form-control">
               </div>
 
-              <!-- Fixed: available_copies -->
+              
               <div class="col-md-4">
                 <label>Available Copies</label>
                 <input v-model.number="currentBook.available_copies" type="number" class="form-control">
               </div>
 
-              <!-- Fixed: total_copies -->
+              
               <div class="col-md-4">
                 <label>Total Copies</label>
                 <input v-model.number="currentBook.total_copies" type="number" class="form-control">
@@ -387,7 +387,7 @@
       </div>
     </div>
 
-    <!-- Room Modal -->
+    
     <div class="modal fade" id="roomModal" tabindex="-1" ref="roomModalRef">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -409,7 +409,7 @@
       </div>
     </div>
 
-    <!-- Event Modal -->
+    
     <div class="modal fade" id="eventModal" tabindex="-1" ref="eventModalRef">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -433,7 +433,7 @@
       </div>
     </div>
 
-    <!-- User View Modal -->
+    
     <div class="modal fade" id="userModal" tabindex="-1" ref="userModalRef">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -453,7 +453,7 @@
       </div>
     </div>
 
-    <!-- Announcement Modal -->
+    
     <div class="modal fade" id="announcementModal" tabindex="-1" ref="announcementModalRef">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -507,7 +507,7 @@ const announcements = ref([])
 const activeBorrowings = ref([])
 const roomBookings = ref([])
 
-// Search states
+
 const bookSearch = ref('')
 const roomSearch = ref('')
 const eventSearch = ref('')
@@ -518,7 +518,7 @@ const roomBookingSearch = ref('')
 
 const bookingSubTab = ref('books')
 
-// Modal states
+
 const editingBook = ref(false)
 const currentBook = ref({})
 const bookModalRef = ref(null)
@@ -543,7 +543,7 @@ const currentAnnouncement = ref({})
 const announcementModalRef = ref(null)
 let announcementModalInstance = null
 
-// Computed filtered lists
+
 const filteredBooks = computed(() => {
   if (!bookSearch.value) return books.value
   const q = bookSearch.value.toLowerCase()
@@ -564,7 +564,7 @@ const getTypeBadgeClass = (type) => {
 const getRoleBadgeClass = (role) => {
   if (role === 'admin') return 'bg-danger text-white'
   if (role === 'staff') return 'bg-warning text-dark'
-  return 'bg-pink text-dark'   // default for normal users
+  return 'bg-pink text-dark'   
 }
 
 const filteredRooms = computed(() => roomSearch.value
@@ -595,7 +595,7 @@ const filteredRoomBookings = computed(() => roomBookingSearch.value
       (rb.user_name || '').toLowerCase().includes(roomBookingSearch.value.toLowerCase()))
   : roomBookings.value)
 
-// Load all data
+
 const loadAllData = async () => {
   try {
     const [b, r, e, u, a, bookingsRes] = await Promise.all([
@@ -639,7 +639,7 @@ const loadAllData = async () => {
         }
       }
 
-// ==================== BOOK ====================
+
 const openBookModal = (book = null) => {
   if (book) {
     currentBook.value = {
@@ -708,7 +708,7 @@ const deleteBook = async (id) => {
   }
 }
 
-// ==================== ROOM ====================
+
 const openRoomModal = (room = null) => {
   if (room) {
     currentRoom.value = {
@@ -765,7 +765,7 @@ const deleteRoom = async (id) => {
   }
 }
 
-// ==================== EVENT ====================
+
 const openEventModal = (eventItem = null) => {
   if (eventItem) {
     currentEvent.value = { ...eventItem }
@@ -815,7 +815,7 @@ const viewUser = (user) => {
   })
 }
 
-// ==================== ANNOUNCEMENT ====================
+
 const openAnnouncementModal = (ann = null) => {
   if (ann) {
     currentAnnouncement.value = { ...ann }
@@ -856,7 +856,7 @@ const deleteAnnouncement = async (id) => {
   }
 }
 
-// ==================== BOOKINGS ACTIONS ====================
+
 const markBookReturned = async (borrowing) => {
   if (!confirm(`Mark "${borrowing.book_title}" as returned?`)) return
 
@@ -867,7 +867,7 @@ const markBookReturned = async (borrowing) => {
     })
 
     toast.success('Book marked as returned successfully!')
-    await loadAllData() // Refresh data
+    await loadAllData() 
   } catch (error) {
     console.error(error)
     toast.error('Failed to mark book as returned')
@@ -883,7 +883,7 @@ const sendPersonalReminder = async (borrowing) => {
       message: reminderMessage,
       type: 'Important',
       is_published: 1,
-      user_id: borrowing.user_id   // ← This makes it personal
+      user_id: borrowing.user_id   
     })
 
     toast.success(`Personal reminder sent to ${borrowing.user_name || 'user'}!`)
@@ -898,25 +898,25 @@ const markRoomAvailable = async (booking) => {
 
   try {
     await api.post('/bookings.php', {
-      action: 'mark_room_available',   // ← Fixed action name
+      action: 'mark_room_available',   
       booking_id: booking.id
     })
 
     toast.success('Room booking marked as completed!')
-    await loadAllData() // refresh the list
+    await loadAllData() 
   } catch (error) {
     console.error(error)
     toast.error('Failed to mark as completed')
   }
 }
 
-// Show "Mark Completed" button for Active rooms
+
 const canMarkAvailable = (b) => {
   const status = (b.status || '').toLowerCase()
-  return status === 'active'   // Only show for Active rooms
+  return status === 'active'   
 }
 
-// ==================== HELPERS ====================
+
 const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-MY') : '-'
 const formatDateTime = (d) => d ? new Date(d).toLocaleString('en-MY') : '-'
 const getStatusClass = (status) => {

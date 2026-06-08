@@ -1,7 +1,7 @@
 <template>
   <div style="background-color: #F8F4F0;" class="py-5">
     <div class="container">
-      <!-- Header -->
+      
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h2 class="fw-bold mb-1" style="color: #2C2C2C;">My Bookings</h2>
@@ -17,7 +17,7 @@
 
       <div v-if="!loading">
 
-        <!-- ACTIVE ROOM BOOKINGS -->
+        
         <div class="mb-5">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="fw-semibold mb-0" style="color: #2C2C2C;">
@@ -62,7 +62,7 @@
           </div>
         </div>
 
-        <!-- ACTIVE BORROWED BOOKS -->
+        
         <div>
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="fw-semibold mb-0" style="color: #2C2C2C;">
@@ -139,7 +139,7 @@ const route = useRoute()
 const allData = ref({ borrowed_books: [], room_bookings: [] })
 const loading = ref(true)
 
-// ==================== EXISTING COMPUTED PROPERTIES ====================
+
 const activeRoomBookings = computed(() => {
   if (!allData.value.room_bookings) return []
   return allData.value.room_bookings.filter(room => {
@@ -156,7 +156,7 @@ const activeBorrowedBooks = computed(() => {
   })
 })
 
-// ==================== EXISTING HELPER FUNCTIONS ====================
+
 const formatDate = (dateStr) => {
   if (!dateStr) return 'N/A'
   return new Date(dateStr).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -197,17 +197,17 @@ const canRenew = (book) => {
   return isOverdue(book) || book.status === 'Overdue'
 }
 
-// ==================== IMPROVED DATA LOADING ====================
+
 const loadMyBookings = async () => {
   try {
     loading.value = true
 
-    // 1. Try main endpoint first
+    
     const mainRes = await api.get(`/bookings.php?action=get&user_id=${authStore.user.id}`)
     let borrowed = mainRes.data?.borrowed_books || []
     let rooms = mainRes.data?.room_bookings || []
 
-    // 2. If no borrowed books found, fallback to books.php
+    
     if (borrowed.length === 0) {
       try {
         const bookRes = await api.get(`/books.php?action=my_borrowed_books&user_id=${authStore.user.id}`)
@@ -223,7 +223,7 @@ const loadMyBookings = async () => {
       room_bookings: rooms
     }
 
-    console.log('Loaded borrowed books:', borrowed) // For debugging
+    console.log('Loaded borrowed books:', borrowed) 
 
   } catch (error) {
     console.error('Failed to load bookings:', error)
@@ -232,7 +232,7 @@ const loadMyBookings = async () => {
     loading.value = false
   }
 }
-// ==================== EXISTING ACTIONS (Keep these) ====================
+
 
 
 const cancelRoom = async (room) => {
@@ -258,14 +258,14 @@ const renewBook = async (book) => {
     alert('Failed to renew')
   }
 }
-// ==================== NEW IMPROVEMENTS ====================
+
 onMounted(async () => {
   await loadMyBookings()
 
-  // Show success toast if user just made a booking
+  
   if (route.query.success === 'true') {
     toast.success('Booking confirmed successfully!', { autoClose: 3000 })
-    // Clean the URL
+    
     window.history.replaceState({}, document.title, window.location.pathname)
   }
 })

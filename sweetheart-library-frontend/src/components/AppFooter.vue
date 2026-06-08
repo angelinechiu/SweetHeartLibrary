@@ -3,7 +3,7 @@
     <div class="container">
       <div class="row gy-4">
 
-        <!-- Library Info -->
+        
         <div class="col-lg-5">
           <div class="d-flex align-items-center mb-3">
             <img src="../assets/images/logo.png" alt="Logo" style="width: 42px; height: 42px; margin-right: 12px;">
@@ -14,7 +14,7 @@
           </p>
         </div>
 
-        <!-- Contact Information -->
+        
         <div class="col-lg-4">
           <h6 class="fw-semibold mb-3" style="color: #E8B4B8;">Contact Us</h6>
           <ul class="list-unstyled small" style="color: #D9CFC2; line-height: 1.8;">
@@ -24,7 +24,7 @@
           </ul>
         </div>
 
-        <!-- Opening Hours + Feedback -->
+        
         <div class="col-lg-3">
           <h6 class="fw-semibold mb-3" style="color: #E8B4B8;">Opening Hours</h6>
           <p class="small mb-1" style="color: #D9CFC2;">

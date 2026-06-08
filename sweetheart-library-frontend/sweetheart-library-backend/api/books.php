@@ -23,7 +23,7 @@ try {
 
     if ($method === 'POST') {
         if (!empty($input['id'])) {
-            // UPDATE
+            
             $stmt = $pdo->prepare("
                 UPDATE books SET 
                     title = ?, 
@@ -51,7 +51,7 @@ try {
             ]);
             echo json_encode(['success' => true, 'message' => 'Book updated successfully']);
         } else {
-            // CREATE
+            
             $stmt = $pdo->prepare("
                 INSERT INTO books 
                 (title, author, isbn, category, year, available_copies, total_copies, is_featured, is_popular) 

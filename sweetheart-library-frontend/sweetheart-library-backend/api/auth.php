@@ -1,5 +1,5 @@
 <?php
-// ==================== CORS HEADERS ====================
+
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
@@ -10,7 +10,7 @@ $data = json_decode(file_get_contents("php://input"), true);
 $action = $_GET['action'] ?? '';
 $method = $_SERVER['REQUEST_METHOD'];
 
-// ==================== LOGIN ====================
+
 if ($action === 'login' && $method === 'POST') {
     $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
     $stmt->execute([$data['email']]);
@@ -32,11 +32,11 @@ if ($action === 'login' && $method === 'POST') {
     }
 }
 
-// ==================== REGISTER ====================
+
 if ($action === 'register' && $method === 'POST') {
     $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
 
-    // student_id removed
+    
     $stmt = $pdo->prepare("INSERT INTO users (name, email, password, role) 
                            VALUES (?, ?, ?, 'user')");
     
@@ -52,11 +52,11 @@ if ($action === 'register' && $method === 'POST') {
             'message' => 'Registration successful'
         ]);
     } else {
-        // Better error handling
+        
         $errorInfo = $stmt->errorInfo();
         $message = 'Registration failed';
 
-        // Detect duplicate email error (MySQL error code 1062)
+        
         if (isset($errorInfo[1]) && $errorInfo[1] == 1062) {
             $message = 'This email is already registered. Please use another email.';
         }
@@ -68,7 +68,7 @@ if ($action === 'register' && $method === 'POST') {
     }
 }
 
-// ==================== FORGOT PASSWORD (Improved) ====================
+
 if ($action === 'forgot_password' && $method === 'POST') {
     try {
         $email = $data['email'] ?? '';
@@ -78,7 +78,7 @@ if ($action === 'forgot_password' && $method === 'POST') {
             exit;
         }
 
-        // Check if user exists
+        
         $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
         $stmt->execute([$email]);
         $user = $stmt->fetch();
@@ -90,14 +90,14 @@ if ($action === 'forgot_password' && $method === 'POST') {
             $token = bin2hex(random_bytes(32));
             $expires = date('Y-m-d H:i:s', strtotime('+1 hour'));
 
-            // Delete old tokens for this email
+            
             $pdo->prepare("DELETE FROM password_resets WHERE email = ?")->execute([$email]);
 
-            // Insert new reset token
+            
             $pdo->prepare("INSERT INTO password_resets (email, token, expires_at) VALUES (?, ?, ?)")
                 ->execute([$email, $token, $expires]);
 
-            // For development/testing only
+            
             $resetLink = "http://localhost:5173/reset-password?token=" . $token;
 
             $message = 'Reset link generated successfully.';
@@ -110,16 +110,16 @@ if ($action === 'forgot_password' && $method === 'POST') {
         ]);
 
     } catch (Exception $e) {
-        // Catch any database or other errors
+        
         echo json_encode([
             'success' => false,
             'message' => 'An error occurred while processing your request.',
-            'debug' => $e->getMessage()   // Remove this line in production
+            'debug' => $e->getMessage()   
         ]);
     }
 }
 
-// ==================== RESET PASSWORD (Improved) ====================
+
 if ($action === 'reset_password' && $method === 'POST') {
     $token = $data['token'] ?? '';
     $newPassword = $data['password'] ?? '';
@@ -129,7 +129,7 @@ if ($action === 'reset_password' && $method === 'POST') {
         exit;
     }
 
-    // More lenient check: token exists and not older than 24 hours
+    
     $stmt = $pdo->prepare("
         SELECT email FROM password_resets 
         WHERE token = ? 
@@ -141,11 +141,11 @@ if ($action === 'reset_password' && $method === 'POST') {
     if ($reset) {
         $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
 
-        // Update user password
+        
         $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE email = ?");
         $stmt->execute([$hashedPassword, $reset['email']]);
 
-        // Delete used token
+        
         $pdo->prepare("DELETE FROM password_resets WHERE token = ?")->execute([$token]);
 
         echo json_encode(['success' => true, 'message' => 'Password reset successful']);

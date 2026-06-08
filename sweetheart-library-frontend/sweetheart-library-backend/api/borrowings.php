@@ -23,7 +23,7 @@ if ($method === 'GET') {
             exit;
         }
 
-        // FIXED: Join to guarantee book_title
+        
         $stmt = $pdo->prepare("
             SELECT 
                 bb.*,
@@ -48,7 +48,7 @@ if ($method === 'GET') {
             exit;
         }
 
-        // FIXED: Join to guarantee book_title + auto-detect overdue
+        
         $stmt = $pdo->prepare("
             SELECT 
                 bb.*,
@@ -66,7 +66,7 @@ if ($method === 'GET') {
         
         $overdueBooks = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        // Auto-update status to 'Overdue' (unchanged)
+        
         if (!empty($overdueBooks)) {
             $ids = array_column($overdueBooks, 'id');
             $placeholders = implode(',', array_fill(0, count($ids), '?'));

@@ -1,10 +1,5 @@
 <?php
-/**
- * Improved events.php (Safe version)
- * - Kept all original functions
- * - Added better error handling
- * - Did NOT remove or change any existing logic
- */
+
 
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
@@ -30,7 +25,7 @@ try {
 
     if ($method === 'POST') {
         if (!empty($input['id'])) {
-            // UPDATE - Original logic kept
+            
             $stmt = $pdo->prepare("
                 UPDATE events SET 
                     title = ?, 
@@ -48,7 +43,7 @@ try {
             ]);
             echo json_encode(['success' => true, 'message' => 'Event updated successfully']);
         } else {
-            // CREATE - Original logic kept
+            
             $stmt = $pdo->prepare("
                 INSERT INTO events (title, event_date, event_time, description) 
                 VALUES (?, ?, ?, ?)

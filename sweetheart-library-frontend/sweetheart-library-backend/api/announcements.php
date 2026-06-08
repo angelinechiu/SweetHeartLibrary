@@ -15,17 +15,17 @@ $method = $_SERVER['REQUEST_METHOD'];
 $input = json_decode(file_get_contents("php://input"), true) ?? [];
 
 try {
-    // ==================== GET ====================
+    
     if ($method === 'GET') {
         $action = $_GET['action'] ?? 'get_all';
 
         if ($action === 'get_all') {
-            // Admin - Get all announcements
+            
             $stmt = $pdo->query("SELECT * FROM announcements ORDER BY created_at DESC");
             echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         } 
         elseif ($action === 'get_visible') {
-            // Normal users + Personal Reminders
+            
             $userId = $_GET['user_id'] ?? null;
 
             if ($userId) {
@@ -37,7 +37,7 @@ try {
                 ");
                 $stmt->execute([$userId]);
             } else {
-                // Only global announcements if no user_id
+                
                 $stmt = $pdo->query("
                     SELECT * FROM announcements 
                     WHERE user_id IS NULL 
@@ -49,10 +49,10 @@ try {
         exit;
     }
 
-    // ==================== POST (Create / Update) ====================
+    
     if ($method === 'POST') {
 
-        // UPDATE existing announcement
+        
         if (!empty($input['id']) || (isset($input['action']) && $input['action'] === 'update')) {
             if (empty($input['id'])) {
                 http_response_code(400);
@@ -76,13 +76,13 @@ try {
                 $input['type'] ?? 'Notice',
                 $input['due_date'] ?? null,
                 $input['is_published'] ?? 1,
-                $input['user_id'] ?? null,           // Support personal reminder
+                $input['user_id'] ?? null,           
                 $input['id']
             ]);
             echo json_encode(['success' => true, 'message' => 'Announcement updated successfully']);
         } 
         else {
-            // CREATE new announcement (Global or Personal)
+            
             $stmt = $pdo->prepare("
                 INSERT INTO announcements (title, message, type, due_date, is_published, user_id) 
                 VALUES (?, ?, ?, ?, ?, ?)
@@ -93,7 +93,7 @@ try {
                 $input['type'] ?? 'Notice',
                 $input['due_date'] ?? null,
                 $input['is_published'] ?? 1,
-                $input['user_id'] ?? null           // NULL = Global, value = Personal reminder
+                $input['user_id'] ?? null           
             ]);
             echo json_encode([
                 'success' => true, 
@@ -104,7 +104,7 @@ try {
         exit;
     }
 
-    // ==================== DELETE ====================
+    
     if ($method === 'DELETE') {
         $id = $_GET['id'] ?? null;
 

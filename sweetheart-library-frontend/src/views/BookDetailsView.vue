@@ -2,21 +2,21 @@
   <div class="book-detail-page">
     <div class="container py-5">
 
-      <!-- Back Button -->
+      
       <router-link to="/books" class="text-decoration-none text-muted mb-4 d-inline-block">
         ← Back to Books
       </router-link>
 
-      <!-- Loading -->
+      
       <div v-if="loading" class="text-center py-5">
         <div class="spinner-border text-pink" role="status"></div>
         <p class="mt-3 text-muted">Loading book details...</p>
       </div>
 
-      <!-- Book Content -->
+      
       <div v-else-if="book" class="row">
 
-        <!-- Left Side -->
+        
         <div class="col-md-4 mb-4">
           <div class="book-emoji-box w-100">
             <span class="book-emoji">📖</span>
@@ -31,12 +31,12 @@
           </div>
         </div>
 
-        <!-- Right Side -->
+        
         <div class="col-md-8">
           <h1 class="fw-bold mb-2">{{ book.title }}</h1>
           <h4 class="text-muted mb-4">{{ book.author }}</h4>
 
-          <!-- Book Info -->
+          
           <div class="row g-3 mb-4">
             <div class="col-6 col-md-4" v-if="book.isbn">
               <div class="info-box">
@@ -64,7 +64,7 @@
             </div>
           </div>
 
-          <!-- Description -->
+          
           <div class="mb-4">
             <h5 class="fw-bold mb-2">Description</h5>
             <p class="lead text-muted" style="line-height: 1.7;">
@@ -72,10 +72,10 @@
             </p>
           </div>
 
-          <!-- Borrow Button Logic -->
+          
           <div class="d-flex flex-column gap-2 mt-4">
 
-            <!-- Button -->
+            
             <button
               v-if="book.available_copies > 0"
               class="btn btn-pink px-5 py-2"
@@ -92,7 +92,7 @@
               Out of Stock
             </button>
 
-            <!-- Availability Message -->
+            
             <div v-if="book.available_copies > 0" class="text-success small">
               {{ book.available_copies }} / {{ book.total_copies }} copies available
             </div>
@@ -105,13 +105,13 @@
         </div>
       </div>
 
-      <!-- Not Found -->
+      
       <div v-else class="text-center py-5">
         <p class="text-muted">Book not found.</p>
         <router-link to="/books" class="btn btn-pink">Back to Catalog</router-link>
       </div>
 
-      <!-- Recommended Books -->
+      
       <div class="mt-5 pt-4" v-if="recommendedBooks.length > 0">
         <div class="d-flex justify-content-between align-items-center mb-4">
           <h3 class="fw-bold">Books You May Like</h3>
@@ -136,7 +136,7 @@
     </div>
   </div>
 
-  <!-- ==================== TERMS & CONDITIONS MODAL ==================== -->
+  
   <div v-if="showTermsModal" class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content rounded-4 shadow">
@@ -200,7 +200,7 @@ const recommendedBooks = ref([])
 const loading = ref(true)
 const allBooks = ref([])
 
-// Modal states
+
 const showTermsModal = ref(false)
 const agreedToTerms = ref(false)
 
@@ -233,7 +233,7 @@ const goToBook = (id) => {
   router.push(`/books/${id}`)
 }
 
-// Modal functions
+
 const showBorrowModal = () => {
   agreedToTerms.value = false
   showTermsModal.value = true

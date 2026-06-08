@@ -4,7 +4,7 @@
 
     <div class="container-fluid px-4">
 
-      <!-- Logo -->
+      
       <router-link class="navbar-brand fw-bold d-flex align-items-center" to="/">
         <img src="../assets/images/logo.png" alt="Sweetheart Library" class="navbar-logo me-2">
         <span style="color: #F8F4F0; font-size: 1.45rem; letter-spacing: 0.5px; margin-left: 8px;">
@@ -14,7 +14,7 @@
 
       <div class="d-flex align-items-center ms-auto">
 
-        <!-- Collapsible Menu -->
+        
         <div
           ref="navbarCollapseEl"
           class="collapse navbar-collapse d-lg-block justify-content-end"
@@ -33,7 +33,7 @@
           </ul>
         </div>
 
-        <!-- Profile -->
+        
         <div class="dropdown">
           <router-link
             v-if="!authStore.token"
@@ -98,7 +98,7 @@
           </div>
         </div>
 
-        <!-- Hamburger -->
+        
         <button
           class="navbar-toggler border-0 d-lg-none ms-2"
           type="button"
@@ -134,7 +134,7 @@ const navbarCollapseEl = ref(null)
 let handlers = []
 
 onMounted(() => {
-  // Close hamburger when profile dropdown opens
+  
   const closeHamburger = () => {
     if (navbarCollapseEl.value) {
       const collapse = window.bootstrap?.Collapse.getOrCreateInstance(navbarCollapseEl.value)
@@ -142,7 +142,7 @@ onMounted(() => {
     }
   }
 
-  // Close profile dropdown when hamburger opens
+  
   const closeProfile = () => {
     if (profileDropdownEl.value) {
       const dropdown = window.bootstrap?.Dropdown.getOrCreateInstance(profileDropdownEl.value)
@@ -150,7 +150,7 @@ onMounted(() => {
     }
   }
 
-  // Use document-level listeners (more reliable)
+  
   document.addEventListener('show.bs.dropdown', closeHamburger)
   document.addEventListener('show.bs.collapse', closeProfile)
 
@@ -166,7 +166,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* Your existing styles */
+
 .profile-avatar {
   width: 42px;
   height: 42px;

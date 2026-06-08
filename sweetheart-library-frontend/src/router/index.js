@@ -17,7 +17,7 @@ const routes = [
     component: () => import('../views/RegisterView.vue')
   },
 
-  // User Routes
+  
   {
     path: '/dashboard',
     name: 'Dashboard',
@@ -105,7 +105,7 @@ const routes = [
     name: 'ResetPassword',
     component: () => import('../views/ResetPasswordView.vue')
   },
-  // Admin Route
+  
   {
     path: '/admin',
     name: 'AdminDashboard',
@@ -119,7 +119,7 @@ const router = createRouter({
   routes
 })
 
-// Navigation Guard
+
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
   const role = localStorage.getItem('role')

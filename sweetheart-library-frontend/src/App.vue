@@ -1,16 +1,16 @@
 <template>
   <div class="app-wrapper d-flex flex-column min-vh-100">
-    <!-- Elegant Header -->
+    
     <Header />
 
-    <!-- Main Content Area -->
+    
     <main class="main-content flex-grow-1">
       <div class="content-container">
         <router-view />
       </div>
     </main>
 
-    <!-- Elegant Footer -->
+    
     <Footer />
   </div>
 </template>
@@ -21,7 +21,7 @@ import Footer from './components/AppFooter.vue'
 </script>
 
 <style>
-/* ==================== GLOBAL ELEGANT THEME ==================== */
+
 :root {
   --primary: #2C2C2C;
   --accent: #E8B4B8;
@@ -29,7 +29,7 @@ import Footer from './components/AppFooter.vue'
   --beige: #D9CFC2;
 }
 
-/* ==================== APP LAYOUT ==================== */
+
 .app-wrapper {
   background-color: #F8F4F0;
 }
@@ -45,7 +45,7 @@ import Footer from './components/AppFooter.vue'
   padding: 0 15px;
 }
 
-/* ==================== RESPONSIVE ==================== */
+
 @media (max-width: 992px) {
   .main-content {
     padding: 35px 15px 55px;
@@ -61,7 +61,7 @@ import Footer from './components/AppFooter.vue'
   }
 }
 
-/* ==================== YOUR EXISTING BEAUTIFUL STYLES ==================== */
+
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.4s ease;
 }

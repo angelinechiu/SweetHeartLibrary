@@ -1,13 +1,13 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://localhost/sweetheart-library-backend/api',   // ← Points directly to /api folder
+  baseURL: 'http://localhost/sweetheart-library-backend/api',   
   headers: {
     'Content-Type': 'application/json'
   }
 })
 
-// Automatically attach token
+
 api.interceptors.request.use(config => {
   const token = localStorage.getItem('token')
   if (token) {

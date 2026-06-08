@@ -1,7 +1,7 @@
 <template>
   <div style="background-color: #F8F4F0;" class="py-5">
     <div class="container">
-      <!-- Header -->
+      
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h2 class="fw-bold mb-1" style="color: #2C2C2C;">Our Elegant Collection</h2>
@@ -10,7 +10,7 @@
         <span class="text-muted">{{ filteredBooks.length }} books</span>
       </div>
 
-      <!-- Search + Filters -->
+      
       <div class="row g-3 mb-4">
         <div class="col-md-5">
           <input v-model="searchQuery" class="form-control form-control-lg" placeholder="Search by title, author or ISBN...">
@@ -28,12 +28,12 @@
 
       <LoadingSpinner :loading="loading" message="Loading beautiful books..." />
 
-      <!-- Book Cards -->
+      
       <div v-if="!loading" class="row g-3">
         <div v-for="book in paginatedBooks" :key="book.id" class="col-md-6 col-lg-4">
           <div class="card border-0 shadow-sm h-100">
             <div class="card-body d-flex flex-column">
-              <!-- Badges -->
+              
               <div class="d-flex justify-content-between align-items-start mb-2">
                 <span class="badge px-3 py-1" style="background-color: #E8B4B8; color: #2C2C2C;">
                   {{ book.category }}
@@ -51,7 +51,7 @@
                 <div class="text-muted">Copies: <strong>{{ book.available_copies }}</strong></div>
               </div>
 
-              <!-- Buttons -->
+              
               <div class="mt-auto d-flex gap-2">
                 <router-link :to="`/books/${book.id}`" class="btn btn-sm btn-outline-dark flex-fill">
                   View Details
@@ -73,18 +73,18 @@
         </div>
       </div>
 
-      <!-- ==================== PAGINATION ==================== -->
+      
       <div v-if="totalPages > 1" class="d-flex justify-content-center mt-5">
         <nav aria-label="Book pagination">
           <ul class="pagination pagination-lg custom-pagination">
-            <!-- Previous -->
+            
             <li class="page-item" :class="{ disabled: currentPage === 1 }">
               <button class="page-link" @click="prevPage">
                 ← Previous
               </button>
             </li>
 
-            <!-- Page Numbers -->
+            
             <li
               v-for="page in totalPages"
               :key="page"
@@ -96,7 +96,7 @@
               </button>
             </li>
 
-            <!-- Next -->
+            
             <li class="page-item" :class="{ disabled: currentPage === totalPages }">
               <button class="page-link" @click="nextPage">
                 Next →
@@ -112,7 +112,7 @@
     </div>
   </div>
 
-  <!-- ==================== T&C MODAL ==================== -->
+  
   <div v-if="showTermsModal" class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content rounded-4 shadow">
@@ -176,7 +176,7 @@ const selectedCategory = ref('')
 const currentPage = ref(1)
 const pageSize = ref(12)
 
-// Modal states
+
 const showTermsModal = ref(false)
 const agreedToTerms = ref(false)
 const selectedBook = ref(null)
@@ -201,11 +201,11 @@ const fetchUserBorrowedBooks = async () => {
   try {
     const res = await api.get(`/bookings.php?action=get&user_id=${authStore.user.id}`)
     const borrowed = res.data?.borrowed_books || []
-    // Store IDs of books that are currently borrowed (not returned)
+    
     borrowedBookIds.value = new Set(
       borrowed
         .filter(b => ['borrowed', 'overdue'].includes((b.status || '').toLowerCase()))
-        .map(b => b.book_id || b.id)   // adjust if your backend uses different field
+        .map(b => b.book_id || b.id)   
     )
   } catch (error) {
     console.error('Failed to fetch user borrows:', error)
@@ -215,7 +215,7 @@ const fetchUserBorrowedBooks = async () => {
 const filteredBooks = computed(() => {
   return books.value
     .filter(book => {
-      // NEW: Hide books the user has already borrowed
+      
       if (borrowedBookIds.value.has(book.id)) {
         return false
       }
@@ -258,7 +258,7 @@ watch([searchQuery, selectedCategory], () => {
   currentPage.value = 1
 })
 
-// Open T&C Modal
+
 const borrowBook = (book) => {
   selectedBook.value = book
   agreedToTerms.value = false
@@ -305,7 +305,7 @@ onMounted(async () => {
   background-color: #D89CA1;
 }
 
-/* ==================== THEME-MATCHED PAGINATION ==================== */
+
 .custom-pagination .page-link {
   color: #2C2C2C;
   background-color: #fff;
@@ -336,7 +336,7 @@ onMounted(async () => {
   cursor: not-allowed;
 }
 
-/* Make pagination buttons slightly rounded like your theme */
+
 .custom-pagination .page-link {
   border-radius: 30px !important;
   margin: 0 4px;

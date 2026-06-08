@@ -1,6 +1,6 @@
 <template>
   <div class="admin-feedback-page">
-    <!-- Page Header -->
+    
     <div class="page-header mb-4">
       <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
         <div>
@@ -19,7 +19,7 @@
       </div>
     </div>
 
-    <!-- Summary Cards -->
+    
     <div class="row g-4 mb-4">
       <div class="col-md-4">
         <div class="summary-card">
@@ -62,7 +62,7 @@
       </div>
     </div>
 
-    <!-- Feedback Table -->
+    
     <div class="card elegant-card">
       <div class="card-header elegant-card-header">
         <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>All User Feedback</h5>
@@ -127,7 +127,7 @@ const feedbacks = ref([])
 
 const API_URL = 'http://localhost/sweetheart-library-backend/api/feedback.php'
 
-// Fetch all feedback
+
 const fetchFeedbacks = async () => {
   try {
     const res = await axios.get(API_URL)
@@ -138,7 +138,7 @@ const fetchFeedbacks = async () => {
   }
 }
 
-// Computed values
+
 const averageRating = computed(() => {
   if (feedbacks.value.length === 0) return '0.0'
   const total = feedbacks.value.reduce((sum, fb) => sum + parseFloat(fb.rating || 0), 0)

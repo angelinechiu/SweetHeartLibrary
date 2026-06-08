@@ -16,7 +16,7 @@ $data = json_decode(file_get_contents('php://input'), true);
 
 header('Content-Type: application/json');
 
-// ====================== UPDATE PROFILE ======================
+
 if ($method === 'POST' && $action === 'update_profile') {
     $user_id = $data['user_id'] ?? null;
     $name = $data['name'] ?? '';
@@ -42,14 +42,14 @@ if ($method === 'POST' && $action === 'update_profile') {
     exit();
 }
 
-// ====================== GET ALL USERS ======================
+
 if ($method === 'GET') {
     $stmt = $pdo->query("SELECT id, name, email, role, created_at FROM users");
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
     exit();
 }
 
-// ====================== DELETE USER ======================
+
 if ($method === 'DELETE') {
     parse_str($_SERVER['QUERY_STRING'], $query);
     $id = $query['id'] ?? null;

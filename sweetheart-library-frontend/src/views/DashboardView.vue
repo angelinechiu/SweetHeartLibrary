@@ -2,20 +2,20 @@
   <div class="dashboard-page py-5" style="background-color: #F8F4F0;">
     <div class="container">
 
-      <!-- Welcome Header -->
+      
       <div class="d-flex flex-wrap justify-content-between align-items-center mb-5">
         <div>
           <h1 class="fw-bold mb-1" style="color: #2C2C2C;">Welcome back, {{ userName }} 💕</h1>
           <p class="text-muted mb-0">Your personal library overview</p>
         </div>
-        <!-- Manage All button removed -->
+        
       </div>
 
       <LoadingSpinner :loading="loading" />
 
       <div v-if="!loading">
 
-        <!-- RECENTLY BOOKED ROOMS -->
+        
         <div class="mb-5">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="fw-semibold mb-0" style="color: #2C2C2C;">
@@ -46,7 +46,7 @@
                   </p>
 
                   <div class="d-flex gap-2 mt-3">
-                    <!-- View button removed -->
+                    
                     <button
                       v-if="room.status !== 'completed' && room.status !== 'cancelled'"
                       class="btn btn-sm btn-outline-danger flex-fill"
@@ -60,7 +60,7 @@
           </div>
         </div>
 
-        <!-- BORROWED BOOKS -->
+        
         <div class="mb-5">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="fw-semibold mb-0" style="color: #2C2C2C;">

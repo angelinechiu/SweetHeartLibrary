@@ -23,7 +23,7 @@ try {
 
     if ($method === 'POST') {
         if (!empty($input['id'])) {
-            // UPDATE
+            
             $stmt = $pdo->prepare("
                 UPDATE rooms SET 
                     name = ?, 
@@ -39,7 +39,7 @@ try {
             ]);
             echo json_encode(['success' => true, 'message' => 'Room updated successfully']);
         } else {
-            // CREATE
+            
             $stmt = $pdo->prepare("
                 INSERT INTO rooms (name, capacity, facilities) 
                 VALUES (?, ?, ?)

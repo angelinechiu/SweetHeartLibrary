@@ -1,14 +1,14 @@
--- ============================================
--- SWEETHEART LIBRARY - COMPLETE DATABASE SETUP
--- ============================================
+
+
+
 
 DROP DATABASE IF EXISTS sweetheart_library;
 CREATE DATABASE sweetheart_library;
 USE sweetheart_library;
 
--- ========================
--- USERS TABLE
--- ========================
+
+
+
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -19,9 +19,9 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- ========================
--- BOOKS TABLE
--- ========================
+
+
+
 CREATE TABLE books (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(200) NOT NULL,
@@ -33,9 +33,9 @@ CREATE TABLE books (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- ========================
--- ROOMS TABLE
--- ========================
+
+
+
 CREATE TABLE rooms (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -44,9 +44,9 @@ CREATE TABLE rooms (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- ========================
--- BOOKINGS TABLE (Updated with time range)
--- ========================
+
+
+
 CREATE TABLE bookings (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
@@ -59,9 +59,9 @@ CREATE TABLE bookings (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- ========================
--- EVENTS TABLE
--- ========================
+
+
+
 CREATE TABLE events (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(200) NOT NULL,
@@ -93,23 +93,23 @@ CREATE TABLE password_resets (
     INDEX (token)
 );
 
--- ============================================
--- DUMMY DATA (Lots of sample data)
--- ============================================
--- =============================================
--- DEMO LOGIN CREDENTIALS
--- Password for ALL accounts (Admin + Users): password
--- =============================================
 
--- Admin Login:
--- Email: admin@library.com
--- Password: password
 
--- User Login (Example):
--- Email: angeline@example.com
--- Password: password
 
--- USERS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 INSERT INTO users (name, email, password, role) VALUES
 ('Angeline Hui Lii CHIU', 'angeline@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'user'),
 ('Admin Library', 'admin@library.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin'),
@@ -117,7 +117,7 @@ INSERT INTO users (name, email, password, role) VALUES
 ('Sarah Lim', 'sarah.lim@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'user'),
 ('David Wong', 'david.wong@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'user');
 
--- BOOKS (20 books)
+
 INSERT INTO books (title, author, year, description, cover_image) VALUES
 ('Pride and Prejudice', 'Jane Austen', 1813, 'A classic romance novel about manners and marriage.', 'https://picsum.photos/id/201/400/300'),
 ('The Great Gatsby', 'F. Scott Fitzgerald', 1925, 'A story of wealth, love, and the American Dream.', 'https://picsum.photos/id/237/400/300'),
@@ -135,7 +135,7 @@ INSERT INTO books (title, author, year, description, cover_image) VALUES
 ('The Seven Husbands of Evelyn Hugo', 'Taylor Jenkins Reid', 2017, 'A reclusive Hollywood icon tells her life story.', 'https://picsum.photos/id/1005/400/300'),
 ('Dune', 'Frank Herbert', 1965, 'A science fiction epic about politics and destiny.', 'https://picsum.photos/id/133/400/300');
 
--- ROOMS
+
 INSERT INTO rooms (name, capacity, equipment) VALUES
 ('Rose Room', 4, 'Whiteboard, Projector, HDMI'),
 ('Lily Room', 6, 'TV, Speakers, Whiteboard'),
@@ -143,14 +143,14 @@ INSERT INTO rooms (name, capacity, equipment) VALUES
 ('Jasmine Room', 3, 'Whiteboard, Natural Light'),
 ('Lavender Room', 10, 'TV, Projector, Conference Table');
 
--- EVENTS
+
 INSERT INTO events (title, event_date, event_time, description) VALUES
 ('Book Reading: Pride and Prejudice', '2026-06-15', '14:00:00', 'Join us for a relaxed reading and discussion.'),
 ('Creative Writing Workshop', '2026-06-20', '10:00:00', 'Learn techniques to improve your creative writing.'),
 ('Poetry Night', '2026-06-25', '19:00:00', 'An evening of poetry reading and open mic.'),
 ('Author Talk: Modern Romance', '2026-07-02', '16:00:00', 'Meet local authors and discuss contemporary romance.');
 
--- BOOKINGS (with time range)
+
 INSERT INTO bookings (user_id, booking_date, start_time, end_time, purpose, status) VALUES
 (1, '2026-06-10', '10:00:00', '12:00:00', 'Group study for literature assignment', 'confirmed'),
 (1, '2026-06-12', '14:00:00', '16:00:00', 'Quiet reading session', 'confirmed'),
@@ -159,7 +159,7 @@ INSERT INTO bookings (user_id, booking_date, start_time, end_time, purpose, stat
 (4, '2026-06-13', '10:30:00', '12:30:00', 'Online class preparation', 'confirmed'),
 (5, '2026-06-19', '19:00:00', '21:00:00', 'Group assignment meeting', 'confirmed');
 
--- ==================== BORROWED BOOKS TABLE ====================
+
 CREATE TABLE IF NOT EXISTS `borrowed_books` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `user_id` INT NOT NULL,
@@ -174,7 +174,7 @@ CREATE TABLE IF NOT EXISTS `borrowed_books` (
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- ==================== ROOM BOOKINGS TABLE ====================
+
 CREATE TABLE IF NOT EXISTS `room_bookings` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `user_id` INT NOT NULL,
@@ -187,7 +187,7 @@ CREATE TABLE IF NOT EXISTS `room_bookings` (
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Sample Data
+
 INSERT INTO borrowed_books (user_id, user_name, book_id, book_title, author, borrow_date, status) 
 VALUES 
 (1, 'Ali Ahmad', 5, 'The Great Gatsby', 'F. Scott Fitzgerald', '2026-05-20', 'Overdue'),
@@ -219,11 +219,11 @@ INSERT INTO feedback (name, email, type, message, rating) VALUES
 
 
 
--- =============================================
--- INSERT FRESH DATA FOR ALL TABLES
--- =============================================
 
--- 1. USERS
+
+
+
+
 INSERT INTO users (id, name, email, password, role, created_at) VALUES
 (1, 'Jeff Liew', 'jeff@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'user', NOW()),
 (2, 'Sarah Tan', 'sarah@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'user', NOW()),
@@ -231,7 +231,7 @@ INSERT INTO users (id, name, email, password, role, created_at) VALUES
 (4, 'Michael Wong', 'michael@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'user', NOW()),
 (5, 'Emily Chen', 'emily@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'user', NOW());
 
--- 2. BOOKS (50 Books)
+
 INSERT INTO books (title, author, isbn, category, publication_year, copies, description, availability_status) VALUES
 ('The Silent Patient', 'Alex Michaelides', '978-1250301697', 'Thriller', 2019, 5, 'A woman shoots her husband and then never speaks another word.', 'Available'),
 ('Educated', 'Tara Westover', '978-0399590504', 'Memoir', 2018, 4, 'A woman leaves her survivalist family and earns a PhD from Cambridge University.', 'Available'),
@@ -284,7 +284,7 @@ INSERT INTO books (title, author, isbn, category, publication_year, copies, desc
 ('The Alchemist (Anniversary)', 'Paulo Coelho', '978-0062315007', 'Fiction', 2014, 4, '25th Anniversary Edition.', 'Available'),
 ('Sapiens (Illustrated)', 'Yuval Noah Harari', '978-0062316097', 'History', 2022, 3, 'Illustrated edition.', 'Available');
 
--- 3. BORROWINGS
+
 INSERT INTO borrowings (user_id, book_id, status, due_date, has_penalty) VALUES
 (1, 1, 'borrowed', '2026-06-10', 0),
 (1, 3, 'borrowed', '2026-06-12', 0),
@@ -295,14 +295,14 @@ INSERT INTO borrowings (user_id, book_id, status, due_date, has_penalty) VALUES
 (4, 8, 'returned', '2026-05-28', 0),
 (5, 10, 'borrowed', '2026-06-18', 0);
 
--- 4. BORROWED_BOOKS (if you use this table too)
+
 INSERT INTO borrowed_books (user_id, book_id, status, due_date, has_penalty) VALUES
 (1, 1, 'borrowed', '2026-06-10', 0),
 (1, 3, 'borrowed', '2026-06-12', 0),
 (2, 5, 'borrowed', '2026-06-05', 1),
 (2, 7, 'returned', '2026-05-20', 0);
 
--- 5. ROOMS
+
 INSERT INTO rooms (id, name, capacity, equipment, created_at) VALUES
 (1, 'Study Room A', 4, 'Whiteboard, Projector, WiFi', NOW()),
 (2, 'Study Room B', 6, 'Whiteboard, TV Screen, WiFi', NOW()),
@@ -310,26 +310,26 @@ INSERT INTO rooms (id, name, capacity, equipment, created_at) VALUES
 (4, 'Quiet Study Pod', 2, 'Desk Lamp, Power Outlets', NOW()),
 (5, 'Group Study Room', 10, 'Projector, Whiteboard, WiFi', NOW());
 
--- 6. ROOM_BOOKINGS
+
 INSERT INTO room_bookings (user_id, room_id, booking_date, start_time, end_time, status) VALUES
 (1, 1, '2026-06-07', '10:00:00', '12:00:00', 'confirmed'),
 (2, 2, '2026-06-08', '14:00:00', '16:00:00', 'confirmed'),
 (3, 3, '2026-06-09', '09:00:00', '11:00:00', 'pending'),
 (1, 4, '2026-06-10', '15:00:00', '17:00:00', 'confirmed');
 
--- 7. ANNOUNCEMENTS
+
 INSERT INTO announcements (title, content, created_at) VALUES
 ('Library Extended Hours', 'The library will be open until 10 PM during exam week (10 - 20 June 2026).', NOW()),
 ('New Book Arrival', 'We have added 50 new titles including "Fourth Wing" and "The Covenant of Water".', NOW()),
 ('Maintenance Notice', 'Study Room C will be closed for maintenance on 8 June 2026.', NOW());
 
--- 8. EVENTS
+
 INSERT INTO events (title, description, event_date, location, created_at) VALUES
 ('Book Club: The Silent Patient', 'Monthly book club discussion. All members are welcome!', '2026-06-15', 'Discussion Room 1', NOW()),
 ('Author Talk: Local Writers Series', 'Meet local authors and discuss their latest works.', '2026-06-22', 'Main Hall', NOW()),
 ('Study Skills Workshop', 'Learn effective study techniques for exams.', '2026-06-12', 'Study Room B', NOW());
 
--- 9. FEEDBACK
+
 INSERT INTO feedback (user_id, subject, message, rating, created_at) VALUES
 (1, 'Great Service', 'The new book collection is amazing! Very satisfied.', 5, NOW()),
 (2, 'Room Booking Issue', 'Had trouble booking a room through the app.', 3, NOW()),

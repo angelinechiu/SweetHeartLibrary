@@ -1,11 +1,5 @@
 <?php
-/**
- * Improved feedback.php (Safe version)
- * - Kept all original functionality
- * - Better error handling (no exposing DB errors)
- * - Added proper OPTIONS handling
- * - Added basic validation
- */
+
 
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
@@ -31,7 +25,7 @@ try {
     if ($method === 'POST') {
         $data = json_decode(file_get_contents("php://input"), true) ?? [];
 
-        // Basic validation
+        
         if (empty($data['name']) || empty($data['email']) || empty($data['type']) || empty($data['message'])) {
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'Please fill in all required fields.']);

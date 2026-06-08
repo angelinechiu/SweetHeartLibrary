@@ -6,7 +6,7 @@ header("Access-Control-Allow-Headers: Content-Type, Authorization");
 $host = 'localhost';
 $dbname = 'SHL';
 $username = 'root';
-$password = ''; // Change if you set a password in XAMPP
+$password = ''; 
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);

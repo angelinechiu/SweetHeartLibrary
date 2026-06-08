@@ -48,7 +48,7 @@ const success = ref(false)
 const token = ref('')
 
 onMounted(async () => {
-  await nextTick() // Wait for route to be fully ready
+  await nextTick() 
 
   token.value = route.query.token || ''
   console.log("Token captured from URL:", token.value)

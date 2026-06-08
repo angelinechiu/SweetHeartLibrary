@@ -1,7 +1,7 @@
 <template>
   <div class="homepage">
 
-    <!-- ==================== HERO ==================== -->
+    
     <div class="hero">
       <div class="container text-center">
         <img src="../assets/images/logo.png" alt="Sweetheart Library" class="hero-logo mb-4" />
@@ -17,7 +17,7 @@
       </div>
     </div>
 
-    <!-- ==================== FEATURED BOOKS (Horizontal Scroll) ==================== -->
+    
     <div class="section">
       <div class="container">
         <div class="section-header">
@@ -44,7 +44,7 @@
       </div>
     </div>
 
-    <!-- ==================== POPULAR BOOKS (Horizontal Scroll) ==================== -->
+    
     <div class="section">
       <div class="container">
         <div class="section-header">
@@ -71,7 +71,7 @@
       </div>
     </div>
 
-    <!-- ==================== FEATURED STUDY ROOMS ==================== -->
+    
     <div class="section">
       <div class="container">
         <div class="section-header">
@@ -100,7 +100,7 @@
       </div>
     </div>
 
-    <!-- ==================== WHY SWEETHEART LIBRARY ==================== -->
+    
     <div class="section">
       <div class="container">
         <div class="text-center mb-5">
@@ -134,7 +134,7 @@
       </div>
     </div>
 
-    <!-- ==================== FINAL CTA ==================== -->
+    
     <div class="cta-section">
       <div class="container text-center">
         <h2 class="cta-title">Ready to begin your journey?</h2>
@@ -168,7 +168,7 @@ const fetchBooks = async () => {
     featuredBooks.value = allBooks.filter(book => book.is_featured == 1)
     popularBooks.value = allBooks.filter(book => book.is_popular == 1)
 
-    // Fallback if no books are marked
+    
     if (featuredBooks.value.length === 0 && allBooks.length > 0) {
       featuredBooks.value = allBooks.slice(0, 8)
     }
@@ -202,7 +202,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* ==================== HERO ==================== */
+
 .hero {
   background-color: #2C2C2C;
   color: #F8F4F0;
@@ -227,7 +227,7 @@ onMounted(() => {
   margin: 20px auto 0;
 }
 
-/* ==================== SECTIONS ==================== */
+
 .section {
   padding: 30px 0;
 }
@@ -249,7 +249,7 @@ onMounted(() => {
   font-size: 0.95rem;
 }
 
-/* ==================== HORIZONTAL SCROLL ==================== */
+
 .horizontal-scroll {
   display: flex;
   gap: 20px;
@@ -267,7 +267,7 @@ onMounted(() => {
   border-radius: 10px;
 }
 
-/* ==================== BOOK CARD ==================== */
+
 .book-card {
   min-width: 220px;
   max-width: 220px;
@@ -307,7 +307,7 @@ onMounted(() => {
   margin-bottom: 16px;
 }
 
-/* ==================== ROOM CARDS ==================== */
+
 .room-card-clean {
   background-color: #ffffff;
   border-radius: 16px;
@@ -358,7 +358,7 @@ onMounted(() => {
   text-align: center;
 }
 
-/* ==================== BENEFIT CARDS ==================== */
+
 .benefit-card {
   background-color: #fff;
   border-radius: 16px;
@@ -382,7 +382,7 @@ onMounted(() => {
   margin: 0;
 }
 
-/* ==================== CTA ==================== */
+
 .cta-section {
   background-color: #2C2C2C;
   color: #F8F4F0;
@@ -399,7 +399,7 @@ onMounted(() => {
   margin: 0 auto 24px;
 }
 
-/* ==================== BUTTONS ==================== */
+
 .btn-pink {
   background-color: #E8B4B8;
   color: #2C2C2C;

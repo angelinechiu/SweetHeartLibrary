@@ -1,7 +1,7 @@
 <template>
   <div style="background-color: #F8F4F0;" class="py-5">
     <div class="container">
-      <!-- Header -->
+      
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h2 class="fw-bold mb-1" style="color: #2C2C2C;">Study Room Booking History</h2>
@@ -22,7 +22,7 @@
         >
           <div class="card border-0 shadow-sm h-100">
             <div class="card-body">
-              <!-- Top Badges -->
+              
               <div class="d-flex justify-content-between align-items-start mb-2">
                 <span class="badge bg-info text-white px-3 py-1">Study Room</span>
                 <span class="badge px-3 py-1" :class="getStatusClass(booking.status)">
@@ -30,20 +30,20 @@
                 </span>
               </div>
 
-              <!-- Room Name -->
+              
               <h5 class="fw-semibold mb-1" style="color: #2C2C2C;">
                 {{ booking.room_name || booking.purpose || 'Study Room' }}
               </h5>
 
-              <!-- Date & Time -->
+              
               <p class="text-muted small mb-3">
                 {{ formatDate(booking.booking_date || booking.start_time) }}
                 • {{ formatTime(booking) }}
               </p>
 
-              <!-- Action Buttons -->
+              
               <div class="d-flex gap-2 mt-auto">
-                <!-- View button removed -->
+                
                 <button
                   v-if="canCancel(booking)"
                   class="btn btn-sm btn-outline-danger flex-fill"
@@ -55,7 +55,7 @@
           </div>
         </div>
 
-        <!-- Empty State -->
+        
         <div v-if="roomHistory.length === 0" class="col-12">
           <div class="text-center py-5 bg-white rounded-3 shadow-sm">
             <i class="bi bi-calendar-x fs-1 text-muted d-block mb-2"></i>

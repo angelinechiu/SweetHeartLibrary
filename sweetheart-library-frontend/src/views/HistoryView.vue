@@ -1,7 +1,7 @@
 <template>
   <div style="background-color: #F8F4F0;" class="py-5">
     <div class="container">
-      <!-- Header -->
+      
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h2 class="fw-bold mb-1" style="color: #2C2C2C;">Borrowing History</h2>
@@ -15,7 +15,7 @@
       <LoadingSpinner :loading="loading" />
 
       <div v-if="!loading" class="row g-3">
-        <!-- Overdue Section -->
+        
         <div v-if="overdueBooks.length > 0" class="col-12 mb-2">
           <h5 class="text-danger fw-bold mb-3">
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
@@ -33,7 +33,7 @@
             :class="{ 'border-danger border-2': isOverdue(book) }"
           >
             <div class="card-body">
-              <!-- Badges -->
+              
               <div class="d-flex justify-content-between align-items-start mb-2">
                 <span class="badge bg-pink text-dark px-3 py-1">Book</span>
                 <span class="badge px-3 py-1" :class="getStatusClass(book.status)">
@@ -41,13 +41,13 @@
                 </span>
               </div>
 
-              <!-- Title -->
+              
               <h5 class="fw-semibold mb-1" style="color: #2C2C2C;">
                 {{ book.book_title || book.title }}
               </h5>
               <p class="text-muted small mb-2">{{ book.author }}</p>
 
-              <!-- Dates -->
+              
               <div class="small mb-3">
                 <div><strong>Borrowed:</strong> {{ book.borrow_date || book.borrowed_date }}</div>
                 <div><strong>Due:</strong> {{ formatDate(book.due_date) }}</div>
@@ -58,11 +58,11 @@
                 </div>
               </div>
 
-              <!-- Buttons: View + Renew (only for overdue) -->
+              
               <div class="d-flex gap-2 mt-auto">
                 <button class="btn btn-sm btn-outline-secondary flex-fill">View</button>
 
-                <!-- Only Overdue books can Renew -->
+                
                 <button
                   v-if="canRenew(book)"
                   class="btn btn-sm btn-danger flex-fill"
@@ -74,7 +74,7 @@
           </div>
         </div>
 
-        <!-- Empty State -->
+        
         <div v-if="borrowedHistory.length === 0" class="col-12">
           <div class="text-center py-5 bg-white rounded-3 shadow-sm">
             <i class="bi bi-journal-x fs-1 text-muted d-block mb-2"></i>
@@ -140,7 +140,7 @@ const calculateOverdueDays = (dueDate) => {
   return Math.ceil((today - due) / (1000 * 60 * 60 * 24))
 }
 
-// Only overdue books can renew
+
 const canRenew = (book) => {
   return isOverdue(book) || book.status === 'Overdue'
 }

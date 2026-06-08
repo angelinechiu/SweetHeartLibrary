@@ -1,7 +1,7 @@
 <template>
   <div style="background-color: #F8F4F0; min-height: 70vh;" class="py-4">
     <div class="container">
-      <!-- Header -->
+      
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h2 class="fw-bold mb-1" style="color: #2C2C2C;">Announcements</h2>
@@ -17,19 +17,19 @@
         </router-link>
       </div>
 
-      <!-- Loading -->
+      
       <div v-if="loading" class="text-center py-5">
         <div class="spinner-border text-secondary"></div>
         <p class="mt-3 text-muted">Loading announcements...</p>
       </div>
 
-      <!-- Empty State -->
+      
       <div v-else-if="announcements.length === 0" class="text-center py-5">
         <i class="bi bi-megaphone fs-1 text-muted"></i>
         <h5 class="mt-3 text-muted">No announcements right now</h5>
       </div>
 
-      <!-- Announcements -->
+      
       <div v-else class="row g-4">
         <div
           v-for="announcement in announcements"
@@ -38,7 +38,7 @@
         >
           <div class="card h-100 border-0 shadow-sm hover-card">
             <div class="card-body d-flex flex-column">
-              <!-- Personal Reminder Badge -->
+              
               <div v-if="announcement.user_id" class="mb-2">
                 <span class="badge bg-info text-white">
                   <i class="bi bi-person-fill me-1"></i> Personal Reminder
@@ -86,7 +86,7 @@ const loadAnnouncements = async () => {
   try {
     const userId = authStore.user?.id
 
-    // Use new endpoint that supports personal reminders
+    
     let url = '/announcements.php?action=get_visible'
     if (userId) {
       url += `&user_id=${userId}`

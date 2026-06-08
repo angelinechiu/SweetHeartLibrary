@@ -8,12 +8,12 @@
               <h2 class="text-center fw-bold mb-2" style="color: #2C2C2C;">Forgot Password?</h2>
               <p class="text-center text-muted mb-4">Enter your email to receive a password reset link.</p>
 
-              <!-- Result Message -->
+              
               <div v-if="message" :class="['alert', isSuccess ? 'alert-success' : 'alert-danger']">
                 {{ message }}
               </div>
 
-              <!-- Testing Reset Link -->
+              
               <div v-if="resetLink" class="alert alert-info text-center">
                 <p class="mb-2"><strong>Development Mode</strong></p>
                 <a :href="resetLink" target="_blank" class="btn btn-success">
@@ -22,7 +22,7 @@
                 <p class="small mt-2 mb-0">Link expires in 1 hour</p>
               </div>
 
-              <!-- Form -->
+              
               <form v-if="!message || !isSuccess" @submit.prevent="handleForgotPassword">
                 <div class="mb-4">
                   <input
@@ -75,7 +75,7 @@ const handleForgotPassword = async () => {
       email: email.value
     })
 
-    console.log('Backend response:', res.data) // For debugging
+    console.log('Backend response:', res.data) 
 
     if (res.data.success) {
       isSuccess.value = true
@@ -94,7 +94,7 @@ const handleForgotPassword = async () => {
     isSuccess.value = false
 
     if (error.response) {
-      // Backend returned error response
+      
       message.value = error.response.data?.message || 'Server error occurred.'
     } else if (error.request) {
       message.value = 'Cannot connect to server. Is the backend running?'

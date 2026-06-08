@@ -8,14 +8,14 @@
               <h2 class="text-center fw-bold mb-4" style="color: #2C2C2C;">Welcome Back</h2>
 
               <form @submit.prevent="handleLogin">
-                <!-- Email & Password fields (same as before) -->
+                
                 <div class="mb-3">
                   <input v-model="form.email" type="email" class="form-control form-control-lg" placeholder="Email" required>
                 </div>
                 <div class="mb-4">
                   <input v-model="form.password" type="password" class="form-control form-control-lg" placeholder="Password" required>
                 </div>
-                <!-- Add this inside the form in RegisterView.vue -->
+                
                 <div class="mb-3 text-end">
                   <router-link to="/forgot-password" style="color: #E8B4B8; font-size: 0.9rem; text-decoration: none;">
                     Forgot your password?
@@ -27,7 +27,7 @@
                 </button>
               </form>
 
-              <!-- Link to Register -->
+              
               <p class="text-center mt-4">
                 Don't have an account?
                 <router-link to="/register" style="color: #E8B4B8; font-weight: 600;">Create one here</router-link>

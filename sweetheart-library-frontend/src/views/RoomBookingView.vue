@@ -2,7 +2,7 @@
   <div style="background-color: #F8F4F0;" class="py-5">
     <div class="container">
 
-      <!-- Header -->
+      
       <div class="text-center mb-4">
         <h2 class="fw-bold" style="color: #2C2C2C;">Sweetheart Library Map</h2>
         <p class="text-muted">Level 2 & Level 3 • Study Rooms • <strong>8:00 AM – 10:00 PM</strong></p>
@@ -11,11 +11,11 @@
         </div>
       </div>
 
-      <!-- Library Map -->
+      
       <div class="card border-0 shadow-sm p-4 mb-5" style="background-color: #fff;">
         <div class="row">
 
-          <!-- Level 2 -->
+          
           <div class="col-md-6 mb-4">
             <h5 class="fw-semibold mb-3 text-center">Level 2</h5>
             <div class="border rounded-3 p-3" style="background-color: #fdfaf5;">
@@ -48,7 +48,7 @@
             </div>
           </div>
 
-          <!-- Level 3 -->
+          
           <div class="col-md-6 mb-4">
             <h5 class="fw-semibold mb-3 text-center">Level 3 (Quiet Zone)</h5>
             <div class="border rounded-3 p-3" style="background-color: #fdfaf5;">
@@ -79,7 +79,7 @@
         </div>
       </div>
 
-      <!-- Available Rooms -->
+      
       <h5 class="fw-semibold mb-3">Available Rooms</h5>
 
       <div v-if="loading" class="text-center py-5">
@@ -95,18 +95,18 @@
         >
           <div class="card border-0 shadow-sm h-100" :class="{ 'border-warning border-2': room.recommended }">
             <div class="card-body">
-              <!-- Header -->
+              
               <div class="d-flex justify-content-between align-items-start mb-2">
                 <span class="badge bg-info text-white px-3 py-1">{{ room.capacity }} seats</span>
                 <span v-if="room.recommended" class="badge bg-warning text-dark px-3 py-1">Recommended</span>
                 <span class="badge bg-success text-white">Available</span>
               </div>
 
-              <!-- Room Info -->
+              
               <h5 class="fw-semibold mb-1">{{ room.name }}</h5>
               <p class="text-muted small mb-2">{{ room.location }}</p>
 
-              <!-- Facilities -->
+              
               <div class="mb-3">
                 <strong class="small d-block mb-1">Facilities:</strong>
                 <div class="d-flex flex-wrap gap-1">
@@ -120,7 +120,7 @@
                 </div>
               </div>
 
-              <!-- Book Button -->
+              
               <button class="btn btn-pink w-100" @click="selectRoom(room)">
                 Book This Room
               </button>
@@ -128,7 +128,7 @@
           </div>
         </div>
 
-        <!-- Empty State -->
+        
         <div v-if="availableRooms.length === 0 && !loading" class="col-12">
           <div class="text-center py-5 bg-white rounded-3 shadow-sm">
             <i class="bi bi-door-closed fs-1 text-muted d-block mb-2"></i>
@@ -150,7 +150,7 @@ const router = useRouter()
 const allRooms = ref([])
 const loading = ref(true)
 
-// Fetch rooms from database
+
 const fetchRooms = async () => {
   loading.value = true
   try {
@@ -164,14 +164,14 @@ const fetchRooms = async () => {
   }
 }
 
-// Get facilities as array (handles both string and array)
+
 const getFacilities = (room) => {
   if (!room.facilities) return []
   if (Array.isArray(room.facilities)) return room.facilities
   return room.facilities.split(',')
 }
 
-// Only show available rooms
+
 const availableRooms = computed(() => {
   return allRooms.value.filter(room => {
     if (room.available === undefined || room.available === null) return true
