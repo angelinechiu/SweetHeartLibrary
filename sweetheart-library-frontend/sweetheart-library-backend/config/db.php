@@ -2,7 +2,7 @@
 // ==================== CORS ====================
 $allowedOrigins = [
     'http://localhost:5173',                    // Local development
-    'https://your-project-name.vercel.app',     // ← CHANGE THIS LATER to your Vercel URL
+    'https://sweet-heart-library.vercel.app/',     // ← CHANGE THIS LATER to your Vercel URL
 ];
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
